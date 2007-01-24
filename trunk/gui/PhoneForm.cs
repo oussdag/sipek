@@ -30,7 +30,8 @@ namespace Gui
     protected CComponentController control;
     private int _caretPos = -1;
     private int _selection = -1;
-    
+    private System.Collections.Generic.List<Button> _buttons;
+
     // languages
     public static CLanguage _langEN = new CEnLanguage();
     public static CDeLanguage _langDE = new CDeLanguage();
@@ -45,6 +46,7 @@ namespace Gui
       ///////////////////////////////////////////////////////////////
       string str = new string(' ', 255);
       richTextBox1.Lines = new string[] { str, str, str, str, str, str, str, str, str, str };
+      _buttons = new System.Collections.Generic.List<Button>();
 
       control = CComponentController.getInstance();
 
@@ -100,6 +102,38 @@ namespace Gui
     {
       _selection = startX + startY * 256;
       richTextBox1.Select(_selection, length);
+    }
+
+    public void drawButton(int x, int y)
+    {
+      Button menuButton = new Button();
+      menuButton.Location = new System.Drawing.Point(x * 13, 14 + y * 22);
+      menuButton.Size = new System.Drawing.Size(41, 23);
+      menuButton.Click += new EventHandler(menuButton_Click);
+      //menuButton.BackColor = System.Drawing.Color.Transparent;
+      _buttons.Add(menuButton);
+      this.Controls.Add(menuButton);
+
+      //richTextBox1.SendToBack();
+      //menuButton.BringToFront();
+    }
+
+    void menuButton_Click(object sender, EventArgs e)
+    {
+      Button origin = (Button)sender;
+      int orgy = origin.Location.Y;
+      int y = (orgy - 14) / 22;
+
+      control.getAccessIf().onSoftKey(y);
+    }
+
+    public void eraseButton()
+    {
+      foreach (Button btn in _buttons)
+      {
+        this.Controls.Remove(btn);
+      }
+      _buttons.Clear();
     }
 
     private void digitKey1_Click(object sender, EventArgs e)
@@ -176,5 +210,11 @@ namespace Gui
     {
       control.getAccessIf().onOffHookKey();
     }
+
+    private void Cancel_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onEscKey();
+    }
+
   }
 }

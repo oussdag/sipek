@@ -115,7 +115,7 @@ namespace Gui
   {
 
     private int maxLines = 10;
-    private int maxColumns = 24;
+    private int maxColumns = 25;
 
     protected PhoneForm mform;
 
@@ -172,6 +172,7 @@ namespace Gui
     {
       int xaxis = 0;
       if (justify == EAlignment.justify_right) xaxis = maxColumns - caption.Length;
+      if (justify == EAlignment.justify_center) xaxis = (maxColumns - caption.Length) / 2;
       //this.mform.eraseText(xaxis, positionId, caption);
       this.mform.writeText(xaxis, positionId, new string(' ', caption.Length));
     }
@@ -184,7 +185,7 @@ namespace Gui
     public void eraseEdit(int positionId, string prompt, string caption, int cursor_position)
     {
       eraseText(positionId, prompt + caption, EAlignment.justify_left);
-      eraseText(19, 0, "   ");
+      eraseText(maxColumns - 3, 0, "   ");
     }
 
     public void drawCheckMark(int posX, int posY, bool checkedFlag)
@@ -214,11 +215,24 @@ namespace Gui
       this.mform.clearScreen();
     }
 
-    public void drawLink(int posX, int posY)
+    public void drawLink(int positionId, string caption, EAlignment justify)
     {
+      //string temp = "<a href=\"index\">" + caption + "</a>";
+      this.drawText(positionId, caption, justify);
+      int x = 0;
+      if (justify == EAlignment.justify_right)
+        x = maxColumns ;
+      else if (justify == EAlignment.justify_center)
+        x = (maxColumns) / 2;
+
+      mform.drawButton(x, positionId);
     }
-    public void eraseLink(int posX, int posY)
+
+    public void eraseLink(int positionId, string caption, EAlignment justify)
     {
+      //string temp = "<a href=\"index\">" + caption + "</a>";
+      this.eraseText(positionId, caption, justify);
+      mform.eraseButton();
     }
 
     public void drawScroller(int positionId, int scrollposition, int scrollSize)
