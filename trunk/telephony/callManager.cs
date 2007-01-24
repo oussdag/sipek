@@ -18,6 +18,7 @@
 
 
 using System.Collections.Generic;
+using MenuDesigner;
 
 
 namespace Telephony
@@ -51,6 +52,7 @@ namespace Telephony
 
     private CCallManager()
     {
+      _calls = new Dictionary<int, CStateMachine>();
     }
     #endregion Constructor
 
@@ -61,7 +63,22 @@ namespace Telephony
     public void updateGui()
     {
       // get current session
-
+      CStateMachine call = getCall(_currentSession);
+      switch (call.getStateId())
+      {
+        case CAbstractState.EStateId.IDLE:
+          CComponentController.getInstance().showPage((int)2);
+          break;
+        case CAbstractState.EStateId.CALLING:
+          CComponentController.getInstance().showPage((int)ECallPages.P_CONNECTING);
+          break;
+        case CAbstractState.EStateId.ACTIVE:
+          CComponentController.getInstance().showPage((int)ECallPages.P_ACTIVE);
+          break;
+        case CAbstractState.EStateId.RELEASED:
+          CComponentController.getInstance().showPage((int)ECallPages.P_RELEASED);
+          break;
+      }
     }
 
     public void createSession(string number)
@@ -74,6 +91,7 @@ namespace Telephony
     {
       CStateMachine call = getCall(_currentSession);
       call.getState().endCall();
+      _calls.Remove(_currentSession);
     }
 
 
