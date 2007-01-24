@@ -25,7 +25,10 @@ namespace Telephony
     P_DIALING = 100,
     P_CALLING,
     P_CONNECTING,
-    P_RINGING
+    P_RINGING,
+    P_ACTIVE,
+    P_RELEASED,
+    P_INCOMING
   }
 
   public abstract class CTelephonyPage : CPage
@@ -41,7 +44,7 @@ namespace Telephony
 	  {
       setText(pageName);
 
-	    CText title = new CText(mPageName);
+	    CText title = new CText(pageName);
 	    title.PosY = 0;
 	    add(title);
 
@@ -67,7 +70,7 @@ namespace Telephony
 	    this.add(_sessions);
 
 	    // sessions link
-	    CLink sesLink = new CLink("");
+	    CLink sesLink = new CLink("0/0");
       sesLink.Align = EAlignment.justify_right;
       sesLink.Softkey += new UintDelegate(sessionHandler);
 	    sesLink.PosY = 0;
@@ -112,8 +115,7 @@ namespace Telephony
 
     bool endCallHandler(int id) 
     {
-      CCallManager.getInstance().destroySession();
-      return true; 
+      return onhookHandler(); 
     }
 
     bool menuHandler() 
@@ -122,7 +124,8 @@ namespace Telephony
     }
 
     bool onhookHandler() 
-    { 
+    {
+      CCallManager.getInstance().destroySession();
       return true; 
     }
 
@@ -178,13 +181,14 @@ namespace Telephony
     }
 
 
-	  string mPageName;
+	  //string mPageName;
 	  // current call
   //	UIStateMachine* currentCall;
   //	UICanvasHandler* muiHandler;
   }
 
-
+  /////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////
   /// <summary>
   /// 
   /// </summary>
@@ -209,7 +213,31 @@ namespace Telephony
 
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CReleasedPage : CTelephonyPage
+  {
+    public CReleasedPage()
+      : base((int)ECallPages.P_RELEASED, "Released...")
+    {
+    }
 
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CActivePage : CTelephonyPage
+  {
+    public CActivePage()
+      : base((int)ECallPages.P_ACTIVE, "Connected...")
+    {
+    }
+
+  }
+
+    
 
 
 } // namespace Telephony

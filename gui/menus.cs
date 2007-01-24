@@ -66,25 +66,38 @@ namespace Gui
   /// </summary>
   public class IdlePage : CPage
   {
+    CText _timedate;
+
     public IdlePage()
       : base((int)EPages.P_IDLE)
     {
+      _timedate = new CText("");
+      _timedate.PosY = 0;
+      _timedate.Caption = System.DateTime.Now.ToShortDateString() + " " + System.DateTime.Now.ToShortTimeString();
+      CTimeoutDecorator timeDecor = new CTimeoutDecorator(_timedate, 1000, true);
+      timeDecor.OnTimeout += new NoParamDelegate(timeDateHandler);
+      this.add(timeDecor);
+
+      CText title = new CText("SIPek", EAlignment.justify_center);
+      title.PosY = 3;
+      add(title);
+
       CLink mlinkPhonebook = new CLink("Phonebook", 0);
-      mlinkPhonebook.PosY = 5;
+      mlinkPhonebook.PosY = 8;
       this.add(mlinkPhonebook);
 
       CLink mlinkRinger = new CLink("Ringer", 0);
       mlinkRinger.Align = EAlignment.justify_right;
-      mlinkRinger.PosY = 4;
+      mlinkRinger.PosY = 7;
       this.add(mlinkRinger);
 
       CLink mlinkCalls = new CLink("Calls", 0);
       mlinkCalls.Align = EAlignment.justify_right;
-      mlinkCalls.PosY = 6;
+      mlinkCalls.PosY = 9;
       this.add(mlinkCalls);
 
       CLink mlinkLines = new CLink("Lines", 0);
-      mlinkLines.PosY = 3;
+      mlinkLines.PosY = 6;
       this.add(mlinkLines);
 
       Digitkey += new UintDelegate(digitkeyHandler);
@@ -98,6 +111,25 @@ namespace Gui
       _controller.showPage((int)EPages.P_PREDIALING);
       return true;
     }
+
+    private bool timeDateHandler()
+    {
+      string seperator;
+
+      if (_flip)
+        seperator = ":";
+      else
+        seperator = " ";
+
+      _flip = !_flip;
+
+      _timedate.Caption = System.DateTime.Now.ToShortDateString() + " " + System.DateTime.Now.ToShortTimeString();
+      _timedate.Caption = _timedate.Caption.Remove(_timedate.Caption.Length - 3, 1);
+      _timedate.Caption = _timedate.Caption.Insert(_timedate.Caption.Length - 2, seperator);
+      return true;
+    }
+
+    private bool _flip = false;
 
   }
 
@@ -136,6 +168,8 @@ namespace Gui
       //this->OnOkKeyFPtr = &this->okHandlerFctr;
       //this->OnOffhookKeyFPtr = &this->okHandlerFctr;
       //this->OnSpeakerKeyFPtr = &this->okHandlerFctr;
+
+      this.Ok += new NoParamDelegate(okHandler);
     }
 
     void setPhonebookHandler()

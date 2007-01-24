@@ -47,6 +47,7 @@
     <Compile Include="PhoneForm.Designer.cs">
       <DependentUpon>PhoneForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="platform.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="PhoneForm.resx">

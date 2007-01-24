@@ -151,6 +151,33 @@ namespace Telephony
 
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CCallingState : CAbstractState
+  {
+    public CCallingState(CStateMachine sm) 
+      : base(sm)
+    {
+      StateId = EStateId.CALLING;
+    }
+
+    public override void onEntry()
+    {
+    }
+
+    public override void onExit()
+    {
+    }
+
+    public override bool endCall()
+    {
+      _smref.changeState(EStateId.IDLE);
+      return true;
+    }
+
+  }
+
 
   /// <summary>
   /// CActiveState

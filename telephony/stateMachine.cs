@@ -30,6 +30,11 @@ namespace Telephony
 
     private CAbstractState _state;
 
+    private CIdleState _stateIdle;
+    private CCallingState _stateCalling;
+    private CActiveState _stateActive;
+    private CReleasedState _stateReleased;
+
     private CSipProxy _sigproxy;
 
     #endregion Variables
@@ -47,6 +52,13 @@ namespace Telephony
     public CStateMachine(CSipProxy proxy)
     {
       _sigproxy = proxy;
+
+      _stateIdle = new CIdleState(this);
+      _stateActive = new CActiveState(this);
+      _stateCalling = new CCallingState(this);
+      _stateReleased = new CReleasedState(this);
+
+      _state = _stateIdle;
     }
 
     #endregion Constructor
@@ -59,6 +71,11 @@ namespace Telephony
       return _state;
     }
 
+    public CAbstractState.EStateId getStateId()
+    {
+      return _state.StateId;
+    }
+
     public void changeState(CAbstractState state)
     {
       _state = state;
@@ -67,7 +84,14 @@ namespace Telephony
 
     public void changeState(CAbstractState.EStateId stateId)
     {
-      //_state = state;
+      switch (stateId) 
+      {
+        case CAbstractState.EStateId.IDLE: _state = _stateIdle; break;
+        case CAbstractState.EStateId.ACTIVE: _state = _stateActive; break;
+        case CAbstractState.EStateId.CALLING: _state = _stateCalling; break;
+        case CAbstractState.EStateId.RELEASED: _state = _stateReleased; break;
+      }
+      CCallManager.getInstance().updateGui();
     }
 
 
