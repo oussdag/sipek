@@ -95,14 +95,6 @@ namespace Telephony
     }
 
 
-    public void onUserOffhook()
-    { 
-    }
-
-    public void onUserOnhook()
-    {
-    }
-
     public void onUserRelease()
     {
     }

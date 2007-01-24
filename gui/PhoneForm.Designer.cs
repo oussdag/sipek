@@ -45,12 +45,7 @@ namespace Gui
       this.onhookButton = new System.Windows.Forms.Button();
       this.offhookButton = new System.Windows.Forms.Button();
       this.OKbutton = new System.Windows.Forms.Button();
-      this.menuButton1 = new System.Windows.Forms.Button();
-      this.menuButton2 = new System.Windows.Forms.Button();
-      this.menuButton3 = new System.Windows.Forms.Button();
-      this.menuButton4 = new System.Windows.Forms.Button();
-      this.menuButton5 = new System.Windows.Forms.Button();
-      this.menuButton6 = new System.Windows.Forms.Button();
+      this.Cancel = new System.Windows.Forms.Button();
       this.panel2.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -59,11 +54,14 @@ namespace Gui
       this.richTextBox1.BackColor = System.Drawing.Color.Navy;
       this.richTextBox1.Font = new System.Drawing.Font("Courier New", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
       this.richTextBox1.ForeColor = System.Drawing.Color.White;
-      this.richTextBox1.Location = new System.Drawing.Point(43, 12);
+      this.richTextBox1.HideSelection = false;
+      this.richTextBox1.Location = new System.Drawing.Point(42, 12);
       this.richTextBox1.Name = "richTextBox1";
-      this.richTextBox1.Size = new System.Drawing.Size(281, 259);
+      this.richTextBox1.ReadOnly = true;
+      this.richTextBox1.Size = new System.Drawing.Size(284, 235);
       this.richTextBox1.TabIndex = 0;
       this.richTextBox1.Text = "";
+      this.richTextBox1.WordWrap = false;
       // 
       // panel2
       // 
@@ -79,13 +77,14 @@ namespace Gui
       this.panel2.Controls.Add(this.digitKey3);
       this.panel2.Controls.Add(this.digitKey2);
       this.panel2.Controls.Add(this.digitKey1);
-      this.panel2.Location = new System.Drawing.Point(93, 366);
+      this.panel2.Location = new System.Drawing.Point(97, 363);
       this.panel2.Name = "panel2";
       this.panel2.Size = new System.Drawing.Size(178, 167);
       this.panel2.TabIndex = 18;
       // 
       // digitKeyH
       // 
+      this.digitKeyH.DialogResult = System.Windows.Forms.DialogResult.Cancel;
       this.digitKeyH.Location = new System.Drawing.Point(120, 126);
       this.digitKeyH.Name = "digitKeyH";
       this.digitKeyH.Size = new System.Drawing.Size(40, 38);
@@ -206,101 +205,62 @@ namespace Gui
       // 
       // onhookButton
       // 
-      this.onhookButton.Location = new System.Drawing.Point(43, 280);
+      this.onhookButton.BackColor = System.Drawing.Color.OrangeRed;
+      this.onhookButton.Location = new System.Drawing.Point(263, 288);
       this.onhookButton.Name = "onhookButton";
-      this.onhookButton.Size = new System.Drawing.Size(35, 82);
+      this.onhookButton.Size = new System.Drawing.Size(48, 50);
       this.onhookButton.TabIndex = 19;
       this.onhookButton.Text = "DOWN";
-      this.onhookButton.UseVisualStyleBackColor = true;
+      this.onhookButton.UseVisualStyleBackColor = false;
       this.onhookButton.Click += new System.EventHandler(this.onhookButton_Click);
       // 
       // offhookButton
       // 
-      this.offhookButton.Location = new System.Drawing.Point(289, 277);
+      this.offhookButton.BackColor = System.Drawing.Color.DarkSeaGreen;
+      this.offhookButton.Location = new System.Drawing.Point(52, 288);
       this.offhookButton.Name = "offhookButton";
-      this.offhookButton.Size = new System.Drawing.Size(35, 82);
+      this.offhookButton.Size = new System.Drawing.Size(46, 50);
       this.offhookButton.TabIndex = 20;
       this.offhookButton.Text = "UP";
-      this.offhookButton.UseVisualStyleBackColor = true;
+      this.offhookButton.UseVisualStyleBackColor = false;
       this.offhookButton.Click += new System.EventHandler(this.offhookButton_Click);
       // 
       // OKbutton
       // 
-      this.OKbutton.Location = new System.Drawing.Point(157, 307);
+      this.OKbutton.Location = new System.Drawing.Point(164, 277);
       this.OKbutton.Name = "OKbutton";
-      this.OKbutton.Size = new System.Drawing.Size(41, 23);
+      this.OKbutton.Size = new System.Drawing.Size(41, 32);
       this.OKbutton.TabIndex = 21;
       this.OKbutton.Text = "OK";
       this.OKbutton.UseVisualStyleBackColor = true;
       this.OKbutton.Click += new System.EventHandler(this.OKbutton_Click);
       // 
-      // menuButton1
+      // Cancel
       // 
-      this.menuButton1.Location = new System.Drawing.Point(13, 124);
-      this.menuButton1.Name = "menuButton1";
-      this.menuButton1.Size = new System.Drawing.Size(24, 30);
-      this.menuButton1.TabIndex = 22;
-      this.menuButton1.UseVisualStyleBackColor = true;
-      // 
-      // menuButton2
-      // 
-      this.menuButton2.Location = new System.Drawing.Point(13, 171);
-      this.menuButton2.Name = "menuButton2";
-      this.menuButton2.Size = new System.Drawing.Size(24, 30);
-      this.menuButton2.TabIndex = 23;
-      this.menuButton2.UseVisualStyleBackColor = true;
-      // 
-      // menuButton3
-      // 
-      this.menuButton3.Location = new System.Drawing.Point(12, 219);
-      this.menuButton3.Name = "menuButton3";
-      this.menuButton3.Size = new System.Drawing.Size(24, 30);
-      this.menuButton3.TabIndex = 24;
-      this.menuButton3.UseVisualStyleBackColor = true;
-      // 
-      // menuButton4
-      // 
-      this.menuButton4.Location = new System.Drawing.Point(331, 124);
-      this.menuButton4.Name = "menuButton4";
-      this.menuButton4.Size = new System.Drawing.Size(24, 30);
-      this.menuButton4.TabIndex = 25;
-      this.menuButton4.UseVisualStyleBackColor = true;
-      // 
-      // menuButton5
-      // 
-      this.menuButton5.Location = new System.Drawing.Point(331, 171);
-      this.menuButton5.Name = "menuButton5";
-      this.menuButton5.Size = new System.Drawing.Size(24, 30);
-      this.menuButton5.TabIndex = 26;
-      this.menuButton5.UseVisualStyleBackColor = true;
-      // 
-      // menuButton6
-      // 
-      this.menuButton6.Location = new System.Drawing.Point(330, 219);
-      this.menuButton6.Name = "menuButton6";
-      this.menuButton6.Size = new System.Drawing.Size(24, 30);
-      this.menuButton6.TabIndex = 27;
-      this.menuButton6.UseVisualStyleBackColor = true;
+      this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.Cancel.Location = new System.Drawing.Point(153, 324);
+      this.Cancel.Name = "Cancel";
+      this.Cancel.Size = new System.Drawing.Size(64, 23);
+      this.Cancel.TabIndex = 22;
+      this.Cancel.Text = "Esc";
+      this.Cancel.UseVisualStyleBackColor = true;
+      this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
       // 
       // PhoneForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.WhiteSmoke;
+      this.CancelButton = this.Cancel;
       this.ClientSize = new System.Drawing.Size(367, 542);
-      this.Controls.Add(this.menuButton6);
-      this.Controls.Add(this.menuButton5);
-      this.Controls.Add(this.menuButton4);
-      this.Controls.Add(this.menuButton3);
-      this.Controls.Add(this.menuButton2);
-      this.Controls.Add(this.menuButton1);
+      this.Controls.Add(this.Cancel);
       this.Controls.Add(this.OKbutton);
       this.Controls.Add(this.offhookButton);
       this.Controls.Add(this.onhookButton);
       this.Controls.Add(this.panel2);
       this.Controls.Add(this.richTextBox1);
       this.Name = "PhoneForm";
-      this.Text = "Sipek Phone";
+      this.Text = "SIPek Phone";
       this.panel2.ResumeLayout(false);
       this.ResumeLayout(false);
 
@@ -325,12 +285,7 @@ namespace Gui
     private System.Windows.Forms.Button onhookButton;
     private System.Windows.Forms.Button offhookButton;
     private System.Windows.Forms.Button OKbutton;
-    private System.Windows.Forms.Button menuButton1;
-    private System.Windows.Forms.Button menuButton2;
-    private System.Windows.Forms.Button menuButton3;
-    private System.Windows.Forms.Button menuButton4;
-    private System.Windows.Forms.Button menuButton5;
-    private System.Windows.Forms.Button menuButton6;
+    private System.Windows.Forms.Button Cancel;
   }
 }
 
