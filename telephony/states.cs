@@ -125,8 +125,8 @@ namespace Telephony
 
     public override bool makeCall(string dialedNo)
     {
+      _smref.DialedNo = dialedNo; 
       _smref.changeState(EStateId.CALLING);
-
       return _smref.SigProxy.makeCall(dialedNo);
     }
 
@@ -140,13 +140,10 @@ namespace Telephony
 
     public override void incomingCall(string callingNo)
     {
-
-      _smref.updateGui();
-
       _smref.SigProxy.alerted();
-
+      _smref.CallingNo = callingNo;
+      _smref.Incoming = true;
       _smref.changeState(EStateId.INCOMING);
-
     }
 
   }
@@ -173,7 +170,7 @@ namespace Telephony
     public override bool endCall()
     {
       _smref.changeState(EStateId.IDLE);
-      return true;
+      return _smref.SigProxy.endCall();
     }
 
   }
@@ -197,8 +194,6 @@ namespace Telephony
     public override void onExit()
     {
     }
-
-
 
   }
 

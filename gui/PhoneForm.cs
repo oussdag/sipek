@@ -36,7 +36,9 @@ namespace Gui
     public static CLanguage _langEN = new CEnLanguage();
     public static CDeLanguage _langDE = new CDeLanguage();
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public PhoneForm()
     {
       InitializeComponent();
@@ -57,21 +59,19 @@ namespace Gui
       control.setTimerFactory(tmrFactory);
       control.Language = _langEN;
 
-
-      new EntryPage();
+      // Create menu pages...
+      new CInitPage();
       new IdlePage();
       new CPreDialPage();
+      new CPhonebookPage();
       
-      new CConnectingPage();
-      new CRingingPage();
-      new CReleasedPage();
-      new CActivePage();
-
       control.initialize();
 
+      // set active page...
+      control.setActivePage((int)EPages.P_INIT);
 
-      control.setActivePage((int)EPages.P_ENTRY);
-
+      // initialize telephony...
+      CCallManager.getInstance().initialize();
     }
 
     public void clearScreen()
@@ -110,7 +110,7 @@ namespace Gui
       menuButton.Location = new System.Drawing.Point(x * 13, 14 + y * 22);
       menuButton.Size = new System.Drawing.Size(41, 23);
       menuButton.Click += new EventHandler(menuButton_Click);
-      //menuButton.BackColor = System.Drawing.Color.Transparent;
+      menuButton.BackColor = System.Drawing.Color.DarkGray;
       _buttons.Add(menuButton);
       this.Controls.Add(menuButton);
 

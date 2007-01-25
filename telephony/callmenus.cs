@@ -39,8 +39,8 @@ namespace Telephony
 	  protected CText _sessions;
   	
 
-    public CTelephonyPage(int pageId, string pageName) 
-      : base(pageId, false,true)
+    public CTelephonyPage(ECallPages pageId, string pageName) 
+      : base((int)pageId, false,true)
 	  {
       setText(pageName);
 
@@ -51,23 +51,19 @@ namespace Telephony
 	    CLink end_call = new CLink("End Call");
       end_call.Align = EAlignment.justify_right;
       end_call.Softkey += new UintDelegate(endCallHandler);
-	    end_call.PosY = 6;
+	    end_call.PosY = 9;
+      end_call.LinkKey = end_call.PosY;
 	    this.add(end_call);
 
 	    _info = new CText("");
       _info.Align = EAlignment.justify_center;
-	    _info.PosY = 4;
+	    _info.PosY = 7;
 	    this.add(_info);
 
 	    _digits = new CText("");
       _digits.Align = EAlignment.justify_center;
-	    _digits.PosY = 2;
+	    _digits.PosY = 5;
 	    this.add(_digits);
-
-	    _sessions = new CText("");
-      _sessions.Align = EAlignment.justify_right;
-	    _sessions.PosY = 0;
-	    this.add(_sessions);
 
 	    // sessions link
 	    CLink sesLink = new CLink("0/0");
@@ -88,6 +84,7 @@ namespace Telephony
       base.onEntry();
     	// get current call instance
 	    //_currentCall = muiHandler->getCurrentStateMachine();
+      CStateMachine currentCall = CCallManager.getInstance().getCurrentCall();
 
 	    // info...
 	    string sinfo = ""/*currentCall->GetCallInfo()*/;
@@ -95,15 +92,15 @@ namespace Telephony
 
 	    // digits...
 	    string digits = "";
-/*	    if (currentCall->GetIncoming())
+	    if (currentCall.Incoming)
 	    {
-		    digits = currentCall->GetCLIP();
+		    digits = currentCall.CallingNo;
 	    }
 	    else
 	    {
-		    digits = currentCall->getCallingNumber();
+        digits = currentCall.DialedNo;
 	    }
- */ 
+ 
 	    _digits.Caption = digits;
 
 	    // call sessions...
@@ -187,7 +184,50 @@ namespace Telephony
   //	UICanvasHandler* muiHandler;
   }
 
+
+
   /////////////////////////////////////////////////////////////////////////////////////////
+
+
+  public class CDialPage : CTelephonyPage
+  {
+    protected CEditField mEditField;
+    //private CPhonebookPage _phbpage;
+
+    public CDialPage() 
+      : base(ECallPages.P_DIALING, "Dialing...")
+	  {
+		  
+	  }
+
+	  public void setDigits(string digits) 
+    {
+		  mEditField.Caption = digits;
+	  }
+
+	  public void makeCall(string number)
+    {
+    }
+
+    ////////////////////////////////////////////////////////////////////
+
+	  private bool okHandler()
+    {
+      return true;
+    }
+
+	  private bool phbHandler(int id)
+    {
+      return true;
+    }
+
+    private bool digitHandler(int id)
+    {
+      return true;
+    }
+
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////////
   /// <summary>
   /// 
@@ -195,7 +235,7 @@ namespace Telephony
   public class CConnectingPage : CTelephonyPage
   {
     public CConnectingPage()
-      : base((int)ECallPages.P_CONNECTING, "Connecting...")
+      : base(ECallPages.P_CONNECTING, "Connecting...")
     {
     }
 
@@ -207,7 +247,7 @@ namespace Telephony
   public class CRingingPage : CTelephonyPage
   {
     public CRingingPage() 
-      : base((int)ECallPages.P_RINGING, "Calling...")
+      : base(ECallPages.P_RINGING, "Calling...")
 	  {
     }
 
@@ -219,7 +259,7 @@ namespace Telephony
   public class CReleasedPage : CTelephonyPage
   {
     public CReleasedPage()
-      : base((int)ECallPages.P_RELEASED, "Released...")
+      : base(ECallPages.P_RELEASED, "Released...")
     {
     }
 
@@ -231,7 +271,7 @@ namespace Telephony
   public class CActivePage : CTelephonyPage
   {
     public CActivePage()
-      : base((int)ECallPages.P_ACTIVE, "Connected...")
+      : base(ECallPages.P_ACTIVE, "Connected...")
     {
     }
 

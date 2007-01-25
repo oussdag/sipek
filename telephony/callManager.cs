@@ -60,6 +60,19 @@ namespace Telephony
     #region Methods
 
 
+    public void initialize()
+    {
+      // Create menu pages...
+      new CConnectingPage();
+      new CRingingPage();
+      new CReleasedPage();
+      new CActivePage();
+      new CDialPage();
+
+      // init SIP
+      CSipProxy.initialize();
+    }
+
     public void updateGui()
     {
       // get current session
@@ -79,6 +92,11 @@ namespace Telephony
           CComponentController.getInstance().showPage((int)ECallPages.P_RELEASED);
           break;
       }
+    }
+
+    public CStateMachine getCurrentCall()
+    {
+      return _calls[_currentSession];
     }
 
     public void createSession(string number)
