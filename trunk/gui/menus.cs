@@ -23,33 +23,30 @@ namespace Gui
 {
   public enum EPages : int
   {
-    P_ENTRY = 0,
-    P_INIT,
+    P_INIT = 1,
     P_IDLE,
     P_PREDIALING,
-    P_LIST,
-    P_DETAILS,
-    P_ADDITEM,
-    P_MENU,
-    P_LANGUAGES
+    P_PHONEBOOK
   }
 
 
 
-  public class EntryPage : CPage
+  public class CInitPage : CPage
   {
-    public EntryPage()
-      : base((int)EPages.P_ENTRY)
+    public CInitPage()
+      : base((int)EPages.P_INIT)
     {
       this.forgetPage(true);
 
-      CText text = new CText("Sipek Phone", EAlignment.justify_left);
-      this.add(text);
-
-      CLink link = new CLink("Press any key", (int)EPages.P_INIT);
-      link.PosY = 3;
+      CLink link = new CLink("Initializing", (int)EPages.P_INIT);
+      link.Align = EAlignment.justify_center;
+      link.PosY = 2;
       link.LinkKey = link.PosY;
       this.add(link);
+
+      CText text = new CText("Sipek Phone", EAlignment.justify_center);
+      text.PosY = 3;
+      this.add(text);
 
       this.Ok += new NoParamDelegate(okhandler);
     }
@@ -82,25 +79,35 @@ namespace Gui
       title.PosY = 3;
       add(title);
 
-      CLink mlinkPhonebook = new CLink("Phonebook", 0);
+      CLink mlinkPhonebook = new CLink("Phonebook", (int)EPages.P_PHONEBOOK);
       mlinkPhonebook.PosY = 8;
+      mlinkPhonebook.LinkKey = mlinkPhonebook.PosY;
       this.add(mlinkPhonebook);
 
       CLink mlinkRinger = new CLink("Ringer", 0);
       mlinkRinger.Align = EAlignment.justify_right;
       mlinkRinger.PosY = 7;
+      mlinkRinger.LinkKey = mlinkRinger.PosY; 
       this.add(mlinkRinger);
 
       CLink mlinkCalls = new CLink("Calls", 0);
       mlinkCalls.Align = EAlignment.justify_right;
       mlinkCalls.PosY = 9;
+      mlinkCalls.LinkKey = mlinkCalls.PosY;
       this.add(mlinkCalls);
 
-      CLink mlinkLines = new CLink("Lines", 0);
+      CLink mlinkLines = new CLink("Accounts", 0);
       mlinkLines.PosY = 6;
       this.add(mlinkLines);
 
       Digitkey += new UintDelegate(digitkeyHandler);
+      Offhook += new NoParamDelegate(IdlePage_Offhook);
+    }
+
+    bool IdlePage_Offhook()
+    {
+      _controller.showPage((int)EPages.P_PREDIALING);
+      return true;
     }
 
     private bool digitkeyHandler(int id)
@@ -142,26 +149,26 @@ namespace Gui
       : base((int)EPages.P_PREDIALING, "Dialing...")
     {
       CLink linkHide = new CLink("Hide Number", 0);
-      linkHide.PosY = 3;
+      linkHide.PosY = 6;
       this.add(linkHide);
 
       CLink dialing_phbook = new CLink("Phonebook"/*, P_PBOOK*/);
-      dialing_phbook.PosY = 5;
+      dialing_phbook.PosY = 8;
       this.add(dialing_phbook);
 
       CLink linkCall = new CLink("Calls");
       linkCall.Align = EAlignment.justify_right;
       linkCall.Softkey += new UintDelegate(callHandler);
-      linkCall.PosY = 4;
+      linkCall.PosY = 7;
       this.add(linkCall);
 
       CLink linkSave = new CLink("Save");
       linkSave.Align = EAlignment.justify_right;
-      linkSave.PosY = 6;
+      linkSave.PosY = 9;
       this.add(linkSave);
 
       _editField = new CEditField(">", "", EEditMode.numeric, true);
-      _editField.PosY = 1;
+      _editField.PosY = 2;
       this.add(_editField);
 
       // page handlers
@@ -170,6 +177,13 @@ namespace Gui
       //this->OnSpeakerKeyFPtr = &this->okHandlerFctr;
 
       this.Ok += new NoParamDelegate(okHandler);
+      Offhook += new NoParamDelegate(CPreDialPage_Offhook);
+    }
+
+    bool CPreDialPage_Offhook()
+    {
+      CCallManager.getInstance().createSession(_editField.Caption);
+      return true;
     }
 
     void setPhonebookHandler()
@@ -226,6 +240,18 @@ namespace Gui
     }
 
     //CPhonebookListPage* _phbPartnerPage;
+
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CPhonebookPage : CPage
+  { 
+    public CPhonebookPage() : base((int)EPages.P_PHONEBOOK,"Phonebook") 
+    {
+    }
+
 
   }
 

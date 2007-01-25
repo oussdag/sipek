@@ -35,14 +35,36 @@ namespace Telephony
     private CActiveState _stateActive;
     private CReleasedState _stateReleased;
 
-    private CSipProxy _sigproxy;
 
     #endregion Variables
 
     #region Properties
+
+    private CSipProxy _sigproxy;
     public CSipProxy SigProxy
     {
       get { return _sigproxy; } 
+    }
+
+    private string _dialedNumber;
+    public string DialedNo
+    {
+      get { return _dialedNumber; }
+      set { _dialedNumber = value; }
+    }
+
+    private string _callingNumber;
+    public string CallingNo
+    {
+      get { return _callingNumber; }
+      set { _callingNumber = value; }
+    }
+
+    private bool _incoming;
+    public bool Incoming
+    {
+      get { return _incoming; }
+      set { _incoming = value; }
     }
 
     #endregion
@@ -94,14 +116,11 @@ namespace Telephony
       CCallManager.getInstance().updateGui();
     }
 
-
-    public void updateGui()
-    {
-
-    }
-
     public void destroy()
-    { 
+    {
+      CallingNo.Remove(0);
+      DialedNo.Remove(0);
+      Incoming = false;
     }
 
     #endregion Methods
