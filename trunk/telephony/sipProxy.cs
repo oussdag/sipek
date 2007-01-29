@@ -26,90 +26,44 @@ using System.Net.Sockets;
 namespace Telephony
 {
   public class CSipProxy : CTelephonyInterface
-  {
-    private static Thread dllThread; // thread which initializes pjsip.dll
-
-    delegate int DoShutdownDelegate();
-    
-    //delegate int OnCallStateChanged(int account, string number);
-    delegate int OnCallStateChanged(int account);
+  {    
+    delegate int OnRegStateChanged(int accountId, int regState);
+    delegate int OnCallStateChanged(int callId, int stateId);
 
     [DllImport("pjsipDll.dll")]
     private static extern int dll_init();
     [DllImport("pjsipDll.dll")]
     private static extern int dll_main();
     [DllImport("pjsipDll.dll")]
+    private static extern int dll_shutdown();
+    [DllImport("pjsipDll.dll")]
     private static extern int onCallStateCallback(OnCallStateChanged cb);
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_test();
-    [DllImport("pjsipDll.dll")]
-    private static extern int dll_shutdown();
-
+    private static extern int onRegStateCallback(OnRegStateChanged cb);
+    
+    // call API
     [DllImport("pjsipDll.dll")]
     private static extern int dll_makeCall(int callId, string number);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_releaseCall(int callId);
 
     ///
+    delegate int DoItDelegate();
     delegate int DoMakeCallDelegate(int callId, string number);
     delegate int DoReleaseCallDelegate(int callId);
 
-
-    static Synchronizer m_Synchronizer;
-
-    private static void dllLoad()
-    {
-      try
-      {
-        onCallStateCallback(new OnCallStateChanged(onCallStateChanged));
-
-        int status = dll_init();
-        //m_Synchronizer.Invoke(new DoShutdownDelegate(dll_init), null);
-
-        if (status == 0)
-        {
-          status = dll_main(); // endless loop
-        }
-        //dll_test();
-  
-      }
-      catch (DllNotFoundException dle) { System.Console.WriteLine(dle.Message); throw new Exception(); };
-    }
-
-
-    public static void initialize()
-    {
-      m_Synchronizer = new Synchronizer();
-      m_Synchronizer.Invoke(new DoShutdownDelegate(dll_init), null);
-
-      onCallStateCallback(new OnCallStateChanged(onCallStateChanged));
-
-      // create listening socket server for receiving SIP events...
-      //new Thread(new ThreadStart(socketHandler));
-
-      // create dll thread
-      try
-      {
-        //dllThread = new Thread(new ThreadStart(dllLoad));
-        //dllThread.Start();
-      }
-      catch (Exception e)
-      {
-        System.Console.WriteLine(e.Message);
-      }
-    }
-
-
-    //private static int onCallStateChanged(int account, string number)
-    private static int onCallStateChanged(int account)
-    {
-      return 1;
-    }
 
 
     #region Variables
     
     private int _line;
+
+
+    static DoItDelegate sddel;
+    static OnCallStateChanged csDel;
+    static OnRegStateChanged rsDel;
+
+    static Synchronizer m_Synchronizer;
 
     #endregion Variables
 
@@ -126,22 +80,35 @@ namespace Telephony
 
     #region Methods
 
+    public static void initialize()
+    {
+      m_Synchronizer = new Synchronizer();
+
+      // register callbacks
+      csDel = new OnCallStateChanged(onCallStateChanged);
+      onCallStateCallback(csDel);
+      rsDel = new OnRegStateChanged(onRegStateChanged);
+      onRegStateCallback(rsDel);
+      // 
+      m_Synchronizer.Invoke(new DoItDelegate(dll_init),null);
+      m_Synchronizer.Invoke(new DoItDelegate(dll_main),null);
+    }
+
     public bool shutdown()
     {
-      //doshutdown.BeginInvoke(3000,
-      //dllThread.Invoke(doshutdown);
-      m_Synchronizer.Invoke(new DoShutdownDelegate(dll_shutdown), null);
+      m_Synchronizer.Invoke(new DoItDelegate(dll_shutdown), null);
       m_Synchronizer.Dispose();
       return true;
     }
 
-    public bool makeCall(string dialedNo)
+
+    public int makeCall(string dialedNo)
     {
       object[] args = new object[2];
       args[0] = 1;
-      args[1] = "1234";
+      args[1] = dialedNo;
       object res = m_Synchronizer.Invoke(new DoMakeCallDelegate( dll_makeCall), args);
-      return true;
+      return (int)res;
     }
 
     public bool endCall()
@@ -158,6 +125,43 @@ namespace Telephony
     }
 
     #endregion Methods
+
+
+    #region Callbacks
+
+    //private static int onCallStateChanged(int account, string number)
+    private static int onCallStateChanged(int callId, int callState)
+    {
+//    PJSIP_INV_STATE_NULL,	    /**< Before INVITE is sent or received  */
+//    PJSIP_INV_STATE_CALLING,	    /**< After INVITE is sent		    */
+//    PJSIP_INV_STATE_INCOMING,	    /**< After INVITE is received.	    */
+//    PJSIP_INV_STATE_EARLY,	    /**< After response with To tag.	    */
+//    PJSIP_INV_STATE_CONNECTING,	    /**< After 2xx is sent/received.	    */
+//    PJSIP_INV_STATE_CONFIRMED,	    /**< After ACK is sent/received.	    */
+//    PJSIP_INV_STATE_DISCONNECTED,   /**< Session is terminated.		    */
+
+      CStateMachine sm = CCallManager.getInstance().getCall(callId);
+      if (sm == null) return 0;
+
+      switch (callState)
+      {
+        case 1:
+          //sm.getState().onCalling();
+          break;
+        case 6:
+          sm.getState().onReleased();
+          break;
+      }
+      return 1;
+    }
+
+
+    private static int onRegStateChanged(int accId, int regState)
+    {
+      return 1;
+    }
+
+    #endregion Callbacks
 
   }
 

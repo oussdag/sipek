@@ -205,8 +205,9 @@ namespace Telephony
 		  mEditField.Caption = digits;
 	  }
 
-	  public void makeCall(string number)
+	  public int makeCall(string number)
     {
+      return -1;
     }
 
     ////////////////////////////////////////////////////////////////////

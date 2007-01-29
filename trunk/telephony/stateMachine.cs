@@ -31,7 +31,7 @@ namespace Telephony
     private CAbstractState _state;
 
     private CIdleState _stateIdle;
-    private CCallingState _stateCalling;
+    private CConnectingState _stateCalling;
     private CActiveState _stateActive;
     private CReleasedState _stateReleased;
 
@@ -40,27 +40,34 @@ namespace Telephony
 
     #region Properties
 
+    private int _session = -1;
+    public int Session
+    {
+      get { return _session; }
+      set { _session = value; }
+    }
+
     private CSipProxy _sigproxy;
     public CSipProxy SigProxy
     {
       get { return _sigproxy; } 
     }
 
-    private string _dialedNumber;
+    private string _dialedNumber = "";
     public string DialedNo
     {
       get { return _dialedNumber; }
       set { _dialedNumber = value; }
     }
 
-    private string _callingNumber;
+    private string _callingNumber = "";
     public string CallingNo
     {
       get { return _callingNumber; }
       set { _callingNumber = value; }
     }
 
-    private bool _incoming;
+    private bool _incoming = false;
     public bool Incoming
     {
       get { return _incoming; }
@@ -77,7 +84,7 @@ namespace Telephony
 
       _stateIdle = new CIdleState(this);
       _stateActive = new CActiveState(this);
-      _stateCalling = new CCallingState(this);
+      _stateCalling = new CConnectingState(this);
       _stateReleased = new CReleasedState(this);
 
       _state = _stateIdle;
@@ -110,7 +117,7 @@ namespace Telephony
       {
         case CAbstractState.EStateId.IDLE: _state = _stateIdle; break;
         case CAbstractState.EStateId.ACTIVE: _state = _stateActive; break;
-        case CAbstractState.EStateId.CALLING: _state = _stateCalling; break;
+        case CAbstractState.EStateId.CONNECTING: _state = _stateCalling; break;
         case CAbstractState.EStateId.RELEASED: _state = _stateReleased; break;
       }
       CCallManager.getInstance().updateGui();
@@ -118,9 +125,11 @@ namespace Telephony
 
     public void destroy()
     {
-      CallingNo.Remove(0);
-      DialedNo.Remove(0);
+      CallingNo = "";
+      DialedNo = "";
       Incoming = false;
+      changeState(CAbstractState.EStateId.IDLE);
+      CCallManager.getInstance().destroySession(Session);
     }
 
     #endregion Methods

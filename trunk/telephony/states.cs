@@ -30,7 +30,7 @@ namespace Telephony
     public enum EStateId
     {
       IDLE,
-      CALLING,
+      CONNECTING, 
       ACTIVE,
       RELEASED,
       INCOMING
@@ -72,9 +72,9 @@ namespace Telephony
     public abstract void onExit();
     
 
-    public virtual bool makeCall(string dialedNo)
+    public virtual int makeCall(string dialedNo)
     {
-      return true;
+      return -1;
     }
 
     public virtual bool endCall()
@@ -92,6 +92,10 @@ namespace Telephony
     #region Callbacks
 
     public virtual void incomingCall(string callingNo)
+    { 
+    }
+
+    public virtual void onReleased()
     { 
     }
 
@@ -123,10 +127,10 @@ namespace Telephony
     {
     }
 
-    public override bool makeCall(string dialedNo)
+    public override int makeCall(string dialedNo)
     {
-      _smref.DialedNo = dialedNo; 
-      _smref.changeState(EStateId.CALLING);
+      _smref.DialedNo = dialedNo;
+      _smref.changeState(EStateId.CONNECTING);
       return _smref.SigProxy.makeCall(dialedNo);
     }
 
@@ -151,12 +155,12 @@ namespace Telephony
   /// <summary>
   /// 
   /// </summary>
-  public class CCallingState : CAbstractState
+  public class CConnectingState : CAbstractState
   {
-    public CCallingState(CStateMachine sm) 
+    public CConnectingState(CStateMachine sm) 
       : base(sm)
     {
-      StateId = EStateId.CALLING;
+      StateId = EStateId.CONNECTING;
     }
 
     public override void onEntry()
@@ -171,6 +175,11 @@ namespace Telephony
     {
       _smref.changeState(EStateId.IDLE);
       return _smref.SigProxy.endCall();
+    }
+
+    public override void onReleased()
+    {
+      _smref.destroy();
     }
 
   }

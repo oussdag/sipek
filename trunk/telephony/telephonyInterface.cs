@@ -24,7 +24,7 @@ namespace Telephony
   {
     #region Methods
 
-    bool makeCall(string dialedNo);
+    int makeCall(string dialedNo);
 
     bool endCall();
 
