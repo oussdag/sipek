@@ -28,10 +28,11 @@ namespace Telephony
   public class CSipProxy : CTelephonyInterface
   {
     private static Thread dllThread; // thread which initializes pjsip.dll
+
+    delegate int DoShutdownDelegate();
     
-    
-    
-    delegate int OnCallStateChanged(int account, string number);
+    //delegate int OnCallStateChanged(int account, string number);
+    delegate int OnCallStateChanged(int account);
 
     [DllImport("pjsipDll.dll")]
     private static extern int dll_init();
@@ -41,6 +42,20 @@ namespace Telephony
     private static extern int onCallStateCallback(OnCallStateChanged cb);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_test();
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_shutdown();
+
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_makeCall(int callId, string number);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_releaseCall(int callId);
+
+    ///
+    delegate int DoMakeCallDelegate(int callId, string number);
+    delegate int DoReleaseCallDelegate(int callId);
+
+
+    static Synchronizer m_Synchronizer;
 
     private static void dllLoad()
     {
@@ -49,10 +64,11 @@ namespace Telephony
         onCallStateCallback(new OnCallStateChanged(onCallStateChanged));
 
         int status = dll_init();
+        //m_Synchronizer.Invoke(new DoShutdownDelegate(dll_init), null);
 
         if (status == 0)
         {
-          dll_main(); // endless loop
+          status = dll_main(); // endless loop
         }
         //dll_test();
   
@@ -63,14 +79,19 @@ namespace Telephony
 
     public static void initialize()
     {
+      m_Synchronizer = new Synchronizer();
+      m_Synchronizer.Invoke(new DoShutdownDelegate(dll_init), null);
+
+      onCallStateCallback(new OnCallStateChanged(onCallStateChanged));
+
       // create listening socket server for receiving SIP events...
       //new Thread(new ThreadStart(socketHandler));
 
       // create dll thread
       try
       {
-        dllThread = new Thread(new ThreadStart(dllLoad));
-        dllThread.Start();
+        //dllThread = new Thread(new ThreadStart(dllLoad));
+        //dllThread.Start();
       }
       catch (Exception e)
       {
@@ -79,81 +100,10 @@ namespace Telephony
     }
 
 
-    private static int onCallStateChanged(int account, string number)
+    //private static int onCallStateChanged(int account, string number)
+    private static int onCallStateChanged(int account)
     {
       return 1;
-    }
-
-
-    public static void socketHandler()
-    {
-      TcpListener server = null;   
-      try
-      {
-        // Set the TcpListener on port 13000.
-        Int32 port = 30000;
-        IPAddress localAddr = IPAddress.Parse("127.0.0.1");
-        
-        // TcpListener server = new TcpListener(port);
-        server = new TcpListener(localAddr, port);
-
-        // Start listening for client requests.
-        server.Start();
-           
-        // Buffer for reading data
-        Byte[] bytes = new Byte[256];
-        String data = null;
-
-        // Enter the listening loop.
-        while(true) 
-        {
-          Console.Write("Waiting for a connection... ");
-          
-          // Perform a blocking call to accept requests.
-          // You could also user server.AcceptSocket() here.
-          TcpClient client = server.AcceptTcpClient();            
-          Console.WriteLine("Connected!");
-
-          data = null;
-
-          // Get a stream object for reading and writing
-          NetworkStream stream = client.GetStream();
-
-          int i;
-
-          // Loop to receive all the data sent by the client.
-          while((i = stream.Read(bytes, 0, bytes.Length))!=0) 
-          {   
-            // Translate data bytes to a ASCII string.
-            data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-            Console.WriteLine("Received: {0}", data);
-         
-            // Process the data sent by the client.
-            data = data.ToUpper();
-
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-
-            // Send back a response.
-            stream.Write(msg, 0, msg.Length);
-            Console.WriteLine("Sent: {0}", data);            
-          }
-           
-          // Shutdown and end connection
-          client.Close();
-        }
-      }
-      catch(SocketException e)
-      {
-        Console.WriteLine("SocketException: {0}", e);
-      }
-      finally
-      {
-         // Stop listening for new clients.
-         server.Stop();
-      }
-
-      Console.WriteLine("\nHit enter to continue...");
-      Console.Read();
     }
 
 
@@ -176,13 +126,29 @@ namespace Telephony
 
     #region Methods
 
+    public bool shutdown()
+    {
+      //doshutdown.BeginInvoke(3000,
+      //dllThread.Invoke(doshutdown);
+      m_Synchronizer.Invoke(new DoShutdownDelegate(dll_shutdown), null);
+      m_Synchronizer.Dispose();
+      return true;
+    }
+
     public bool makeCall(string dialedNo)
     {
+      object[] args = new object[2];
+      args[0] = 1;
+      args[1] = "1234";
+      object res = m_Synchronizer.Invoke(new DoMakeCallDelegate( dll_makeCall), args);
       return true;
     }
 
     public bool endCall()
     {
+      object[] args = new object[1];
+      args[0] = 0;
+      m_Synchronizer.Invoke(new DoReleaseCallDelegate( dll_releaseCall), args);
       return true;
     }
 
