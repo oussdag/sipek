@@ -216,5 +216,10 @@ namespace Gui
       control.getAccessIf().onEscKey();
     }
 
+    private void PhoneForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      CCallManager.getInstance().shutdown();
+    }
+
   }
 }

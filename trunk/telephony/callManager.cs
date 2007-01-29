@@ -73,6 +73,13 @@ namespace Telephony
       CSipProxy.initialize();
     }
 
+    public void shutdown()
+    {
+      CSipProxy proxy = new CSipProxy(0);
+      proxy.shutdown();
+    }
+
+
     public void updateGui()
     {
       // get current session

@@ -261,6 +261,7 @@ namespace Gui
       this.Controls.Add(this.richTextBox1);
       this.Name = "PhoneForm";
       this.Text = "SIPek Phone";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PhoneForm_FormClosing);
       this.panel2.ResumeLayout(false);
       this.ResumeLayout(false);
 
