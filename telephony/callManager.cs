@@ -33,7 +33,7 @@ namespace Telephony
 
     private Dictionary<int, CStateMachine> _calls;  //!< Call table
 
-    private int _currentSession = 0;
+    private int _currentSession = -1;
 
     #endregion
 
@@ -71,6 +71,9 @@ namespace Telephony
 
       // init SIP
       CSipProxy.initialize();
+
+      // Initialize call table
+      _calls = new Dictionary<int, CStateMachine>();
     }
 
     public void shutdown()
@@ -83,13 +86,15 @@ namespace Telephony
     public void updateGui()
     {
       // get current session
+      if (_currentSession < 0) return;
+
       CStateMachine call = getCall(_currentSession);
       switch (call.getStateId())
       {
         case CAbstractState.EStateId.IDLE:
           CComponentController.getInstance().showPage((int)2);
           break;
-        case CAbstractState.EStateId.CALLING:
+        case CAbstractState.EStateId.CONNECTING:
           CComponentController.getInstance().showPage((int)ECallPages.P_CONNECTING);
           break;
         case CAbstractState.EStateId.ACTIVE:
@@ -106,10 +111,21 @@ namespace Telephony
       return _calls[_currentSession];
     }
 
+    public CStateMachine getCall(int session)
+    {
+      if (_calls.Count == 0) return null;
+      return _calls[session];
+    }
+
+
     public void createSession(string number)
     {
       CStateMachine call = createCall();
-      call.getState().makeCall(number);
+      int newsession = call.getState().makeCall(number);
+      call.Session = newsession;
+      _calls.Add(newsession, call);
+      _currentSession = newsession;
+      updateGui();
     }
 
     public void destroySession()
@@ -119,6 +135,11 @@ namespace Telephony
       _calls.Remove(_currentSession);
     }
 
+    public void destroySession(int session)
+    {
+      CStateMachine call = getCall(session);
+      _calls.Remove(_currentSession);
+    }
 
     public void onUserRelease()
     {
@@ -133,19 +154,12 @@ namespace Telephony
     private CStateMachine createCall()
     {
       CStateMachine call = new CStateMachine(new CSipProxy(0));
-      _calls.Add(0, call);
-      _currentSession = 0;
-      return _calls[0];
+      return call;
     }
 
     public void destroy(int session)
     {
       _calls.Remove(session);
-    }
-
-    private CStateMachine getCall(int session)
-    {
-      return _calls[session];
     }
 
     #endregion Methods
