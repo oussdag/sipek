@@ -83,7 +83,6 @@ namespace Telephony
     { 
       base.onEntry();
     	// get current call instance
-	    //_currentCall = muiHandler->getCurrentStateMachine();
       CStateMachine currentCall = CCallManager.getInstance().getCurrentCall();
 
 	    // info...
@@ -177,11 +176,6 @@ namespace Telephony
       return true; 
     }
 
-
-	  //string mPageName;
-	  // current call
-  //	UIStateMachine* currentCall;
-  //	UICanvasHandler* muiHandler;
   }
 
 
@@ -248,7 +242,7 @@ namespace Telephony
   public class CRingingPage : CTelephonyPage
   {
     public CRingingPage() 
-      : base(ECallPages.P_RINGING, "Calling...")
+      : base(ECallPages.P_RINGING, "Ringing...")
 	  {
     }
 
@@ -278,7 +272,27 @@ namespace Telephony
 
   }
 
-    
 
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CIncomingPage : CTelephonyPage
+  {
+    public CIncomingPage()
+      : base(ECallPages.P_INCOMING, "Incoming...")
+    {
+      CLink accept_call = new CLink("Accept");
+      accept_call.Softkey += new UintDelegate(accept_call_Softkey);
+      accept_call.PosY = 8;
+      accept_call.LinkKey = accept_call.PosY;
+      this.add(accept_call);
+    }
+
+    bool accept_call_Softkey(int keyId)
+    {
+      CCallManager.getInstance().onUserAnswer();
+      return true;
+    }
+  }
 
 } // namespace Telephony

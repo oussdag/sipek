@@ -30,7 +30,8 @@ namespace Telephony
     public enum EStateId
     {
       IDLE,
-      CONNECTING, 
+      CONNECTING,
+      ALERTING, 
       ACTIVE,
       RELEASED,
       INCOMING
@@ -82,6 +83,11 @@ namespace Telephony
       return true;
     }
 
+    public virtual bool acceptCall()
+    {
+      return true;
+    }
+
 
     public virtual bool alerted()
     {
@@ -95,9 +101,18 @@ namespace Telephony
     { 
     }
 
+    public virtual void onAlerting()
+    {
+    }
+
+    public virtual void onConnect()
+    {
+    }
+    
     public virtual void onReleased()
     { 
     }
+
 
     #endregion Callbacks
 
@@ -173,8 +188,52 @@ namespace Telephony
 
     public override bool endCall()
     {
-      _smref.changeState(EStateId.IDLE);
-      return _smref.SigProxy.endCall();
+      _smref.SigProxy.endCall();
+      _smref.destroy();
+      return true;
+    }
+
+    public override void onReleased()
+    {
+      _smref.destroy();
+    }
+
+    public override void onAlerting()
+    {
+      _smref.changeState(EStateId.ALERTING);
+    }
+
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CAlertingState : CAbstractState
+  {
+    public CAlertingState(CStateMachine sm)
+      : base(sm)
+    {
+      StateId = EStateId.ALERTING;
+    }
+
+    public override void onEntry()
+    {
+    }
+
+    public override void onExit()
+    {
+    }
+
+    public override bool endCall()
+    {
+      _smref.SigProxy.endCall();
+      _smref.destroy();
+      return true;
+    }
+
+    public override void onConnect()
+    {
+      _smref.changeState(EStateId.ACTIVE);
     }
 
     public override void onReleased()
@@ -203,6 +262,18 @@ namespace Telephony
     public override void onExit()
     {
     }
+    
+    public override bool endCall()
+    {
+      _smref.SigProxy.endCall();
+      _smref.destroy();
+      return true;
+    }
+
+    public override void onReleased()
+    {
+      _smref.destroy();
+    }
 
   }
 
@@ -225,6 +296,44 @@ namespace Telephony
     public override void onExit()
     {
     }
+
+  }
+
+
+  /// <summary>
+  /// CIncomingState
+  /// </summary>
+  public class CIncomingState : CAbstractState
+  {
+    public CIncomingState(CStateMachine sm)
+      : base(sm)
+    {
+      StateId = EStateId.INCOMING;
+    }
+
+    public override void onEntry()
+    {
+    }
+
+    public override void onExit()
+    {
+    }
+
+    public override bool endCall()
+    {
+      _smref.SigProxy.endCall();
+      _smref.destroy();
+      return true;
+    }
+
+    public override bool acceptCall()
+    {
+      _smref.SigProxy.acceptCall();
+      _smref.changeState(EStateId.ACTIVE);
+      return true;
+    }
+
+
 
   }
 

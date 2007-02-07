@@ -119,11 +119,43 @@ namespace Gui
 
     protected PhoneForm mform;
 
+    delegate void writerDelegate(int xaxis, int posY, string text);
+    delegate void setCursorDelegate(int xaxis, int yaxis);
+    delegate void setSelectionDelegate(int xaxis, int yaxis, int length);
+    delegate void drawButtonDelegate(int xaxis, int yaxis);
+    delegate void eraseButtonDelegate();
+
     public Renderer(PhoneForm form)
       : base()
     {
       mform = form;
     }
+
+    private void formWriter(int xaxis, int yaxis, string text)
+    {
+      mform.Invoke(new writerDelegate(mform.writeText), new object[3] { xaxis, yaxis, text });
+    }
+
+    private void formSetCursor(int xaxis, int yaxis)
+    {
+      mform.Invoke(new setCursorDelegate(mform.setCursor), new object[2] { xaxis, yaxis});
+    }
+
+    private void formSetSelection(int xaxis, int yaxis, int length)
+    {
+      mform.Invoke(new setSelectionDelegate(mform.setSelection), new object[3] { xaxis, yaxis, length});
+    }
+
+    private void formDrawButton(int xaxis, int yaxis)
+    {
+      mform.Invoke(new drawButtonDelegate(mform.drawButton), new object[2] { xaxis, yaxis});
+    }
+
+    private void formErasebutton()
+    {
+      mform.Invoke(new eraseButtonDelegate(mform.eraseButton));
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////
 
     public void drawText(int positionId, string caption, EAlignment justify)
     {
@@ -136,14 +168,16 @@ namespace Gui
         case EAlignment.justify_right: xaxis = maxColumns  - caption.Length; break;
         case EAlignment.justify_center: xaxis = (maxColumns - caption.Length) / 2; break;
       }
-      this.mform.writeText(xaxis, positionId, caption);
+      //this.mform.writeText(xaxis, positionId, caption);
+      formWriter(xaxis, positionId, caption);
     }
 
     public void drawText(int posX, int posY, string caption)
     {
       if (posY > maxLines) return;
 
-      this.mform.writeText(posX, posY, caption);
+      //this.mform.writeText(posX, posY, caption);
+      formWriter(posX, posY, caption);
     }
 
     public void drawEdit(int positionId, string prompt, string caption, int cursor_position, bool selected, EEditMode mode)
@@ -165,7 +199,8 @@ namespace Gui
             break;
         }
       }
-      mform.setCursor(prompt.Length + cursor_position, positionId);
+      //mform.setCursor(prompt.Length + cursor_position, positionId);
+      formSetCursor(prompt.Length + cursor_position, positionId);
     }
 
     public void eraseText(int positionId, string caption, EAlignment justify)
@@ -174,12 +209,14 @@ namespace Gui
       if (justify == EAlignment.justify_right) xaxis = maxColumns - caption.Length;
       if (justify == EAlignment.justify_center) xaxis = (maxColumns - caption.Length) / 2;
       //this.mform.eraseText(xaxis, positionId, caption);
-      this.mform.writeText(xaxis, positionId, new string(' ', caption.Length));
+      //this.mform.writeText(xaxis, positionId, new string(' ', caption.Length));
+      formWriter(xaxis, positionId, new string(' ', caption.Length));
     }
 
     public void eraseText(int posX, int posY, string caption)
     {
-      this.mform.writeText(posX, posY, new string(' ', caption.Length));
+      //this.mform.writeText(posX, posY, new string(' ', caption.Length));
+      formWriter(posX, posY, new string(' ', caption.Length));
     }
 
     public void eraseEdit(int positionId, string prompt, string caption, int cursor_position)
@@ -202,7 +239,8 @@ namespace Gui
 
     public void drawSelection(int position, int type)
     {
-      mform.setSelection(0, position, maxColumns);
+      //mform.setSelection(0, position, maxColumns);
+      formSetSelection(0, position, maxColumns);
     }
 
     public void eraseSelection(int position, int type)
@@ -225,14 +263,16 @@ namespace Gui
       else if (justify == EAlignment.justify_center)
         x = (maxColumns) / 2;
 
-      mform.drawButton(x, positionId);
+      //mform.drawButton(x, positionId);
+      formDrawButton(x, positionId);
     }
 
     public void eraseLink(int positionId, string caption, EAlignment justify)
     {
       //string temp = "<a href=\"index\">" + caption + "</a>";
       this.eraseText(positionId, caption, justify);
-      mform.eraseButton();
+      //mform.eraseButton();
+      formErasebutton();
     }
 
     public void drawScroller(int positionId, int scrollposition, int scrollSize)
