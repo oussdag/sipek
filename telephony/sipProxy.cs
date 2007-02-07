@@ -29,6 +29,7 @@ namespace Telephony
   {    
     delegate int OnRegStateChanged(int accountId, int regState);
     delegate int OnCallStateChanged(int callId, int stateId);
+    delegate int OnCallIncoming(int callId, string number);
 
     [DllImport("pjsipDll.dll")]
     private static extern int dll_init();
@@ -40,17 +41,22 @@ namespace Telephony
     private static extern int onCallStateCallback(OnCallStateChanged cb);
     [DllImport("pjsipDll.dll")]
     private static extern int onRegStateCallback(OnRegStateChanged cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int onCallIncoming(OnCallIncoming cb);
     
     // call API
     [DllImport("pjsipDll.dll")]
     private static extern int dll_makeCall(int callId, string number);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_releaseCall(int callId);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_answerCall(int callId, int code);
 
     ///
     delegate int DoItDelegate();
     delegate int DoMakeCallDelegate(int callId, string number);
     delegate int DoReleaseCallDelegate(int callId);
+    delegate int DoAnswerCallDelegate(int callId, int code);
 
 
 
@@ -62,6 +68,7 @@ namespace Telephony
     static DoItDelegate sddel;
     static OnCallStateChanged csDel;
     static OnRegStateChanged rsDel;
+    static OnCallIncoming ciDel;
 
     static Synchronizer m_Synchronizer;
 
@@ -85,6 +92,8 @@ namespace Telephony
       m_Synchronizer = new Synchronizer();
 
       // register callbacks
+      ciDel = new OnCallIncoming(onCallIncoming);
+      onCallIncoming(ciDel);
       csDel = new OnCallStateChanged(onCallStateChanged);
       onCallStateCallback(csDel);
       rsDel = new OnRegStateChanged(onRegStateChanged);
@@ -101,26 +110,32 @@ namespace Telephony
       return true;
     }
 
+    /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
 
     public int makeCall(string dialedNo)
     {
-      object[] args = new object[2];
-      args[0] = 1;
-      args[1] = dialedNo;
-      object res = m_Synchronizer.Invoke(new DoMakeCallDelegate( dll_makeCall), args);
-      return (int)res;
+      string uri = "sip:" + dialedNo + "@192.168.60.216";
+      object res = m_Synchronizer.Invoke(new DoMakeCallDelegate(dll_makeCall), new object[2] { 0, uri});
+      _line = (int)res;
+      return _line;
     }
 
     public bool endCall()
     {
-      object[] args = new object[1];
-      args[0] = 0;
-      m_Synchronizer.Invoke(new DoReleaseCallDelegate( dll_releaseCall), args);
+      m_Synchronizer.Invoke(new DoReleaseCallDelegate(dll_releaseCall), new object[1] { _line });
       return true;
     }
 
     public bool alerted()
     {
+      m_Synchronizer.Invoke(new DoAnswerCallDelegate(dll_answerCall), new object[2] { _line, 180 });
+      return true;
+    }
+
+    public bool acceptCall()
+    {
+      m_Synchronizer.Invoke(new DoAnswerCallDelegate(dll_answerCall), new object[2] { _line, 200 });
       return true;
     }
 
@@ -148,10 +163,26 @@ namespace Telephony
         case 1:
           //sm.getState().onCalling();
           break;
+        case 2:
+          //sm.getState().incomingCall("4444");
+          break;
+        case 3:
+          sm.getState().onAlerting();
+          break;
+        case 4:
+          sm.getState().onConnect();
+          break;
         case 6:
           sm.getState().onReleased();
           break;
       }
+      return 1;
+    }
+
+    private static int onCallIncoming(int callId, string number)
+    {
+      CStateMachine sm = CCallManager.getInstance().createSession(callId, number);
+      sm.getState().incomingCall(number);
       return 1;
     }
 

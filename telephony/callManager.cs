@@ -68,6 +68,7 @@ namespace Telephony
       new CReleasedPage();
       new CActivePage();
       new CDialPage();
+      new CIncomingPage();
 
       // init SIP
       CSipProxy.initialize();
@@ -97,11 +98,17 @@ namespace Telephony
         case CAbstractState.EStateId.CONNECTING:
           CComponentController.getInstance().showPage((int)ECallPages.P_CONNECTING);
           break;
+        case CAbstractState.EStateId.ALERTING:
+           CComponentController.getInstance().showPage((int)ECallPages.P_RINGING);
+          break;
         case CAbstractState.EStateId.ACTIVE:
           CComponentController.getInstance().showPage((int)ECallPages.P_ACTIVE);
           break;
         case CAbstractState.EStateId.RELEASED:
           CComponentController.getInstance().showPage((int)ECallPages.P_RELEASED);
+          break;
+        case CAbstractState.EStateId.INCOMING:
+          CComponentController.getInstance().showPage((int)ECallPages.P_INCOMING);
           break;
       }
     }
@@ -127,18 +134,27 @@ namespace Telephony
       _currentSession = newsession;
       updateGui();
     }
+    
+    public CStateMachine createSession(int sessionId, string number)
+    {
+      CStateMachine call = createCall();
+      call.Session = sessionId;
+      _calls.Add(sessionId, call);
+      _currentSession = sessionId;
+      updateGui();
+      return call;
+    }
 
     public void destroySession()
     {
       CStateMachine call = getCall(_currentSession);
       call.getState().endCall();
-      _calls.Remove(_currentSession);
     }
 
     public void destroySession(int session)
     {
-      CStateMachine call = getCall(session);
       _calls.Remove(_currentSession);
+      if (_calls.Count == 0) _currentSession = -1;
     }
 
     public void onUserRelease()
@@ -147,6 +163,8 @@ namespace Telephony
 
     public void onUserAnswer()
     {
+      CStateMachine call = getCall(_currentSession);
+      call.getState().acceptCall();
     }
 
     /////////////////////////////////////////////////////////////////////

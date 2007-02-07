@@ -32,8 +32,10 @@ namespace Telephony
 
     private CIdleState _stateIdle;
     private CConnectingState _stateCalling;
+    private CAlertingState _stateAlerting;
     private CActiveState _stateActive;
     private CReleasedState _stateReleased;
+    private CIncomingState _stateIncoming;
 
 
     #endregion Variables
@@ -83,10 +85,11 @@ namespace Telephony
       _sigproxy = proxy;
 
       _stateIdle = new CIdleState(this);
+      _stateAlerting = new CAlertingState(this);
       _stateActive = new CActiveState(this);
       _stateCalling = new CConnectingState(this);
       _stateReleased = new CReleasedState(this);
-
+      _stateIncoming = new CIncomingState(this);
       _state = _stateIdle;
     }
 
@@ -116,9 +119,11 @@ namespace Telephony
       switch (stateId) 
       {
         case CAbstractState.EStateId.IDLE: _state = _stateIdle; break;
-        case CAbstractState.EStateId.ACTIVE: _state = _stateActive; break;
         case CAbstractState.EStateId.CONNECTING: _state = _stateCalling; break;
+        case CAbstractState.EStateId.ALERTING: _state = _stateAlerting; break;
+        case CAbstractState.EStateId.ACTIVE: _state = _stateActive; break;
         case CAbstractState.EStateId.RELEASED: _state = _stateReleased; break;
+        case CAbstractState.EStateId.INCOMING: _state = _stateIncoming; break;
       }
       CCallManager.getInstance().updateGui();
     }

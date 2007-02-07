@@ -49,29 +49,6 @@ namespace Gui
       string str = new string(' ', 255);
       richTextBox1.Lines = new string[] { str, str, str, str, str, str, str, str, str, str };
       _buttons = new System.Collections.Generic.List<Button>();
-
-      control = CComponentController.getInstance();
-
-      Renderer renderer = new Renderer(this);
-      CTimerFactoryImpl tmrFactory = new CTimerFactoryImpl();
-
-      control.attach(renderer);
-      control.setTimerFactory(tmrFactory);
-      control.Language = _langEN;
-
-      // Create menu pages...
-      new CInitPage();
-      new IdlePage();
-      new CPreDialPage();
-      new CPhonebookPage();
-      
-      control.initialize();
-
-      // set active page...
-      control.setActivePage((int)EPages.P_INIT);
-
-      // initialize telephony...
-      CCallManager.getInstance().initialize();
     }
 
     public void clearScreen()
@@ -219,6 +196,33 @@ namespace Gui
     private void PhoneForm_FormClosing(object sender, FormClosingEventArgs e)
     {
       CCallManager.getInstance().shutdown();
+    }
+
+    private void PhoneForm_Shown(object sender, EventArgs e)
+    {
+      control = CComponentController.getInstance();
+
+      Renderer renderer = new Renderer(this);
+      CTimerFactoryImpl tmrFactory = new CTimerFactoryImpl();
+
+      control.attach(renderer);
+      control.setTimerFactory(tmrFactory);
+      control.Language = _langEN;
+
+      // Create menu pages...
+      new CInitPage();
+      new IdlePage();
+      new CPreDialPage();
+      new CPhonebookPage();
+
+      control.initialize();
+
+      // set active page...
+      control.setActivePage((int)EPages.P_INIT);
+
+      // initialize telephony...
+      CCallManager.getInstance().initialize();
+
     }
 
   }

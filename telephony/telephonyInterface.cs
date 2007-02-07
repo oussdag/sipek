@@ -30,6 +30,8 @@ namespace Telephony
 
     bool alerted();
 
+    bool acceptCall();
+
     #endregion Methods
   }
 
@@ -39,6 +41,11 @@ namespace Telephony
 
     void incomingCall( string callingNo);
 
+    void onAlerting();
+
+    void onConnect();
+
+    void onReleased();
 
     #endregion Methods
   }
