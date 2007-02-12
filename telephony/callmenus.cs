@@ -23,6 +23,7 @@ namespace Telephony
   public enum ECallPages : int
   {
     P_DIALING = 100,
+    P_PREDIALING,
     P_CALLING,
     P_CONNECTING,
     P_RINGING,
@@ -82,8 +83,11 @@ namespace Telephony
     public override void onEntry() 
     { 
       base.onEntry();
-    	// get current call instance
+
+      // get current call instance
       CStateMachine currentCall = CCallManager.getInstance().getCurrentCall();
+
+      if (currentCall == null) return;
 
 	    // info...
 	    string sinfo = ""/*currentCall->GetCallInfo()*/;
@@ -178,7 +182,110 @@ namespace Telephony
 
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  // Pre Dialing page
+  //////////////////////////////////////////////////////////////////////////
+  public class CPreDialPage : CTelephonyPage
+  {
+    public CPreDialPage()
+      : base(ECallPages.P_PREDIALING, "Dialing...")
+    {
+      clearHistory(false);
 
+      CLink linkHide = new CLink("Hide Number", 0);
+      linkHide.PosY = 6;
+      this.add(linkHide);
+
+      CLink dialing_phbook = new CLink("Phonebook"/*, P_PBOOK*/);
+      dialing_phbook.PosY = 8;
+      this.add(dialing_phbook);
+
+      CLink linkCall = new CLink("Calls");
+      linkCall.Align = EAlignment.justify_right;
+      linkCall.Softkey += new UintDelegate(callHandler);
+      linkCall.PosY = 7;
+      this.add(linkCall);
+
+      CLink linkSave = new CLink("Save");
+      linkSave.Align = EAlignment.justify_right;
+      linkSave.PosY = 9;
+      this.add(linkSave);
+
+      _editField = new CEditField(">", "", EEditMode.numeric, true);
+      _editField.PosY = 2;
+      this.add(_editField);
+
+      // page handlers
+      //this->OnOkKeyFPtr = &this->okHandlerFctr;
+      //this->OnOffhookKeyFPtr = &this->okHandlerFctr;
+      //this->OnSpeakerKeyFPtr = &this->okHandlerFctr;
+
+      this.Ok += new NoParamDelegate(okHandler);
+      Offhook += new NoParamDelegate(CPreDialPage_Offhook);
+    }
+
+    bool CPreDialPage_Offhook()
+    {
+      CCallManager.getInstance().createSession(_editField.Caption);
+      return true;
+    }
+
+    void setPhonebookHandler()
+    {
+    }
+
+    // Overridden methods
+    public override void onEntry()
+    {
+      base.onEntry();
+    }
+
+    public override void onExit()
+    {
+      base.onExit();
+    }
+
+    public void setDigits(string digit)
+    {
+      _editField.Caption = digit;
+    }
+
+    protected CEditField _editField;
+
+    //////////////////////////////////////////////////
+    // handlers
+
+    private bool menuHandler()
+    {
+      return true;
+    }
+
+    private bool okHandler()
+    {
+      //CDialPage* page = (CDialPage*)_controller->getPage(P_DIALING);
+      //page->makeCall(mEditField->getCaption());
+      CCallManager.getInstance().createSession(_editField.Caption);
+      return true;
+    }
+
+    private bool onhookHandler()
+    {
+      return true;
+    }
+
+    private bool callHandler(int id)
+    {
+      return true;
+    }
+
+    private bool phbHandler()
+    {
+      return true;
+    }
+
+    //CPhonebookListPage* _phbPartnerPage;
+
+  }
 
   /////////////////////////////////////////////////////////////////////////////////////////
 

@@ -193,11 +193,22 @@ namespace Gui
       control.getAccessIf().onEscKey();
     }
 
+    private void clearButton_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onClearKey();
+    }
+
+
     private void PhoneForm_FormClosing(object sender, FormClosingEventArgs e)
     {
       CCallManager.getInstance().shutdown();
     }
 
+    private void buttonSettings_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onMenuKey();
+    }    
+    
     private void PhoneForm_Shown(object sender, EventArgs e)
     {
       control = CComponentController.getInstance();
@@ -212,8 +223,9 @@ namespace Gui
       // Create menu pages...
       new CInitPage();
       new IdlePage();
-      new CPreDialPage();
       new CPhonebookPage();
+      new CMenuPage();
+      new CSIPSettings();
 
       control.initialize();
 

@@ -42,10 +42,11 @@ namespace Gui
       this.digitKey3 = new System.Windows.Forms.Button();
       this.digitKey2 = new System.Windows.Forms.Button();
       this.digitKey1 = new System.Windows.Forms.Button();
-      this.onhookButton = new System.Windows.Forms.Button();
+      this.clearButton = new System.Windows.Forms.Button();
       this.offhookButton = new System.Windows.Forms.Button();
       this.OKbutton = new System.Windows.Forms.Button();
       this.Cancel = new System.Windows.Forms.Button();
+      this.buttonSettings = new System.Windows.Forms.Button();
       this.panel2.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -77,7 +78,7 @@ namespace Gui
       this.panel2.Controls.Add(this.digitKey3);
       this.panel2.Controls.Add(this.digitKey2);
       this.panel2.Controls.Add(this.digitKey1);
-      this.panel2.Location = new System.Drawing.Point(97, 363);
+      this.panel2.Location = new System.Drawing.Point(94, 308);
       this.panel2.Name = "panel2";
       this.panel2.Size = new System.Drawing.Size(178, 167);
       this.panel2.TabIndex = 18;
@@ -203,33 +204,33 @@ namespace Gui
       this.digitKey1.UseVisualStyleBackColor = true;
       this.digitKey1.Click += new System.EventHandler(this.digitKey1_Click);
       // 
-      // onhookButton
+      // clearButton
       // 
-      this.onhookButton.BackColor = System.Drawing.Color.OrangeRed;
-      this.onhookButton.Location = new System.Drawing.Point(263, 288);
-      this.onhookButton.Name = "onhookButton";
-      this.onhookButton.Size = new System.Drawing.Size(48, 50);
-      this.onhookButton.TabIndex = 19;
-      this.onhookButton.Text = "DOWN";
-      this.onhookButton.UseVisualStyleBackColor = false;
-      this.onhookButton.Click += new System.EventHandler(this.onhookButton_Click);
+      this.clearButton.BackColor = System.Drawing.Color.OrangeRed;
+      this.clearButton.Location = new System.Drawing.Point(229, 270);
+      this.clearButton.Name = "clearButton";
+      this.clearButton.Size = new System.Drawing.Size(48, 32);
+      this.clearButton.TabIndex = 19;
+      this.clearButton.Text = "Clear";
+      this.clearButton.UseVisualStyleBackColor = false;
+      this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
       // 
       // offhookButton
       // 
       this.offhookButton.BackColor = System.Drawing.Color.DarkSeaGreen;
-      this.offhookButton.Location = new System.Drawing.Point(52, 288);
+      this.offhookButton.Location = new System.Drawing.Point(42, 253);
       this.offhookButton.Name = "offhookButton";
       this.offhookButton.Size = new System.Drawing.Size(46, 50);
       this.offhookButton.TabIndex = 20;
-      this.offhookButton.Text = "UP";
+      this.offhookButton.Text = "GO";
       this.offhookButton.UseVisualStyleBackColor = false;
       this.offhookButton.Click += new System.EventHandler(this.offhookButton_Click);
       // 
       // OKbutton
       // 
-      this.OKbutton.Location = new System.Drawing.Point(164, 277);
+      this.OKbutton.Location = new System.Drawing.Point(161, 253);
       this.OKbutton.Name = "OKbutton";
-      this.OKbutton.Size = new System.Drawing.Size(41, 32);
+      this.OKbutton.Size = new System.Drawing.Size(64, 32);
       this.OKbutton.TabIndex = 21;
       this.OKbutton.Text = "OK";
       this.OKbutton.UseVisualStyleBackColor = true;
@@ -237,14 +238,25 @@ namespace Gui
       // 
       // Cancel
       // 
+      this.Cancel.BackColor = System.Drawing.Color.Red;
       this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.Cancel.Location = new System.Drawing.Point(153, 324);
+      this.Cancel.Location = new System.Drawing.Point(278, 253);
       this.Cancel.Name = "Cancel";
-      this.Cancel.Size = new System.Drawing.Size(64, 23);
+      this.Cancel.Size = new System.Drawing.Size(48, 49);
       this.Cancel.TabIndex = 22;
       this.Cancel.Text = "Esc";
-      this.Cancel.UseVisualStyleBackColor = true;
+      this.Cancel.UseVisualStyleBackColor = false;
       this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
+      // 
+      // buttonSettings
+      // 
+      this.buttonSettings.Location = new System.Drawing.Point(94, 270);
+      this.buttonSettings.Name = "buttonSettings";
+      this.buttonSettings.Size = new System.Drawing.Size(58, 32);
+      this.buttonSettings.TabIndex = 23;
+      this.buttonSettings.Text = "Menu";
+      this.buttonSettings.UseVisualStyleBackColor = true;
+      this.buttonSettings.Click += new System.EventHandler(this.buttonSettings_Click);
       // 
       // PhoneForm
       // 
@@ -252,11 +264,12 @@ namespace Gui
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.WhiteSmoke;
       this.CancelButton = this.Cancel;
-      this.ClientSize = new System.Drawing.Size(367, 542);
+      this.ClientSize = new System.Drawing.Size(367, 488);
+      this.Controls.Add(this.buttonSettings);
       this.Controls.Add(this.Cancel);
       this.Controls.Add(this.OKbutton);
       this.Controls.Add(this.offhookButton);
-      this.Controls.Add(this.onhookButton);
+      this.Controls.Add(this.clearButton);
       this.Controls.Add(this.panel2);
       this.Controls.Add(this.richTextBox1);
       this.Name = "PhoneForm";
@@ -284,10 +297,11 @@ namespace Gui
     private System.Windows.Forms.Button digitKey3;
     private System.Windows.Forms.Button digitKey2;
     private System.Windows.Forms.Button digitKey1;
-    private System.Windows.Forms.Button onhookButton;
+    private System.Windows.Forms.Button clearButton;
     private System.Windows.Forms.Button offhookButton;
     private System.Windows.Forms.Button OKbutton;
     private System.Windows.Forms.Button Cancel;
+    private System.Windows.Forms.Button buttonSettings;
   }
 }
 

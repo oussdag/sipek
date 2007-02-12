@@ -59,18 +59,18 @@ namespace Telephony
     delegate int DoAnswerCallDelegate(int callId, int code);
 
 
-
     #region Variables
     
+    // identify line
     private int _line;
 
+    // used for single threaded communication with pjsip 
+    static Synchronizer m_Synchronizer;
 
-    static DoItDelegate sddel;
+    //static DoItDelegate sddel;
     static OnCallStateChanged csDel;
     static OnRegStateChanged rsDel;
     static OnCallIncoming ciDel;
-
-    static Synchronizer m_Synchronizer;
 
     #endregion Variables
 
@@ -89,21 +89,24 @@ namespace Telephony
 
     public static void initialize()
     {
+      // create pjsip thread synchronizer
       m_Synchronizer = new Synchronizer();
 
-      // register callbacks
       ciDel = new OnCallIncoming(onCallIncoming);
-      onCallIncoming(ciDel);
       csDel = new OnCallStateChanged(onCallStateChanged);
-      onCallStateCallback(csDel);
       rsDel = new OnRegStateChanged(onRegStateChanged);
-      onRegStateCallback(rsDel);
-      // 
+
+      // register callbacks (delegates)
+      onCallIncoming( ciDel );
+      onCallStateCallback( csDel );
+      onRegStateCallback( rsDel );
+
+      // Initialize pjsip...
       m_Synchronizer.Invoke(new DoItDelegate(dll_init),null);
       m_Synchronizer.Invoke(new DoItDelegate(dll_main),null);
     }
 
-    public bool shutdown()
+    public static bool shutdown()
     {
       m_Synchronizer.Invoke(new DoItDelegate(dll_shutdown), null);
       m_Synchronizer.Dispose();
@@ -112,10 +115,11 @@ namespace Telephony
 
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
-
+    // Call API
+    //
     public int makeCall(string dialedNo)
     {
-      string uri = "sip:" + dialedNo + "@192.168.60.216";
+      string uri = "sip:" + dialedNo + "@" + CCallManager.getInstance().SipProxy;
       object res = m_Synchronizer.Invoke(new DoMakeCallDelegate(dll_makeCall), new object[2] { 0, uri});
       _line = (int)res;
       return _line;
@@ -195,8 +199,5 @@ namespace Telephony
     #endregion Callbacks
 
   }
-
-
-
 
 } // namespace Telephony
