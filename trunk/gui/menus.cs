@@ -25,8 +25,9 @@ namespace Gui
   {
     P_INIT = 1,
     P_IDLE,
-    P_PREDIALING,
-    P_PHONEBOOK
+    P_PHONEBOOK,
+    P_MENU,
+    P_SIPSETTINGS
   }
 
 
@@ -100,22 +101,30 @@ namespace Gui
       mlinkLines.PosY = 6;
       this.add(mlinkLines);
 
+      // Initialize handlers
       Digitkey += new UintDelegate(digitkeyHandler);
       Offhook += new NoParamDelegate(IdlePage_Offhook);
+      Menu += new NoParamDelegate(IdlePage_Menu);
+    }
+
+    bool IdlePage_Menu()
+    {
+      _controller.showPage((int)EPages.P_MENU);
+      return true;
     }
 
     bool IdlePage_Offhook()
     {
-      _controller.showPage((int)EPages.P_PREDIALING);
+      _controller.showPage((int)ECallPages.P_PREDIALING);
       return true;
     }
 
     private bool digitkeyHandler(int id)
     {
-      CPreDialPage page = (CPreDialPage)_controller.getPage((int)EPages.P_PREDIALING);
+      CPreDialPage page = (CPreDialPage)_controller.getPage((int)ECallPages.P_PREDIALING);
 
       page.setDigits(id.ToString());
-      _controller.showPage((int)EPages.P_PREDIALING);
+      _controller.showPage((int)ECallPages.P_PREDIALING);
       return true;
     }
 
@@ -140,108 +149,6 @@ namespace Gui
 
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  // Pre Dialing page
-  //////////////////////////////////////////////////////////////////////////
-  public class CPreDialPage : CPage
-  {
-    public CPreDialPage()
-      : base((int)EPages.P_PREDIALING, "Dialing...")
-    {
-      CLink linkHide = new CLink("Hide Number", 0);
-      linkHide.PosY = 6;
-      this.add(linkHide);
-
-      CLink dialing_phbook = new CLink("Phonebook"/*, P_PBOOK*/);
-      dialing_phbook.PosY = 8;
-      this.add(dialing_phbook);
-
-      CLink linkCall = new CLink("Calls");
-      linkCall.Align = EAlignment.justify_right;
-      linkCall.Softkey += new UintDelegate(callHandler);
-      linkCall.PosY = 7;
-      this.add(linkCall);
-
-      CLink linkSave = new CLink("Save");
-      linkSave.Align = EAlignment.justify_right;
-      linkSave.PosY = 9;
-      this.add(linkSave);
-
-      _editField = new CEditField(">", "", EEditMode.numeric, true);
-      _editField.PosY = 2;
-      this.add(_editField);
-
-      // page handlers
-      //this->OnOkKeyFPtr = &this->okHandlerFctr;
-      //this->OnOffhookKeyFPtr = &this->okHandlerFctr;
-      //this->OnSpeakerKeyFPtr = &this->okHandlerFctr;
-
-      this.Ok += new NoParamDelegate(okHandler);
-      Offhook += new NoParamDelegate(CPreDialPage_Offhook);
-    }
-
-    bool CPreDialPage_Offhook()
-    {
-      CCallManager.getInstance().createSession(_editField.Caption);
-      return true;
-    }
-
-    void setPhonebookHandler()
-    {
-    }
-
-    // Overridden methods
-    public override void onEntry()
-    {
-      base.onEntry();
-    }
-
-    public override void onExit()
-    {
-      base.onExit();
-    }
-
-    public void setDigits(string digit)
-    {
-      _editField.Caption = digit;
-    }
-
-    protected CEditField _editField;
-
-    //////////////////////////////////////////////////
-    // handlers
-
-    private bool menuHandler()
-    {
-      return true;
-    }
-
-    private bool okHandler()
-    {
-      //CDialPage* page = (CDialPage*)_controller->getPage(P_DIALING);
-      //page->makeCall(mEditField->getCaption());
-      CCallManager.getInstance().createSession(_editField.Caption);
-      return true;
-    }
-
-    private bool onhookHandler()
-    {
-      return true;
-    }
-
-    private bool callHandler(int id)
-    {
-      return true;
-    }
-
-    private bool phbHandler()
-    {
-      return true;
-    }
-
-    //CPhonebookListPage* _phbPartnerPage;
-
-  }
 
   /// <summary>
   /// 
@@ -250,6 +157,91 @@ namespace Gui
   { 
     public CPhonebookPage() : base((int)EPages.P_PHONEBOOK,"Phonebook") 
     {
+    }
+
+
+  }
+
+
+  public class CMenuPage : CPage 
+  {
+    public CMenuPage()     
+      : base((int)EPages.P_MENU, "Settings")
+    {
+      CLink linkNetwork = new CLink("Network", 0);
+      linkNetwork.PosY = 5;
+      add(linkNetwork);
+
+      CLink linkSound = new CLink("Sound", 0);
+      linkSound.PosY = 6;
+      linkSound.Align = EAlignment.justify_right;
+      add(linkSound);
+
+      CLink linkSIP = new CLink("SIP", (int)EPages.P_SIPSETTINGS);
+      linkSIP.PosY = 7;
+      linkSIP.LinkKey = linkSIP.PosY;
+      add(linkSIP);
+
+    }
+
+  }
+
+  public class CSIPSettings : CPage
+  {
+    CIpAddressEdit _editproxy;
+    CEditField _editport;
+    CCheckBox _checkRegister;
+    CEditField _editperiod;
+
+    public CSIPSettings() 
+      : base((int)EPages.P_SIPSETTINGS, "SIP Settings") 
+    {
+      _editproxy = new CIpAddressEdit("Proxy>");
+      _editproxy.PosY = 3;
+      _editproxy.Focused = true;
+      _editproxy.LinkKey = _editproxy.PosY;
+      add(_editproxy);
+
+      _editport = new CEditField("Port>","",EEditMode.numeric);
+      _editport.PosY = 5;
+      _editport.LinkKey = _editport.PosY;
+      add(_editport);
+
+      _checkRegister = new CCheckBox("Register");
+      _checkRegister.PosY = 7;
+      _checkRegister.LinkKey = _checkRegister.PosY;
+      add(_checkRegister);
+
+      _editperiod = new CEditField("Period>", "", EEditMode.numeric);
+      _editperiod.PosY = 9;
+      _editperiod.LinkKey = _editperiod.PosY;
+      add(_editperiod);
+
+      // ok handler
+      this.Ok += new NoParamDelegate(CSIPSettings_Ok);
+    }
+
+    bool CSIPSettings_Ok()
+    {
+      Properties.Settings.Default.cfgSipProxy = _editproxy.Caption;
+      Properties.Settings.Default.cfgSipPort = int.Parse(_editport.Caption);
+      Properties.Settings.Default.cfgSipRegister = _checkRegister.Checked;
+      Properties.Settings.Default.cfgSipRegPeriod = int.Parse(_editperiod.Caption);
+
+      Properties.Settings.Default.Save();
+
+      _controller.previousPage();
+      return true;
+    }
+
+    public override void onEntry()
+    {
+      _editproxy.Caption = Properties.Settings.Default.cfgSipProxy;
+      _editport.Caption = Properties.Settings.Default.cfgSipPort.ToString();
+      _checkRegister.Checked = Properties.Settings.Default.cfgSipRegister;
+      _editperiod.Caption = Properties.Settings.Default.cfgSipRegPeriod.ToString();
+
+      base.onEntry();
     }
 
 

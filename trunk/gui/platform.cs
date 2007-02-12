@@ -176,31 +176,7 @@ namespace Gui
     {
       if (posY > maxLines) return;
 
-      //this.mform.writeText(posX, posY, caption);
       formWriter(posX, posY, caption);
-    }
-
-    public void drawEdit(int positionId, string prompt, string caption, int cursor_position, bool selected, EEditMode mode)
-    {
-      drawText(positionId, prompt + caption, EAlignment.justify_left);
-
-      if (selected)
-      {
-        switch (mode)
-        {
-          case EEditMode.alphanum_high:
-            drawText(maxColumns - 3, 0, "ABC");
-            break;
-          case EEditMode.alphanum_low:
-            drawText(maxColumns - 3, 0, "abc");
-            break;
-          case EEditMode.numeric:
-            drawText(maxColumns - 3, 0, "123");
-            break;
-        }
-      }
-      //mform.setCursor(prompt.Length + cursor_position, positionId);
-      formSetCursor(prompt.Length + cursor_position, positionId);
     }
 
     public void eraseText(int positionId, string caption, EAlignment justify)
@@ -217,12 +193,6 @@ namespace Gui
     {
       //this.mform.writeText(posX, posY, new string(' ', caption.Length));
       formWriter(posX, posY, new string(' ', caption.Length));
-    }
-
-    public void eraseEdit(int positionId, string prompt, string caption, int cursor_position)
-    {
-      eraseText(positionId, prompt + caption, EAlignment.justify_left);
-      eraseText(maxColumns - 3, 0, "   ");
     }
 
     public void drawCheckMark(int posX, int posY, bool checkedFlag)
@@ -255,7 +225,6 @@ namespace Gui
 
     public void drawLink(int positionId, string caption, EAlignment justify)
     {
-      //string temp = "<a href=\"index\">" + caption + "</a>";
       this.drawText(positionId, caption, justify);
       int x = 0;
       if (justify == EAlignment.justify_right)
@@ -263,7 +232,6 @@ namespace Gui
       else if (justify == EAlignment.justify_center)
         x = (maxColumns) / 2;
 
-      //mform.drawButton(x, positionId);
       formDrawButton(x, positionId);
     }
 
@@ -274,6 +242,36 @@ namespace Gui
       //mform.eraseButton();
       formErasebutton();
     }
+
+    public void drawEdit(int positionId, string prompt, string caption, int cursor_position, bool selected, EEditMode mode)
+    {
+      drawLink(positionId, prompt + caption, EAlignment.justify_left);
+
+      if (selected)
+      {
+        switch (mode)
+        {
+          case EEditMode.alphanum_high:
+            drawText(maxColumns - 3, 0, "ABC");
+            break;
+          case EEditMode.alphanum_low:
+            drawText(maxColumns - 3, 0, "abc");
+            break;
+          case EEditMode.numeric:
+            drawText(maxColumns - 3, 0, "123");
+            break;
+        }
+      }
+      formSetCursor(prompt.Length + cursor_position, positionId);
+    }
+
+    public void eraseEdit(int positionId, string prompt, string caption, int cursor_position)
+    {
+      eraseText(positionId, prompt + caption, EAlignment.justify_left);
+      eraseText(maxColumns - 3, 0, "   ");
+      formErasebutton();
+    }
+
 
     public void drawScroller(int positionId, int scrollposition, int scrollSize)
     {

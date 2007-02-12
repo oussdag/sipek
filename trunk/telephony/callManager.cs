@@ -24,9 +24,54 @@ using MenuDesigner;
 namespace Telephony
 {
 
+  public class CConfigData
+  {
+    private int _sipPort = 5060;
+    private string _sipProxy = "0.0.0.0";
+    private bool _sipRegister = false;
+    private int _sipRegPeriod = 3600;
+    private string _sipUsername = "";
+    private string _sipPassword = "";
+
+    public int SipPort 
+    {
+      get { return _sipPort; }
+      set { _sipPort = value; }
+    }
+    public string SipProxy 
+    {
+      get { return _sipProxy; }
+      set { _sipProxy = value; }
+    }
+    public bool SipRegister 
+    {
+      get { return _sipRegister; }
+      set { _sipRegister = value; }
+    }
+    public int SipRegPeriod
+    {
+      get { return _sipRegPeriod; }
+      set { _sipRegPeriod = value; }
+    }
+    public string SipUsername
+    {
+      get { return _sipUsername; }
+      set { _sipUsername = value; }
+    }
+    public string SipPassword 
+    {
+      get { return _sipPassword; }
+      set { _sipPassword = value; }
+    }
+  
+  }
+
+
+  /// <summary>
+  /// 
+  /// </summary>
   public class CCallManager
   {
-
     #region Variables
 
     private static CCallManager _instance = null;
@@ -35,9 +80,21 @@ namespace Telephony
 
     private int _currentSession = -1;
 
+    private CConfigData _config;
+
     #endregion
 
+    #region Properties
 
+    public string SipProxy
+    {
+      get { return _config.SipProxy; }
+    }
+
+    #endregion Properties
+
+
+    #region Constructor
 
     public static CCallManager getInstance()
     { 
@@ -48,11 +105,11 @@ namespace Telephony
       return _instance;
     }
 
-    #region Constructor
-
     private CCallManager()
     {
       _calls = new Dictionary<int, CStateMachine>();
+      _config = new CConfigData();
+
     }
     #endregion Constructor
 
@@ -69,6 +126,8 @@ namespace Telephony
       new CActivePage();
       new CDialPage();
       new CIncomingPage();
+      new CPreDialPage();
+
 
       // init SIP
       CSipProxy.initialize();
@@ -79,15 +138,25 @@ namespace Telephony
 
     public void shutdown()
     {
-      CSipProxy proxy = new CSipProxy(0);
-      proxy.shutdown();
+      //CSipProxy proxy = new CSipProxy(0);
+      //proxy.shutdown();
+      CSipProxy.shutdown();
     }
 
+    public void updateConfig(string proxy, int port)
+    {
+      _config.SipProxy = proxy;
+      _config.SipPort = port;
+    }
 
     public void updateGui()
     {
       // get current session
-      if (_currentSession < 0) return;
+      if (_currentSession < 0)
+      {
+        CComponentController.getInstance().showPage((int)2);
+        return;
+      }
 
       CStateMachine call = getCall(_currentSession);
       switch (call.getStateId())
@@ -115,6 +184,7 @@ namespace Telephony
 
     public CStateMachine getCurrentCall()
     {
+      if (_currentSession < 0) return null;
       return _calls[_currentSession];
     }
 
@@ -129,9 +199,12 @@ namespace Telephony
     {
       CStateMachine call = createCall();
       int newsession = call.getState().makeCall(number);
-      call.Session = newsession;
-      _calls.Add(newsession, call);
-      _currentSession = newsession;
+      if (newsession != -1)
+      {
+        call.Session = newsession;
+        _calls.Add(newsession, call);
+        _currentSession = newsession;
+      }
       updateGui();
     }
     
