@@ -30,9 +30,10 @@ namespace Gui
     P_SIPSETTINGS,
     P_SIPPROXYSETTINGS
   }
-
-
-
+  
+  /// <summary>
+  /// 
+  /// </summary>
   public class CInitPage : CPage
   {
     public CInitPage()
@@ -49,6 +50,13 @@ namespace Gui
       CText text = new CText("Sipek Phone", EAlignment.justify_center);
       text.PosY = 3;
       this.add(text);
+
+      CText txt = new CText(".....");
+      txt.PosY = 5;
+      txt.PosX = 10;
+      CHorizontalScroller scrollingtext = new CHorizontalScroller(txt, 10, 200);
+      add(scrollingtext);
+
 
       this.Ok += new NoParamDelegate(okhandler);
     }
