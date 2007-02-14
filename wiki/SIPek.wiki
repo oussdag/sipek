@@ -8,4 +8,4 @@ SIPek is VoIP PC phone based on SIP.
 
 = Details =
 
-Written in C#, use pjSip protocol stack.  
+Written in C#, using pjSip protocol stack.  
