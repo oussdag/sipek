@@ -16,68 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
  */
 
-
+using System.Collections;
 using System.Collections.Generic;
 using MenuDesigner;
 
 
 namespace Telephony
 {
-
-  public class CConfigData
-  {
-    private int _sipPort = 5060;
-    private string _sipProxy = "0.0.0.0";
-    private int _sipProxyPort = 5060;
-    private bool _sipRegister = false;
-    private int _sipRegPeriod = 3600;
-    private string _sipName = "";
-    private string _sipUsername = "";
-    private string _sipPassword = "";
-
-    public int SipPort 
-    {
-      get { return _sipPort; }
-      set { _sipPort = value; }
-    }
-    public string SipProxy 
-    {
-      get { return _sipProxy; }
-      set { _sipProxy = value; }
-    }
-    public int SipProxyPort
-    {
-      get { return _sipProxyPort; }
-      set { _sipProxyPort = value; }
-    }
-    public bool SipRegister 
-    {
-      get { return _sipRegister; }
-      set { _sipRegister = value; }
-    }
-    public int SipRegPeriod
-    {
-      get { return _sipRegPeriod; }
-      set { _sipRegPeriod = value; }
-    }
-    public string SipUsername
-    {
-      get { return _sipUsername; }
-      set { _sipUsername = value; }
-    }
-    public string SipPassword 
-    {
-      get { return _sipPassword; }
-      set { _sipPassword = value; }
-    }
-    public string SipName
-    {
-      get { return _sipName; }
-      set { _sipName = value; }
-    }  
-  }
-
-
   /// <summary>
   /// 
   /// </summary>
@@ -91,23 +36,36 @@ namespace Telephony
 
     private int _currentSession = -1;
 
-    private CConfigData _config;
+    // Configuration parameters
+    private int _sipPort = 5060;
+    private string _sipProxy = "0.0.0.0";
+    private int _sipProxyPort = 5060;
+    private bool _sipRegister = false;
+    private int _sipRegPeriod = 3600;
+    private string _sipName = "";
+    private string _sipUsername = "";
+    private string _sipPassword = "";
 
     #endregion
 
     #region Properties
 
+    public int Count
+    {
+      get { return _calls.Count; }
+    }
+
     public string SipProxy
     {
-      get { return _config.SipProxy; }
+      get { return _sipProxy; }
     }
     public int SipProxyPort
     {
-      get { return _config.SipProxyPort; }
+      get { return _sipProxyPort; }
     }
     public string SipName
     {
-      get { return _config.SipName; }
+      get { return _sipName; }
     }
 
     #endregion Properties
@@ -126,9 +84,6 @@ namespace Telephony
 
     private CCallManager()
     {
-      _calls = new Dictionary<int, CStateMachine>();
-      _config = new CConfigData();
-
     }
     #endregion Constructor
 
@@ -158,16 +113,14 @@ namespace Telephony
 
     public void shutdown()
     {
-      //CSipProxy proxy = new CSipProxy(0);
-      //proxy.shutdown();
       CSipProxy.shutdown();
     }
 
     public void updateConfig(System.Configuration.ApplicationSettingsBase config)
     {
-      _config.SipProxy = config["cfgSipProxy"].ToString();
-      _config.SipProxyPort = (int)config["cfgSipProxyPort"];
-      _config.SipName = config["cfgSipDisplayName"].ToString();
+      _sipProxy = config["cfgSipProxy"].ToString();
+      _sipProxyPort = (int)config["cfgSipProxyPort"];
+      _sipName = config["cfgSipDisplayName"].ToString();
     }
 
     public void updateGui()
@@ -211,7 +164,7 @@ namespace Telephony
 
     public CStateMachine getCall(int session)
     {
-      if (_calls.Count == 0) return null;
+      if ((_calls.Count == 0)||(!_calls.ContainsKey(session))) return null;
       return _calls[session];
     }
 
@@ -239,20 +192,24 @@ namespace Telephony
       return call;
     }
 
-    public void destroySession()
-    {
-      CStateMachine call = getCall(_currentSession);
-      call.getState().endCall();
-    }
-
-    public void destroySession(int session)
+     public void destroySession(int session)
     {
       _calls.Remove(_currentSession);
-      if (_calls.Count == 0) _currentSession = -1;
+      if (_calls.Count == 0)
+      {
+        _currentSession = -1;
+      }
+      else 
+      {
+        // select other session
+        _currentSession = _calls.GetEnumerator().Current.Key;
+      }
     }
 
     public void onUserRelease()
     {
+      CStateMachine call = getCall(_currentSession);
+      call.getState().endCall();
     }
 
     public void onUserAnswer()
@@ -261,6 +218,40 @@ namespace Telephony
       call.getState().acceptCall();
     }
 
+    public void nextSession()
+    {
+      int newsession = _currentSession;
+      bool stop = false;
+      foreach (KeyValuePair<int, CStateMachine> kvp in _calls)
+      {
+        if (stop) 
+        {
+          newsession = kvp.Value.Session;
+          break;
+        }
+        if (_currentSession == kvp.Value.Session) stop = true;
+      }
+      // in case last session is active choose first one
+      if (newsession == _currentSession)
+      {
+        _currentSession = _calls.GetEnumerator().Current.Key;
+      }
+      else
+      {
+        _currentSession = newsession;
+      }
+      // update gui
+      updateGui();
+    }
+    
+    public void previousSession()
+    {
+      //
+      foreach (KeyValuePair<int, CStateMachine> call in _calls)
+      { 
+        //call.
+      }
+    }
     /////////////////////////////////////////////////////////////////////
 
     private CStateMachine createCall()

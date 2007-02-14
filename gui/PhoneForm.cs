@@ -198,17 +198,17 @@ namespace Gui
       control.getAccessIf().onClearKey();
     }
 
-
-    private void PhoneForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-      CCallManager.getInstance().shutdown();
-    }
-
     private void buttonSettings_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onMenuKey();
     }    
     
+    private void PhoneForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      control.shutdown();
+      CCallManager.getInstance().shutdown();
+    }
+
     private void PhoneForm_Shown(object sender, EventArgs e)
     {
       control = CComponentController.getInstance();

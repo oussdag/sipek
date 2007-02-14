@@ -133,7 +133,8 @@ namespace Gui
 
     private void formWriter(int xaxis, int yaxis, string text)
     {
-      mform.Invoke(new writerDelegate(mform.writeText), new object[3] { xaxis, yaxis, text });
+      if (!mform.IsDisposed)
+        mform.Invoke(new writerDelegate(mform.writeText), new object[3] { xaxis, yaxis, text });
     }
 
     private void formSetCursor(int xaxis, int yaxis)

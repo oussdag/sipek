@@ -37,7 +37,7 @@ namespace Telephony
 
     protected CText _info;
 	  protected CText _digits;
-	  protected CText _sessions;
+	  protected CLink _sessions;
   	
 
     public CTelephonyPage(ECallPages pageId, string pageName) 
@@ -67,11 +67,11 @@ namespace Telephony
 	    this.add(_digits);
 
 	    // sessions link
-	    CLink sesLink = new CLink("0/0");
-      sesLink.Align = EAlignment.justify_right;
-      sesLink.Softkey += new UintDelegate(sessionHandler);
-	    sesLink.PosY = 0;
-	    this.add(sesLink);
+      _sessions = new CLink("0/0");
+      _sessions.Align = EAlignment.justify_right;
+      _sessions.Softkey += new UintDelegate(sessionHandler);
+      _sessions.PosY = 0;
+      this.add(_sessions);
 
 	    // assign page handlers....
       this.Onhook += new NoParamDelegate(onhookHandler);
@@ -107,9 +107,8 @@ namespace Telephony
 	    _digits.Caption = digits;
 
 	    // call sessions...
-	    //char buf[6] = {0};
-	    //sprintf(buf, "%d/%d", muiHandler->getCurrentSID(), muiHandler->getUISessionsNum());
-	    //_sessions->setCaption(buf);
+      _sessions.Caption = (CCallManager.getInstance().getCurrentCall().Session + 1).ToString() 
+          + "/" + CCallManager.getInstance().Count.ToString();
     }
 
 
@@ -125,7 +124,7 @@ namespace Telephony
 
     bool onhookHandler() 
     {
-      CCallManager.getInstance().destroySession();
+      CCallManager.getInstance().onUserRelease();
       return true; 
     }
 
@@ -135,7 +134,8 @@ namespace Telephony
     }
 
     bool sessionHandler(int id) 
-    { 
+    {
+      CCallManager.getInstance().nextSession();
       return true; 
     }
 

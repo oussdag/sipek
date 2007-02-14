@@ -175,6 +175,7 @@ namespace Telephony
 //    PJSIP_INV_STATE_CONNECTING,	    /**< After 2xx is sent/received.	    */
 //    PJSIP_INV_STATE_CONFIRMED,	    /**< After ACK is sent/received.	    */
 //    PJSIP_INV_STATE_DISCONNECTED,   /**< Session is terminated.		    */
+      if (callState == 2) return 0;
 
       CStateMachine sm = CCallManager.getInstance().getCall(callId);
       if (sm == null) return 0;
