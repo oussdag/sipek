@@ -27,9 +27,17 @@ namespace Telephony
 {
   public class CSipProxy : CTelephonyInterface
   {    
+    // incoming
+    delegate int GetConfigData(int cfgId);
     delegate int OnRegStateChanged(int accountId, int regState);
     delegate int OnCallStateChanged(int callId, int stateId);
     delegate int OnCallIncoming(int callId, string number);
+    /// outgoing
+    delegate int DoItDelegate();
+    delegate int DoMakeCallDelegate(int callId, string number);
+    delegate int DoReleaseCallDelegate(int callId);
+    delegate int DoAnswerCallDelegate(int callId, int code);
+    delegate int DoRegisterDelegate(string uri, string reguri);
 
     [DllImport("pjsipDll.dll")]
     private static extern int dll_init();
@@ -43,20 +51,19 @@ namespace Telephony
     private static extern int onRegStateCallback(OnRegStateChanged cb);
     [DllImport("pjsipDll.dll")]
     private static extern int onCallIncoming(OnCallIncoming cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int getConfigDataCallback(GetConfigData cb);
     
     // call API
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_registerAccount(string uri, string reguri);
+
     [DllImport("pjsipDll.dll")]
     private static extern int dll_makeCall(int callId, string number);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_releaseCall(int callId);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_answerCall(int callId, int code);
-
-    ///
-    delegate int DoItDelegate();
-    delegate int DoMakeCallDelegate(int callId, string number);
-    delegate int DoReleaseCallDelegate(int callId);
-    delegate int DoAnswerCallDelegate(int callId, int code);
 
 
     #region Variables
@@ -71,6 +78,7 @@ namespace Telephony
     static OnCallStateChanged csDel;
     static OnRegStateChanged rsDel;
     static OnCallIncoming ciDel;
+    static GetConfigData gdDel;
 
     #endregion Variables
 
@@ -95,6 +103,7 @@ namespace Telephony
       ciDel = new OnCallIncoming(onCallIncoming);
       csDel = new OnCallStateChanged(onCallStateChanged);
       rsDel = new OnRegStateChanged(onRegStateChanged);
+      gdDel = new GetConfigData(getConfigData);
 
       // register callbacks (delegates)
       onCallIncoming( ciDel );
@@ -117,6 +126,14 @@ namespace Telephony
     /////////////////////////////////////////////////////////////////////////////////
     // Call API
     //
+    public static int registerAccount(int accountId)
+    {
+      string uri = "sip:" + CCallManager.getInstance().SipName + "@" + CCallManager.getInstance().SipProxy;
+      string reguri = "sip:" + CCallManager.getInstance().SipProxy + ":"+CCallManager.getInstance().SipProxyPort;
+      object res = m_Synchronizer.Invoke(new DoRegisterDelegate(dll_registerAccount), new object[2] { uri, reguri });
+      return 1;
+    }
+
     public int makeCall(string dialedNo)
     {
       string uri = "sip:" + dialedNo + "@" + CCallManager.getInstance().SipProxy;
@@ -196,7 +213,15 @@ namespace Telephony
       return 1;
     }
 
+
+    private static int getConfigData(int cfgId)
+    {
+
+      return 1;
+    }
+
     #endregion Callbacks
+
 
   }
 
