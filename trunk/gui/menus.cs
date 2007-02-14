@@ -27,7 +27,8 @@ namespace Gui
     P_IDLE,
     P_PHONEBOOK,
     P_MENU,
-    P_SIPSETTINGS
+    P_SIPSETTINGS,
+    P_SIPPROXYSETTINGS
   }
 
 
@@ -188,24 +189,76 @@ namespace Gui
 
   public class CSIPSettings : CPage
   {
-    CIpAddressEdit _editproxy;
+    CEditField _editDisplayName;
     CEditField _editport;
-    CCheckBox _checkRegister;
-    CEditField _editperiod;
 
     public CSIPSettings() 
       : base((int)EPages.P_SIPSETTINGS, "SIP Settings") 
     {
-      _editproxy = new CIpAddressEdit("Proxy>");
-      _editproxy.PosY = 3;
-      _editproxy.Focused = true;
-      _editproxy.LinkKey = _editproxy.PosY;
-      add(_editproxy);
+      _editDisplayName = new CEditField("Name>", "");
+      _editDisplayName.PosY = 3;
+      _editDisplayName.LinkKey = _editDisplayName.PosY;
+      add(_editDisplayName);
 
-      _editport = new CEditField("Port>","",EEditMode.numeric);
+      _editport = new CEditField("Port>", "", EEditMode.numeric);
       _editport.PosY = 5;
       _editport.LinkKey = _editport.PosY;
       add(_editport);
+
+      CLink proxyLink = new CLink("Proxy", (int)EPages.P_SIPPROXYSETTINGS);
+      proxyLink.Align = EAlignment.justify_right;
+      proxyLink.PosY = 7;
+      proxyLink.LinkKey = proxyLink.PosY;
+      add(proxyLink);
+
+      // ok handler
+      this.Ok += new NoParamDelegate(CSIPSettings_Ok);
+    }
+
+    bool CSIPSettings_Ok()
+    {
+      Properties.Settings.Default.cfgSipProxy = _editDisplayName.Caption;
+      Properties.Settings.Default.cfgSipPort = int.Parse(_editport.Caption);
+
+      Properties.Settings.Default.Save();
+
+      _controller.previousPage();
+      return true;
+    }
+
+    public override void onEntry()
+    {
+      _editDisplayName.Caption = Properties.Settings.Default.cfgSipDisplayName;
+      _editport.Caption = Properties.Settings.Default.cfgSipPort.ToString();
+
+      base.onEntry();
+    }
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CSIPProxySettings : CPage
+  {
+    CIpAddressEdit _editProxyAddress;
+    CEditField _editProxyPort;
+    CCheckBox _checkRegister;
+    CEditField _editperiod;
+
+    public CSIPProxySettings()
+      : base((int)EPages.P_SIPPROXYSETTINGS, "SIP Proxy Settings")
+    {
+      _editProxyAddress = new CIpAddressEdit("Proxy>");
+      _editProxyAddress.PosY = 3;
+      _editProxyAddress.Focused = true;
+      _editProxyAddress.LinkKey = _editProxyAddress.PosY;
+      add(_editProxyAddress);
+
+      _editProxyPort = new CEditField("Port>", "", EEditMode.numeric);
+      _editProxyPort.PosY = 5;
+      _editProxyPort.LinkKey = _editProxyPort.PosY;
+      add(_editProxyPort);
+
 
       _checkRegister = new CCheckBox("Register");
       _checkRegister.PosY = 7;
@@ -217,34 +270,34 @@ namespace Gui
       _editperiod.LinkKey = _editperiod.PosY;
       add(_editperiod);
 
-      // ok handler
-      this.Ok += new NoParamDelegate(CSIPSettings_Ok);
-    }
-
-    bool CSIPSettings_Ok()
-    {
-      Properties.Settings.Default.cfgSipProxy = _editproxy.Caption;
-      Properties.Settings.Default.cfgSipPort = int.Parse(_editport.Caption);
-      Properties.Settings.Default.cfgSipRegister = _checkRegister.Checked;
-      Properties.Settings.Default.cfgSipRegPeriod = int.Parse(_editperiod.Caption);
-
-      Properties.Settings.Default.Save();
-
-      _controller.previousPage();
-      return true;
+      this.Ok += new NoParamDelegate(CSIPProxySettings_Ok);
     }
 
     public override void onEntry()
     {
-      _editproxy.Caption = Properties.Settings.Default.cfgSipProxy;
-      _editport.Caption = Properties.Settings.Default.cfgSipPort.ToString();
+      _editProxyAddress.Caption = Properties.Settings.Default.cfgSipProxy;
+      _editProxyPort.Caption = Properties.Settings.Default.cfgSipPort.ToString();
       _checkRegister.Checked = Properties.Settings.Default.cfgSipRegister;
       _editperiod.Caption = Properties.Settings.Default.cfgSipRegPeriod.ToString();
 
       base.onEntry();
     }
 
+    bool CSIPProxySettings_Ok()
+    {
+      Properties.Settings.Default.cfgSipProxy = _editProxyAddress.Caption;
+      Properties.Settings.Default.cfgSipProxyPort = int.Parse(_editProxyPort.Caption);
+      Properties.Settings.Default.cfgSipRegister = _checkRegister.Checked;
+      Properties.Settings.Default.cfgSipRegPeriod = int.Parse(_editperiod.Caption);
 
+      Properties.Settings.Default.Save();
+
+      CCallManager.getInstance().updateConfig(Properties.Settings.Default);
+
+      _controller.previousPage();
+
+      return true;
+    }
   }
 
 } // namespace Gui

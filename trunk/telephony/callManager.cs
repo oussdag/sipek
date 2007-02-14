@@ -28,8 +28,10 @@ namespace Telephony
   {
     private int _sipPort = 5060;
     private string _sipProxy = "0.0.0.0";
+    private int _sipProxyPort = 5060;
     private bool _sipRegister = false;
     private int _sipRegPeriod = 3600;
+    private string _sipName = "";
     private string _sipUsername = "";
     private string _sipPassword = "";
 
@@ -42,6 +44,11 @@ namespace Telephony
     {
       get { return _sipProxy; }
       set { _sipProxy = value; }
+    }
+    public int SipProxyPort
+    {
+      get { return _sipProxyPort; }
+      set { _sipProxyPort = value; }
     }
     public bool SipRegister 
     {
@@ -63,7 +70,11 @@ namespace Telephony
       get { return _sipPassword; }
       set { _sipPassword = value; }
     }
-  
+    public string SipName
+    {
+      get { return _sipName; }
+      set { _sipName = value; }
+    }  
   }
 
 
@@ -89,6 +100,14 @@ namespace Telephony
     public string SipProxy
     {
       get { return _config.SipProxy; }
+    }
+    public int SipProxyPort
+    {
+      get { return _config.SipProxyPort; }
+    }
+    public string SipName
+    {
+      get { return _config.SipName; }
     }
 
     #endregion Properties
@@ -131,6 +150,7 @@ namespace Telephony
 
       // init SIP
       CSipProxy.initialize();
+      CSipProxy.registerAccount(0);
 
       // Initialize call table
       _calls = new Dictionary<int, CStateMachine>();
@@ -143,10 +163,11 @@ namespace Telephony
       CSipProxy.shutdown();
     }
 
-    public void updateConfig(string proxy, int port)
+    public void updateConfig(System.Configuration.ApplicationSettingsBase config)
     {
-      _config.SipProxy = proxy;
-      _config.SipPort = port;
+      _config.SipProxy = config["cfgSipProxy"].ToString();
+      _config.SipProxyPort = (int)config["cfgSipProxyPort"];
+      _config.SipName = config["cfgSipDisplayName"].ToString();
     }
 
     public void updateGui()

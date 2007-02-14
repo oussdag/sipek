@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="cfgSipProxy" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0.0.0.0</Value>
     </Setting>
     <Setting Name="cfgSipUsername" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -19,6 +19,12 @@
     </Setting>
     <Setting Name="cfgSipRegPeriod" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3600</Value>
+    </Setting>
+    <Setting Name="cfgSipProxyPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5060</Value>
+    </Setting>
+    <Setting Name="cfgSipDisplayName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SIPek</Value>
     </Setting>
   </Settings>
 </SettingsFile>
