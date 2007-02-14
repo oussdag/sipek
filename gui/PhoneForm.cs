@@ -226,12 +226,15 @@ namespace Gui
       new CPhonebookPage();
       new CMenuPage();
       new CSIPSettings();
+      new CSIPProxySettings();
 
       control.initialize();
 
       // set active page...
       control.setActivePage((int)EPages.P_INIT);
 
+      // update telephony
+      CCallManager.getInstance().updateConfig(Properties.Settings.Default);
       // initialize telephony...
       CCallManager.getInstance().initialize();
 

@@ -40,15 +40,11 @@
     <Compile Include="callManager.cs" />
     <Compile Include="callmenus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="sipProxy.cs" />
     <Compile Include="stateMachine.cs" />
     <Compile Include="states.cs" />
     <Compile Include="synchronizer.cs" />
     <Compile Include="telephonyInterface.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

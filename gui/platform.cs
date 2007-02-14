@@ -262,7 +262,7 @@ namespace Gui
             break;
         }
       }
-      formSetCursor(prompt.Length + cursor_position, positionId);
+      if (selected) formSetCursor(prompt.Length + cursor_position, positionId);
     }
 
     public void eraseEdit(int positionId, string prompt, string caption, int cursor_position)

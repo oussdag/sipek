@@ -25,7 +25,7 @@ namespace Gui.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.0.0.0")]
         public string cfgSipProxy {
             get {
                 return ((string)(this["cfgSipProxy"]));
@@ -92,6 +92,30 @@ namespace Gui.Properties {
             }
             set {
                 this["cfgSipRegPeriod"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5060")]
+        public int cfgSipProxyPort {
+            get {
+                return ((int)(this["cfgSipProxyPort"]));
+            }
+            set {
+                this["cfgSipProxyPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SIPek")]
+        public string cfgSipDisplayName {
+            get {
+                return ((string)(this["cfgSipDisplayName"]));
+            }
+            set {
+                this["cfgSipDisplayName"] = value;
             }
         }
     }
