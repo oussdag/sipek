@@ -47,7 +47,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="calllog.cs" />
     <Compile Include="menus.cs" />
+    <Compile Include="phonebook.cs" />
     <Compile Include="PhoneForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,6 +71,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <BaseApplicationManifest Include="Properties\app.manifest" />
     <None Include="app.config" />

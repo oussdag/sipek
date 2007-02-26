@@ -90,9 +90,6 @@ namespace Gui
       menuButton.BackColor = System.Drawing.Color.DarkGray;
       _buttons.Add(menuButton);
       this.Controls.Add(menuButton);
-
-      //richTextBox1.SendToBack();
-      //menuButton.BringToFront();
     }
 
     void menuButton_Click(object sender, EventArgs e)
@@ -224,6 +221,7 @@ namespace Gui
       new CInitPage();
       new IdlePage();
       new CPhonebookPage();
+      new CPhonebookEditPage();
       new CMenuPage();
       new CSIPSettings();
       new CSIPProxySettings();

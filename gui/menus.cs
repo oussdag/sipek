@@ -18,6 +18,7 @@
 
 using MenuDesigner;
 using Telephony;
+using System.Collections.ObjectModel;
 
 namespace Gui
 {
@@ -26,6 +27,7 @@ namespace Gui
     P_INIT = 1,
     P_IDLE,
     P_PHONEBOOK,
+    P_PHONEBOOKEDIT,
     P_MENU,
     P_SIPSETTINGS,
     P_SIPPROXYSETTINGS
@@ -163,15 +165,151 @@ namespace Gui
   /// 
   /// </summary>
   public class CPhonebookPage : CPage
-  { 
+  {
+    private CEditField _criteria;
+    private CSelectList _list;
+
     public CPhonebookPage() : base((int)EPages.P_PHONEBOOK,"Phonebook") 
     {
+      _criteria = new CEditField(">", "", EEditMode.alphanum_low, true);
+      _criteria.PosY = 1;
+      _criteria.Digitkey += new UintDelegate(_criteria_Digitkey);
+      add(_criteria);
+
+      _list = new CSelectList(7);
+      _list.PosY = 3;
+      add(_list);
+
+      CLink addNewLink = new CLink("Add new", (int)EPages.P_PHONEBOOKEDIT);
+      addNewLink.PosY = 2;
+      addNewLink.LinkKey = addNewLink.PosY;
+      addNewLink.Align = EAlignment.justify_right;
+      add(addNewLink);
+
+      Menu += new NoParamDelegate(CPhonebookPage_Menu);
+    }
+
+    public override void onEntry()
+    {
+      _list.removeAll();
+
+      Collection<CPhonebookRecord> results = CPhonebook.getInstance().getList();
+
+      foreach (CPhonebookRecord item in results)
+      {
+        CLink recordLink = new CLink(item.FirstName + " " + item.LastName);
+        recordLink.subItems[0] = item.LastName;
+        recordLink.subItems[1] = item.Number;
+        _list.add(recordLink);
+      }
+
+      base.onEntry();
     }
 
 
+    bool _criteria_Digitkey(int keyId)
+    {
+      _controller.drawComponent(this);
+      return true;
+    }
+
+    bool CPhonebookPage_Menu()
+    {
+      CPhonebookEditPage editPage = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
+      editPage.FirstName = ((CLink)_list.Selected).Caption;
+      editPage.LastName = ((CLink)_list.Selected).subItems[0];
+      editPage.Number = ((CLink)_list.Selected).subItems[1];
+      _controller.showPage(editPage.Id);
+      return true;
+    }
+
   }
 
+  ///////////////////////////////////////////////////////////////////////////////
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CPhonebookEditPage : CPage
+  {
+    private CEditField _fname;
+    private CEditField _lname;
+    private CEditField _number;
 
+    public string FirstName
+    {
+      set { _fname.Caption = value; }
+    }
+    public string LastName
+    {
+      set { _lname.Caption = value; }
+    }
+    public string Number
+    {
+      set { _number.Caption = value; }
+    }
+
+    public CPhonebookEditPage()
+      : base((int)EPages.P_PHONEBOOKEDIT, "Editing")
+    {
+      _fname = new CEditField("First Name>", "", EEditMode.alphanum_high, true);
+      _fname.PosY = 2;
+      _fname.LinkKey = _fname.PosY;
+      add(_fname);
+
+      _lname = new CEditField("Last Name>", "", EEditMode.alphanum_high, false);
+      _lname.PosY = 4;
+      _lname.LinkKey = _lname.PosY;
+      add(_lname);
+
+      _number = new CEditField("Number>", "", EEditMode.numeric);
+      _number.PosY = 6;
+      _number.LinkKey = _number.PosY;
+      add(_number);
+
+      CLink saveLink = new CLink("Save!");
+      saveLink.PosY = 7;
+      saveLink.LinkKey = saveLink.PosY;
+      saveLink.Align = EAlignment.justify_right;
+      saveLink.Softkey += new UintDelegate(saveLink_Softkey);
+      add(saveLink);
+
+      CLink deleteLink = new CLink("Delete!");
+      deleteLink.PosY = 8;
+      deleteLink.LinkKey = deleteLink.PosY;
+      deleteLink.Align = EAlignment.justify_right;
+      deleteLink.Softkey += new UintDelegate(deleteLink_Softkey);
+      add(deleteLink);
+    }
+
+    bool saveLink_Ok()
+    {
+      return saveLink_Softkey(0);
+    }
+
+    bool saveLink_Softkey(int keyId)
+    {
+      CPhonebookRecord record = new CPhonebookRecord();
+      record.FirstName = _fname.Caption;
+      record.LastName = _lname.Caption;
+      record.Number = _number.Caption;
+
+      CPhonebook.getInstance().addRecord(record);
+      CPhonebook.getInstance().save();
+
+      _controller.previousPage();
+      return true;
+    }
+
+    bool deleteLink_Softkey(int keyId)
+    {
+      CPhonebook.getInstance().deleteRecord(_lname.Caption);
+      CPhonebook.getInstance().save();
+
+      _controller.previousPage();
+      return true;
+    }
+
+  }
   public class CMenuPage : CPage 
   {
     public CMenuPage()     

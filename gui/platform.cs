@@ -169,7 +169,6 @@ namespace Gui
         case EAlignment.justify_right: xaxis = maxColumns  - caption.Length; break;
         case EAlignment.justify_center: xaxis = (maxColumns - caption.Length) / 2; break;
       }
-      //this.mform.writeText(xaxis, positionId, caption);
       formWriter(xaxis, positionId, caption);
     }
 
@@ -185,14 +184,11 @@ namespace Gui
       int xaxis = 0;
       if (justify == EAlignment.justify_right) xaxis = maxColumns - caption.Length;
       if (justify == EAlignment.justify_center) xaxis = (maxColumns - caption.Length) / 2;
-      //this.mform.eraseText(xaxis, positionId, caption);
-      //this.mform.writeText(xaxis, positionId, new string(' ', caption.Length));
       formWriter(xaxis, positionId, new string(' ', caption.Length));
     }
 
     public void eraseText(int posX, int posY, string caption)
     {
-      //this.mform.writeText(posX, posY, new string(' ', caption.Length));
       formWriter(posX, posY, new string(' ', caption.Length));
     }
 
@@ -210,7 +206,6 @@ namespace Gui
 
     public void drawSelection(int position, int type)
     {
-      //mform.setSelection(0, position, maxColumns);
       formSetSelection(0, position, maxColumns);
     }
 
@@ -238,9 +233,7 @@ namespace Gui
 
     public void eraseLink(int positionId, string caption, EAlignment justify)
     {
-      //string temp = "<a href=\"index\">" + caption + "</a>";
       this.eraseText(positionId, caption, justify);
-      //mform.eraseButton();
       formErasebutton();
     }
 
@@ -270,7 +263,6 @@ namespace Gui
     {
       eraseText(positionId, prompt + caption, EAlignment.justify_left);
       eraseText(maxColumns - 3, 0, "   ");
-      formErasebutton();
     }
 
 
