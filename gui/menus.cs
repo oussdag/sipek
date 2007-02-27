@@ -30,7 +30,8 @@ namespace Gui
     P_PHONEBOOKEDIT,
     P_MENU,
     P_SIPSETTINGS,
-    P_SIPPROXYSETTINGS
+    P_SIPPROXYSETTINGS,
+    P_RINGMODE
   }
   
   /// <summary>
@@ -96,7 +97,7 @@ namespace Gui
       mlinkPhonebook.LinkKey = mlinkPhonebook.PosY;
       this.add(mlinkPhonebook);
 
-      CLink mlinkRinger = new CLink("Ringer", 0);
+      CLink mlinkRinger = new CLink("Ring Mode", (int)EPages.P_RINGMODE);
       mlinkRinger.Align = EAlignment.justify_right;
       mlinkRinger.PosY = 7;
       mlinkRinger.LinkKey = mlinkRinger.PosY; 
@@ -177,14 +178,20 @@ namespace Gui
       add(_criteria);
 
       _list = new CSelectList(7);
-      _list.PosY = 3;
+      _list.PosY = 4;
       add(_list);
 
-      CLink addNewLink = new CLink("Add new", (int)EPages.P_PHONEBOOKEDIT);
+      CLink addNewLink = new CLink("Add New", (int)EPages.P_PHONEBOOKEDIT);
       addNewLink.PosY = 2;
       addNewLink.LinkKey = addNewLink.PosY;
-      addNewLink.Align = EAlignment.justify_right;
+      //addNewLink.Align = EAlignment.justify_right;
       add(addNewLink);
+
+      CLink modifyLink = new CLink("Modify", (int)EPages.P_PHONEBOOKEDIT);
+      modifyLink.PosY = 3;
+      modifyLink.LinkKey = modifyLink.PosY;
+      modifyLink.Align = EAlignment.justify_right;
+      add(modifyLink);
 
       Menu += new NoParamDelegate(CPhonebookPage_Menu);
     }
@@ -310,6 +317,9 @@ namespace Gui
     }
 
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
   public class CMenuPage : CPage 
   {
     public CMenuPage()     
@@ -444,6 +454,66 @@ namespace Gui
 
       return true;
     }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public class CRingModePage : CPage
+  {
+    public enum ERingModes : int
+    { 
+      ESILENT,
+      EMELODY,
+      EBEEP
+    }
+
+    CRadioButtonGroup _radio;
+    CCheckBox _silentCb;
+    CCheckBox _melodyCb;
+    CCheckBox _beepCb;
+
+    public CRingModePage() 
+      : base((int)EPages.P_RINGMODE,"Ringer Mode")
+    {
+      _radio = new CRadioButtonGroup();
+
+      _silentCb = new CCheckBox("Silent");
+      _silentCb.PosY = 3;
+      _silentCb.LinkKey = _silentCb.PosY;
+      _radio.add(_silentCb);
+
+      _melodyCb = new CCheckBox("Melody");
+      _melodyCb.PosY = 4;
+      _melodyCb.LinkKey = _melodyCb.PosY;
+      _radio.add(_melodyCb);
+      
+      _beepCb = new CCheckBox("Beep");
+      _beepCb.PosY = 5;
+      _beepCb.LinkKey = _beepCb.PosY;
+      _radio.add(_beepCb);
+
+
+    }
+
+    public override void onEntry()
+    {
+      base.onEntry();
+
+      if (Properties.Settings.Default.cfgRingMode == (int)ERingModes.ESILENT)
+      {
+        _radio.Checked = _silentCb;
+      }
+      if (Properties.Settings.Default.cfgRingMode == (int)ERingModes.EMELODY)
+      {
+        _radio.Checked = _melodyCb;
+      }
+      if (Properties.Settings.Default.cfgRingMode == (int)ERingModes.EBEEP)
+      {
+        _radio.Checked = _beepCb;
+      }
+
+    }
+  
   }
 
 } // namespace Gui

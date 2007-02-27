@@ -26,5 +26,8 @@
     <Setting Name="cfgSipDisplayName" Type="System.String" Scope="User">
       <Value Profile="(Default)">SIPek</Value>
     </Setting>
+    <Setting Name="cfgRingMode" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

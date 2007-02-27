@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using System.Collections.ObjectModel;
 
 namespace Gui
 {
@@ -83,26 +84,26 @@ namespace Gui
       Collection<CCallRecord> result = new Collection<CCallRecord>();
 
       XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
-
+/*
       foreach (XmlNode item in list)
       {
         CCallRecord record = new CCallRecord();
-        record.FirstName = item.ChildNodes[0].InnerText;
-        record.LastName = item.ChildNodes[1].InnerText;
+        record. = item.ChildNodes[0].InnerText;
+        record. = item.ChildNodes[1].InnerText;
 
         XmlNode node = item.ChildNodes[2];
         record.Number = node.ChildNodes[0].InnerText;
 
         result.Add(record);
       }
-
+      */
       return result;
     }
 
     public void addRecord(CCallRecord record)
     {
       XmlNode nodeRecord = _xmlDocument.CreateNode("element", "Record", "");
-
+/*
       XmlElement ellastname = _xmlDocument.CreateElement("LastName");
       ellastname.InnerText = record.LastName;
       nodeRecord.AppendChild(ellastname);
@@ -117,7 +118,7 @@ namespace Gui
       elNumber.InnerText = record.Number;
       phelem.AppendChild(elNumber);
       nodeRecord.AppendChild(phelem);
-
+      */
       _xmlDocument.DocumentElement.AppendChild(nodeRecord);
     }
 

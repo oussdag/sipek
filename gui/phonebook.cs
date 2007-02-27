@@ -93,7 +93,7 @@ namespace Gui
       { 
         System.Console.WriteLine(ee.Message);
 
-        XmlNode root = _xmlDocument.CreateNode("element","phonebook","");
+        XmlNode root = _xmlDocument.CreateNode("element","Phonebook","");
         _xmlDocument.AppendChild(root);
 
       }
