@@ -118,5 +118,17 @@ namespace Gui.Properties {
                 this["cfgSipDisplayName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int cfgRingMode {
+            get {
+                return ((int)(this["cfgRingMode"]));
+            }
+            set {
+                this["cfgRingMode"] = value;
+            }
+        }
     }
 }
