@@ -225,6 +225,7 @@ namespace Gui
       new CMenuPage();
       new CSIPSettings();
       new CSIPProxySettings();
+      new CRingModePage();
 
       control.initialize();
 
@@ -236,6 +237,26 @@ namespace Gui
       // initialize telephony...
       CCallManager.getInstance().initialize();
 
+    }
+
+    private void rightNav_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onRightKey();
+    }
+
+    private void leftNav_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onLeftKey();
+    }
+
+    private void downNav_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onDownKey();
+    }
+
+    private void upNav_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onUpKey();
     }
 
   }
