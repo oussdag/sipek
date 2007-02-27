@@ -33,7 +33,12 @@ namespace Gui
     P_SIPPROXYSETTINGS,
     P_RINGMODE
   }
-  
+  public enum ERingModes : int
+  {
+    ESILENT,
+    EMELODY,
+    EBEEP
+  }
   /// <summary>
   /// 
   /// </summary>
@@ -77,6 +82,7 @@ namespace Gui
   public class IdlePage : CPage
   {
     CText _timedate;
+    CLink _linkRinger;
 
     public IdlePage()
       : base((int)EPages.P_IDLE)
@@ -97,11 +103,11 @@ namespace Gui
       mlinkPhonebook.LinkKey = mlinkPhonebook.PosY;
       this.add(mlinkPhonebook);
 
-      CLink mlinkRinger = new CLink("Ring Mode", (int)EPages.P_RINGMODE);
-      mlinkRinger.Align = EAlignment.justify_right;
-      mlinkRinger.PosY = 7;
-      mlinkRinger.LinkKey = mlinkRinger.PosY; 
-      this.add(mlinkRinger);
+      _linkRinger = new CLink("Ring Mode", (int)EPages.P_RINGMODE);
+      _linkRinger.Align = EAlignment.justify_right;
+      _linkRinger.PosY = 7;
+      _linkRinger.LinkKey = _linkRinger.PosY;
+      this.add(_linkRinger);
 
       CLink mlinkCalls = new CLink("Calls", 0);
       mlinkCalls.Align = EAlignment.justify_right;
@@ -117,6 +123,24 @@ namespace Gui
       Digitkey += new UintDelegate(digitkeyHandler);
       Offhook += new NoParamDelegate(IdlePage_Offhook);
       Menu += new NoParamDelegate(IdlePage_Menu);
+    }
+
+    public override void onEntry()
+    {
+      base.onEntry();
+      
+      switch (Properties.Settings.Default.cfgRingMode)
+      {
+        case (int)ERingModes.ESILENT:
+          _linkRinger.Caption = "Silent";
+          break;
+        case (int)ERingModes.EMELODY:
+          _linkRinger.Caption = "Melody";
+          break;
+        case (int)ERingModes.EBEEP:
+          _linkRinger.Caption = "Beep";
+          break;
+      }
     }
 
     bool IdlePage_Menu()
@@ -187,13 +211,28 @@ namespace Gui
       //addNewLink.Align = EAlignment.justify_right;
       add(addNewLink);
 
-      CLink modifyLink = new CLink("Modify", (int)EPages.P_PHONEBOOKEDIT);
+      CLink modifyLink = new CLink("Modify");
       modifyLink.PosY = 3;
       modifyLink.LinkKey = modifyLink.PosY;
+      modifyLink.Softkey += new UintDelegate(modifyLink_Softkey);
       modifyLink.Align = EAlignment.justify_right;
       add(modifyLink);
 
       Menu += new NoParamDelegate(CPhonebookPage_Menu);
+    }
+
+    bool modifyLink_Softkey(int keyId)
+    {
+      CPhonebookEditPage page = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
+
+      CLink selitem = (CLink)_list.Selected;
+      page.LastName = selitem.subItems[0];
+      page.FirstName = selitem.subItems[1];
+      page.Number = selitem.subItems[2];
+
+      _controller.showPage(page.Id);
+      
+      return true;
     }
 
     public override void onEntry()
@@ -206,7 +245,8 @@ namespace Gui
       {
         CLink recordLink = new CLink(item.FirstName + " " + item.LastName);
         recordLink.subItems[0] = item.LastName;
-        recordLink.subItems[1] = item.Number;
+        recordLink.subItems[1] = item.FirstName;
+        recordLink.subItems[2] = item.Number;
         _list.add(recordLink);
       }
 
@@ -274,16 +314,15 @@ namespace Gui
       add(_number);
 
       CLink saveLink = new CLink("Save!");
-      saveLink.PosY = 7;
+      saveLink.PosY = 8;
       saveLink.LinkKey = saveLink.PosY;
       saveLink.Align = EAlignment.justify_right;
       saveLink.Softkey += new UintDelegate(saveLink_Softkey);
       add(saveLink);
 
       CLink deleteLink = new CLink("Delete!");
-      deleteLink.PosY = 8;
+      deleteLink.PosY = 9;
       deleteLink.LinkKey = deleteLink.PosY;
-      deleteLink.Align = EAlignment.justify_right;
       deleteLink.Softkey += new UintDelegate(deleteLink_Softkey);
       add(deleteLink);
     }
@@ -460,13 +499,6 @@ namespace Gui
 
   public class CRingModePage : CPage
   {
-    public enum ERingModes : int
-    { 
-      ESILENT,
-      EMELODY,
-      EBEEP
-    }
-
     CRadioButtonGroup _radio;
     CCheckBox _silentCb;
     CCheckBox _melodyCb;
@@ -480,36 +512,60 @@ namespace Gui
       _silentCb = new CCheckBox("Silent");
       _silentCb.PosY = 3;
       _silentCb.LinkKey = _silentCb.PosY;
+      _silentCb.Softkey += new UintDelegate(_silentCb_Softkey);
       _radio.add(_silentCb);
 
       _melodyCb = new CCheckBox("Melody");
       _melodyCb.PosY = 4;
       _melodyCb.LinkKey = _melodyCb.PosY;
+      _melodyCb.Softkey += new UintDelegate(_melodyCb_Softkey);
       _radio.add(_melodyCb);
       
       _beepCb = new CCheckBox("Beep");
       _beepCb.PosY = 5;
       _beepCb.LinkKey = _beepCb.PosY;
+      _beepCb.Softkey += new UintDelegate(_beepCb_Softkey);
       _radio.add(_beepCb);
 
+      add(_radio);
+    }
 
+    bool _beepCb_Softkey(int keyId)
+    {
+      Properties.Settings.Default.cfgRingMode = 2;
+      Properties.Settings.Default.Save();
+      return true;
+    }
+
+    bool _melodyCb_Softkey(int keyId)
+    {
+      Properties.Settings.Default.cfgRingMode = 1;
+      Properties.Settings.Default.Save();
+      return true;
+    }
+
+    bool _silentCb_Softkey(int keyId)
+    {
+      Properties.Settings.Default.cfgRingMode = 0;
+      Properties.Settings.Default.Save();
+      return true;
     }
 
     public override void onEntry()
     {
       base.onEntry();
 
-      if (Properties.Settings.Default.cfgRingMode == (int)ERingModes.ESILENT)
+      switch (Properties.Settings.Default.cfgRingMode)
       {
-        _radio.Checked = _silentCb;
-      }
-      if (Properties.Settings.Default.cfgRingMode == (int)ERingModes.EMELODY)
-      {
-        _radio.Checked = _melodyCb;
-      }
-      if (Properties.Settings.Default.cfgRingMode == (int)ERingModes.EBEEP)
-      {
-        _radio.Checked = _beepCb;
+        case (int)ERingModes.ESILENT:
+          _radio.Checked = _silentCb;
+          break;
+        case (int)ERingModes.EMELODY:
+          _radio.Checked = _melodyCb;
+          break;
+        case (int)ERingModes.EBEEP:
+          _radio.Checked = _beepCb;
+          break;
       }
 
     }
