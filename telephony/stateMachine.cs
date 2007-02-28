@@ -39,6 +39,7 @@ namespace Telephony
 
     private ECallType _callType;
     private System.DateTime _timestamp;
+    private System.TimeSpan _duration;
 
 
     #endregion Variables
@@ -56,13 +57,6 @@ namespace Telephony
     public CSipProxy SigProxy
     {
       get { return _sigproxy; } 
-    }
-
-    private string _dialedNumber = "";
-    public string DialedNo
-    {
-      get { return _dialedNumber; }
-      set { _dialedNumber = value; }
     }
 
     private string _callingNumber = "";
@@ -91,7 +85,8 @@ namespace Telephony
 
     public System.TimeSpan Duration
     {
-      get { return System.DateTime.Now.Subtract(Time); }
+      set { _duration = value; }
+      get { return _duration; }
     }
     #endregion
 
@@ -108,6 +103,9 @@ namespace Telephony
       _stateReleased = new CReleasedState(this);
       _stateIncoming = new CIncomingState(this);
       _state = _stateIdle;
+
+      Time = System.DateTime.Now;
+      Duration = System.TimeSpan.Zero;
     }
 
     #endregion Constructor
@@ -150,10 +148,10 @@ namespace Telephony
     public void destroy()
     {
       // update call log
-      CCallLog.getInstance().addCall(Type, CallingNo, _timestamp, System.DateTime.Now.Subtract(_timestamp));
+      CCallLog.getInstance().addCall(Type, CallingNo, Time, Duration);
+      CCallLog.getInstance().save();
 
       CallingNo = "";
-      DialedNo = "";
       Incoming = false;
       changeState(CAbstractState.EStateId.IDLE);
       CCallManager.getInstance().destroySession(Session);

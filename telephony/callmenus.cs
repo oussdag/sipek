@@ -95,14 +95,7 @@ namespace Telephony
 
 	    // digits...
 	    string digits = "";
-	    if (currentCall.Incoming)
-	    {
-		    digits = currentCall.CallingNo;
-	    }
-	    else
-	    {
-        digits = currentCall.DialedNo;
-	    }
+	    digits = currentCall.CallingNo;
  
 	    _digits.Caption = digits;
 
