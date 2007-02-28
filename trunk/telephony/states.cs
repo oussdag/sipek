@@ -146,7 +146,7 @@ namespace Telephony
     {
       _smref.Type = ECallType.EDialed;
 
-      _smref.DialedNo = dialedNo;
+      _smref.CallingNo = dialedNo;
       _smref.changeState(EStateId.CONNECTING);
       return _smref.SigProxy.makeCall(dialedNo);
     }
@@ -268,6 +268,8 @@ namespace Telephony
     
     public override bool endCall()
     {
+      _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
+
       _smref.SigProxy.endCall();
       _smref.destroy();
       return true;
@@ -275,6 +277,8 @@ namespace Telephony
 
     public override void onReleased()
     {
+      _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
+
       _smref.destroy();
     }
 

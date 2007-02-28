@@ -19,7 +19,7 @@ namespace Telephony
     private string _name;
     private string _number;
     private DateTime _time;
-    private DateTime _duration;
+    private TimeSpan _duration;
     private int _count;
 
     public string Name
@@ -32,7 +32,26 @@ namespace Telephony
       get { return _number; }
       set { _number = value; }
     }
-
+    public ECallType Type
+    {
+      get { return _type; }
+      set { _type = value; }
+    }
+    public TimeSpan Duration
+    {
+      get { return _duration; }
+      set { _duration = value; }
+    }
+    public DateTime Time
+    {
+      get { return _time; }
+      set { _time = value; }
+    }
+    public int Count
+    {
+      get { return _count; }
+      set { _count = value; }
+    }
   }
 
   public class CCallLog
@@ -69,7 +88,7 @@ namespace Telephony
       {
         System.Console.WriteLine(ee.Message);
 
-        XmlNode root = _xmlDocument.CreateNode("element", "calllog", "");
+        XmlNode root = _xmlDocument.CreateNode("element", "Calllog", "");
         _xmlDocument.AppendChild(root);
 
       }
@@ -94,41 +113,86 @@ namespace Telephony
       Collection<CCallRecord> result = new Collection<CCallRecord>();
 
       XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
-/*
+      
       foreach (XmlNode item in list)
       {
         CCallRecord record = new CCallRecord();
-        record. = item.ChildNodes[0].InnerText;
-        record. = item.ChildNodes[1].InnerText;
-
-        XmlNode node = item.ChildNodes[2];
-        record.Number = node.ChildNodes[0].InnerText;
+        record.Type = (ECallType)int.Parse(item.ChildNodes[0].InnerText);
+        record.Name = item.ChildNodes[1].InnerText;
+        record.Number = item.ChildNodes[2].InnerText;
+        record.Time = DateTime.Parse(item.ChildNodes[3].InnerText);
+        record.Duration = TimeSpan.Parse(item.ChildNodes[4].InnerText);
+        record.Count = int.Parse(item.ChildNodes[5].InnerText);
 
         result.Add(record);
       }
-      */
+      
       return result;
     }
 
-    public void addRecord(CCallRecord record)
+    public XmlNode findRecord(string number)
+    { 
+      XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
+
+      foreach (XmlNode item in list)
+      {
+        if (item.ChildNodes[2].InnerText == number)
+        {
+          return item;
+        }
+      }
+      return null;
+    }
+
+    protected void addRecord(CCallRecord record)
     {
+      int count = 1;
+
+      XmlNode searchRes = findRecord(record.Number);
+
+      if (searchRes != null)
+      {
+        try
+        {
+          count = int.Parse(searchRes.ChildNodes[5].InnerText);
+          count++;
+        }
+        catch (Exception e)
+        {
+          count = 1;
+          XmlElement xmlcount = _xmlDocument.CreateElement("Count");
+          searchRes.AppendChild(xmlcount);
+        }
+        searchRes.ChildNodes[5].InnerText = count.ToString();
+        return;
+      }
+
       XmlNode nodeRecord = _xmlDocument.CreateNode("element", "Record", "");
-/*
-      XmlElement ellastname = _xmlDocument.CreateElement("LastName");
-      ellastname.InnerText = record.LastName;
+
+      XmlElement eltype = _xmlDocument.CreateElement("Type");
+      eltype.InnerText = ((int)record.Type).ToString();
+      nodeRecord.AppendChild(eltype);
+
+      XmlElement ellastname = _xmlDocument.CreateElement("Name");
+      ellastname.InnerText = record.Name;
       nodeRecord.AppendChild(ellastname);
 
-      XmlElement elname = _xmlDocument.CreateElement("FirstName");
-      elname.InnerText = record.FirstName;
+      XmlElement elname = _xmlDocument.CreateElement("Number");
+      elname.InnerText = record.Number;
       nodeRecord.AppendChild(elname);
 
-      XmlElement phelem = _xmlDocument.CreateElement("Phone");
+      XmlElement eltime = _xmlDocument.CreateElement("Time");
+      eltime.InnerText = record.Time.ToString();
+      nodeRecord.AppendChild(eltime);
 
-      XmlElement elNumber = _xmlDocument.CreateElement("phonenumber");
-      elNumber.InnerText = record.Number;
-      phelem.AppendChild(elNumber);
-      nodeRecord.AppendChild(phelem);
-      */
+      XmlElement eldur = _xmlDocument.CreateElement("Duration");
+      eldur.InnerText = record.Duration.ToString();
+      nodeRecord.AppendChild(eldur);
+
+      XmlElement elcount = _xmlDocument.CreateElement("Count");
+      elcount.InnerText = count.ToString();
+      nodeRecord.AppendChild(elcount);
+
       _xmlDocument.DocumentElement.AppendChild(nodeRecord);
     }
 
@@ -148,7 +212,11 @@ namespace Telephony
       CCallRecord record = new CCallRecord();
       record.Name = "";
       record.Number = number;
-      
+      record.Duration = duration;
+      record.Type = type;
+      record.Time = time;
+
+      addRecord(record);
     }
 
   }

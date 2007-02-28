@@ -409,7 +409,7 @@ namespace Gui
 
       foreach (CCallRecord item in results)
       {
-        CLink recordLink = new CLink(item.Name + " " + item.Number);
+        CLink recordLink = new CLink(item.Name + " " + item.Number + " " + item.Time);
         //recordLink.subItems[0] = item.LastName;
         //recordLink.subItems[1] = item.FirstName;
         recordLink.subItems[2] = item.Number;

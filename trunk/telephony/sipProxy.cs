@@ -165,7 +165,6 @@ namespace Telephony
 
     #region Callbacks
 
-    //private static int onCallStateChanged(int account, string number)
     private static int onCallStateChanged(int callId, int callState)
     {
 //    PJSIP_INV_STATE_NULL,	    /**< Before INVITE is sent or received  */
