@@ -144,6 +144,8 @@ namespace Telephony
 
     public override int makeCall(string dialedNo)
     {
+      _smref.Type = ECallType.EDialed;
+
       _smref.DialedNo = dialedNo;
       _smref.changeState(EStateId.CONNECTING);
       return _smref.SigProxy.makeCall(dialedNo);
@@ -257,6 +259,7 @@ namespace Telephony
 
     public override void onEntry()
     {
+      _smref.Time = System.DateTime.Now;
     }
 
     public override void onExit()
@@ -313,6 +316,7 @@ namespace Telephony
 
     public override void onEntry()
     {
+      _smref.Type = ECallType.EMissed;
     }
 
     public override void onExit()
@@ -328,6 +332,9 @@ namespace Telephony
 
     public override bool acceptCall()
     {
+      _smref.Type = ECallType.EReceived;
+      _smref.Time = System.DateTime.Now;
+
       _smref.SigProxy.acceptCall();
       _smref.changeState(EStateId.ACTIVE);
       return true;

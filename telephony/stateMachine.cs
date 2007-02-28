@@ -37,6 +37,9 @@ namespace Telephony
     private CReleasedState _stateReleased;
     private CIncomingState _stateIncoming;
 
+    private ECallType _callType;
+    private System.DateTime _timestamp;
+
 
     #endregion Variables
 
@@ -75,7 +78,21 @@ namespace Telephony
       get { return _incoming; }
       set { _incoming = value; }
     }
+    public ECallType Type
+    {
+      get { return _callType; }
+      set { _callType = value; }
+    }
+    public System.DateTime Time
+    {
+      get { return _timestamp; }
+      set { _timestamp = value; }
+    }
 
+    public System.TimeSpan Duration
+    {
+      get { return System.DateTime.Now.Subtract(Time); }
+    }
     #endregion
 
     #region Constructor
@@ -110,7 +127,9 @@ namespace Telephony
 
     public void changeState(CAbstractState state)
     {
+      _state.onExit();
       _state = state;
+      _state.onEntry();
     }
 
 
@@ -118,18 +137,21 @@ namespace Telephony
     {
       switch (stateId) 
       {
-        case CAbstractState.EStateId.IDLE: _state = _stateIdle; break;
-        case CAbstractState.EStateId.CONNECTING: _state = _stateCalling; break;
-        case CAbstractState.EStateId.ALERTING: _state = _stateAlerting; break;
-        case CAbstractState.EStateId.ACTIVE: _state = _stateActive; break;
-        case CAbstractState.EStateId.RELEASED: _state = _stateReleased; break;
-        case CAbstractState.EStateId.INCOMING: _state = _stateIncoming; break;
+        case CAbstractState.EStateId.IDLE:  changeState(_stateIdle); break;
+        case CAbstractState.EStateId.CONNECTING: changeState(_stateCalling); break;
+        case CAbstractState.EStateId.ALERTING: changeState(_stateAlerting); break;
+        case CAbstractState.EStateId.ACTIVE: changeState(_stateActive); break;
+        case CAbstractState.EStateId.RELEASED: changeState(_stateReleased); break;
+        case CAbstractState.EStateId.INCOMING: changeState(_stateIncoming); break;
       }
       CCallManager.getInstance().updateGui();
     }
 
     public void destroy()
     {
+      // update call log
+      CCallLog.getInstance().addCall(Type, CallingNo, _timestamp, System.DateTime.Now.Subtract(_timestamp));
+
       CallingNo = "";
       DialedNo = "";
       Incoming = false;

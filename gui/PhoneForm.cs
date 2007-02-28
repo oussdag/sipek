@@ -226,6 +226,7 @@ namespace Gui
       new CSIPSettings();
       new CSIPProxySettings();
       new CRingModePage();
+      new CCalllogPage();
 
       control.initialize();
 

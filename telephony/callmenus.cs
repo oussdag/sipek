@@ -372,9 +372,25 @@ namespace Telephony
   /// </summary>
   public class CActivePage : CTelephonyPage
   {
+    CText _duration;
+
     public CActivePage()
       : base(ECallPages.P_ACTIVE, "Connected...")
     {
+      _duration = new CText("00:00");
+      _duration.PosY = 2;
+      _duration.Align = EAlignment.justify_right;
+
+      CTimeoutDecorator decor = new CTimeoutDecorator(_duration, 1000, true);
+      decor.OnTimeout += new NoParamDelegate(decor_OnTimeout);
+
+      add(decor);
+    }
+
+    bool decor_OnTimeout()
+    {
+ 	    _duration.Caption = CCallManager.getInstance().getCurrentCall().Duration.Seconds.ToString();
+      return true;
     }
 
   }

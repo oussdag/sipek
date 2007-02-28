@@ -31,7 +31,8 @@ namespace Gui
     P_MENU,
     P_SIPSETTINGS,
     P_SIPPROXYSETTINGS,
-    P_RINGMODE
+    P_RINGMODE,
+    P_CALLLOG,
   }
   public enum ERingModes : int
   {
@@ -109,7 +110,7 @@ namespace Gui
       _linkRinger.LinkKey = _linkRinger.PosY;
       this.add(_linkRinger);
 
-      CLink mlinkCalls = new CLink("Calls", 0);
+      CLink mlinkCalls = new CLink("Calls", (int)EPages.P_CALLLOG);
       mlinkCalls.Align = EAlignment.justify_right;
       mlinkCalls.PosY = 9;
       mlinkCalls.LinkKey = mlinkCalls.PosY;
@@ -221,6 +222,40 @@ namespace Gui
       Menu += new NoParamDelegate(CPhonebookPage_Menu);
     }
 
+    public override void onEntry()
+    {
+      _list.removeAll();
+
+      Collection<CPhonebookRecord> results = CPhonebook.getInstance().getList();
+
+      foreach (CPhonebookRecord item in results)
+      {
+        CLink recordLink = new CLink(item.FirstName + " " + item.LastName);
+        recordLink.subItems[0] = item.LastName;
+        recordLink.subItems[1] = item.FirstName;
+        recordLink.subItems[2] = item.Number;
+        recordLink.Ok += new NoParamDelegate(recordLink_Ok);
+        recordLink.Softkey += new UintDelegate(recordLink_Softkey);
+        _list.add(recordLink);
+      }
+
+      base.onEntry();
+    }
+
+    bool recordLink_Softkey(int keyId)
+    {
+      return recordLink_Ok();
+    }
+
+    bool recordLink_Ok()
+    {
+      CLink item = (CLink)_list.Selected;
+      if (item == null) return false;
+
+      CCallManager.getInstance().createSession(item.subItems[2]);
+      return true;
+    }
+
     bool modifyLink_Softkey(int keyId)
     {
       CPhonebookEditPage page = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
@@ -234,25 +269,6 @@ namespace Gui
       
       return true;
     }
-
-    public override void onEntry()
-    {
-      _list.removeAll();
-
-      Collection<CPhonebookRecord> results = CPhonebook.getInstance().getList();
-
-      foreach (CPhonebookRecord item in results)
-      {
-        CLink recordLink = new CLink(item.FirstName + " " + item.LastName);
-        recordLink.subItems[0] = item.LastName;
-        recordLink.subItems[1] = item.FirstName;
-        recordLink.subItems[2] = item.Number;
-        _list.add(recordLink);
-      }
-
-      base.onEntry();
-    }
-
 
     bool _criteria_Digitkey(int keyId)
     {
@@ -357,6 +373,97 @@ namespace Gui
 
   }
 
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CCalllogPage : CPage
+  {
+    private CSelectList _list;
+
+    public CCalllogPage()
+      : base((int)EPages.P_CALLLOG, "Call Register")
+    {
+      _list = new CSelectList(7);
+      _list.PosY = 4;
+      add(_list);
+
+      CLink detailsLink = new CLink("Details");
+      detailsLink.PosY = 3;
+      detailsLink.LinkKey = detailsLink.PosY;
+      detailsLink.Align = EAlignment.justify_right;
+      detailsLink.Softkey += new UintDelegate(detailsLink_Softkey);
+      add(detailsLink);
+
+      Menu += new NoParamDelegate(CCalllogPage_Menu);
+    }
+
+    public override void onEntry()
+    {
+      _list.removeAll();
+
+      Collection<CCallRecord> results = CCallLog.getInstance().getList();
+
+      foreach (CCallRecord item in results)
+      {
+        CLink recordLink = new CLink(item.Name + " " + item.Number);
+        //recordLink.subItems[0] = item.LastName;
+        //recordLink.subItems[1] = item.FirstName;
+        recordLink.subItems[2] = item.Number;
+        recordLink.Ok += new NoParamDelegate(recordLink_Ok);
+        recordLink.Softkey += new UintDelegate(recordLink_Softkey);
+        _list.add(recordLink);
+      }
+
+      base.onEntry();
+    }
+
+    bool recordLink_Softkey(int keyId)
+    {
+      return recordLink_Ok();
+    }
+
+    bool recordLink_Ok()
+    {
+      CLink item = (CLink)_list.Selected;
+      if (item == null) return false;
+
+      CCallManager.getInstance().createSession(item.subItems[2]);
+      return true;
+    }
+
+    bool detailsLink_Softkey(int keyId)
+    {
+/*      
+      CPhonebookEditPage page = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
+      CLink selitem = (CLink)_list.Selected;
+      page.LastName = selitem.subItems[0];
+      page.FirstName = selitem.subItems[1];
+      page.Number = selitem.subItems[2];
+      
+      _controller.showPage(page.Id);
+*/
+      return true;
+    }
+
+    bool CCalllogPage_Menu()
+    {
+/*      CPhonebookEditPage editPage = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
+      editPage.FirstName = ((CLink)_list.Selected).Caption;
+      editPage.LastName = ((CLink)_list.Selected).subItems[0];
+      editPage.Number = ((CLink)_list.Selected).subItems[1];
+      _controller.showPage(editPage.Id);
+ */ 
+      return true;
+    }
+
+  }
+
+  ///
+  //////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
   public class CMenuPage : CPage 
@@ -384,35 +491,55 @@ namespace Gui
 
   public class CSIPSettings : CPage
   {
-    CEditField _editDisplayName;
     CEditField _editport;
+    CSelectList _list;
 
     public CSIPSettings() 
       : base((int)EPages.P_SIPSETTINGS, "SIP Settings") 
     {
-      _editDisplayName = new CEditField("Name>", "");
-      _editDisplayName.PosY = 3;
-      _editDisplayName.LinkKey = _editDisplayName.PosY;
-      add(_editDisplayName);
-
+      _list = new CSelectList(3);
+      _list.PosY = 2;
+      add(_list);
+      
       _editport = new CEditField("Port>", "", EEditMode.numeric);
-      _editport.PosY = 5;
+      _editport.PosY = 7;
       _editport.LinkKey = _editport.PosY;
       add(_editport);
 
-      CLink proxyLink = new CLink("Proxy", (int)EPages.P_SIPPROXYSETTINGS);
+      CLink proxyLink = new CLink("Default Account", (int)EPages.P_SIPPROXYSETTINGS);
       proxyLink.Align = EAlignment.justify_right;
-      proxyLink.PosY = 7;
+      proxyLink.PosY = 8;
       proxyLink.LinkKey = proxyLink.PosY;
       add(proxyLink);
+
+      CLink addproxyLink = new CLink("Add New Account", 0); // todo!!!
+      addproxyLink.PosY = 9;
+      addproxyLink.LinkKey = addproxyLink.PosY;
+      add(addproxyLink);
 
       // ok handler
       this.Ok += new NoParamDelegate(CSIPSettings_Ok);
     }
 
+    public override void onEntry()
+    {
+      CAccounts accounts = CAccounts.getInstance();
+
+      _list.removeAll();
+
+      for (int i = 0; i < accounts.getSize(); i++ )
+      {
+        CLink accLink = new CLink(accounts[i].Name + " " + accounts[i].Address, 0); // todo
+        _list.add(accLink);
+      }
+
+      _editport.Caption = Properties.Settings.Default.cfgSipPort.ToString();
+
+      base.onEntry();
+    }
+
     bool CSIPSettings_Ok()
     {
-      Properties.Settings.Default.cfgSipProxy = _editDisplayName.Caption;
       Properties.Settings.Default.cfgSipPort = int.Parse(_editport.Caption);
 
       Properties.Settings.Default.Save();
@@ -421,13 +548,7 @@ namespace Gui
       return true;
     }
 
-    public override void onEntry()
-    {
-      _editDisplayName.Caption = Properties.Settings.Default.cfgSipDisplayName;
-      _editport.Caption = Properties.Settings.Default.cfgSipPort.ToString();
 
-      base.onEntry();
-    }
   }
 
   /// <summary>
@@ -439,10 +560,16 @@ namespace Gui
     CEditField _editProxyPort;
     CCheckBox _checkRegister;
     CEditField _editperiod;
+    CEditField _editDisplayName;
 
     public CSIPProxySettings()
       : base((int)EPages.P_SIPPROXYSETTINGS, "SIP Proxy Settings")
     {
+      _editDisplayName = new CEditField("Name>", "");
+      _editDisplayName.PosY = 1;
+      _editDisplayName.LinkKey = _editDisplayName.PosY;
+      add(_editDisplayName);
+
       _editProxyAddress = new CIpAddressEdit("Proxy>");
       _editProxyAddress.PosY = 3;
       _editProxyAddress.Focused = true;
@@ -470,20 +597,24 @@ namespace Gui
 
     public override void onEntry()
     {
-      _editProxyAddress.Caption = Properties.Settings.Default.cfgSipProxy;
-      _editProxyPort.Caption = Properties.Settings.Default.cfgSipPort.ToString();
-      _checkRegister.Checked = Properties.Settings.Default.cfgSipRegister;
-      _editperiod.Caption = Properties.Settings.Default.cfgSipRegPeriod.ToString();
+      _editperiod.Caption = CAccounts.getInstance()[0].Period.ToString(); // Properties.Settings.Default.cfgSipAccountRegPeriod.ToString();
+      _editDisplayName.Caption = CAccounts.getInstance()[0].Name; // Properties.Settings.Default.cfgSipAccountDisplayName[0];
+      _editProxyAddress.Caption = CAccounts.getInstance()[0].Address;
+      _editProxyPort.Caption = CAccounts.getInstance()[0].Port.ToString();
+      _editperiod.Caption = CAccounts.getInstance()[0].Period.ToString();
 
       base.onEntry();
     }
 
     bool CSIPProxySettings_Ok()
     {
-      Properties.Settings.Default.cfgSipProxy = _editProxyAddress.Caption;
-      Properties.Settings.Default.cfgSipProxyPort = int.Parse(_editProxyPort.Caption);
-      Properties.Settings.Default.cfgSipRegister = _checkRegister.Checked;
-      Properties.Settings.Default.cfgSipRegPeriod = int.Parse(_editperiod.Caption);
+      CAccount acc = new CAccount();
+      acc.Address = _editProxyAddress.Caption;
+      acc.Port = int.Parse(_editProxyPort.Caption);
+      acc.Name = _editDisplayName.Caption;
+      acc.Period = int.Parse(_editperiod.Caption);
+
+      CAccounts.getInstance()[0] = acc;
 
       Properties.Settings.Default.Save();
 

@@ -47,7 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="calllog.cs" />
+    <Compile Include="accounts.cs" />
     <Compile Include="menus.cs" />
     <Compile Include="phonebook.cs" />
     <Compile Include="PhoneForm.cs">

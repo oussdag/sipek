@@ -82,9 +82,9 @@ namespace Gui
       this.panel2.Controls.Add(this.digitKey3);
       this.panel2.Controls.Add(this.digitKey2);
       this.panel2.Controls.Add(this.digitKey1);
-      this.panel2.Location = new System.Drawing.Point(86, 369);
+      this.panel2.Location = new System.Drawing.Point(86, 364);
       this.panel2.Name = "panel2";
-      this.panel2.Size = new System.Drawing.Size(193, 167);
+      this.panel2.Size = new System.Drawing.Size(201, 167);
       this.panel2.TabIndex = 18;
       // 
       // digitKeyH
@@ -110,7 +110,7 @@ namespace Gui
       // 
       // digitKeyS
       // 
-      this.digitKeyS.Location = new System.Drawing.Point(16, 128);
+      this.digitKeyS.Location = new System.Drawing.Point(26, 128);
       this.digitKeyS.Name = "digitKeyS";
       this.digitKeyS.Size = new System.Drawing.Size(39, 36);
       this.digitKeyS.TabIndex = 9;
@@ -120,7 +120,7 @@ namespace Gui
       // 
       // digitKey7
       // 
-      this.digitKey7.Location = new System.Drawing.Point(16, 86);
+      this.digitKey7.Location = new System.Drawing.Point(26, 86);
       this.digitKey7.Name = "digitKey7";
       this.digitKey7.Size = new System.Drawing.Size(39, 36);
       this.digitKey7.TabIndex = 8;
@@ -150,7 +150,7 @@ namespace Gui
       // 
       // digitKey4
       // 
-      this.digitKey4.Location = new System.Drawing.Point(16, 45);
+      this.digitKey4.Location = new System.Drawing.Point(26, 45);
       this.digitKey4.Name = "digitKey4";
       this.digitKey4.Size = new System.Drawing.Size(39, 34);
       this.digitKey4.TabIndex = 5;
@@ -200,7 +200,7 @@ namespace Gui
       // 
       // digitKey1
       // 
-      this.digitKey1.Location = new System.Drawing.Point(16, 3);
+      this.digitKey1.Location = new System.Drawing.Point(26, 3);
       this.digitKey1.Name = "digitKey1";
       this.digitKey1.Size = new System.Drawing.Size(39, 36);
       this.digitKey1.TabIndex = 0;
@@ -211,7 +211,7 @@ namespace Gui
       // clearButton
       // 
       this.clearButton.BackColor = System.Drawing.Color.OrangeRed;
-      this.clearButton.Location = new System.Drawing.Point(266, 285);
+      this.clearButton.Location = new System.Drawing.Point(266, 253);
       this.clearButton.Name = "clearButton";
       this.clearButton.Size = new System.Drawing.Size(48, 30);
       this.clearButton.TabIndex = 19;
@@ -222,7 +222,8 @@ namespace Gui
       // offhookButton
       // 
       this.offhookButton.BackColor = System.Drawing.Color.DarkSeaGreen;
-      this.offhookButton.Location = new System.Drawing.Point(24, 335);
+      this.offhookButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+      this.offhookButton.Location = new System.Drawing.Point(42, 308);
       this.offhookButton.Name = "offhookButton";
       this.offhookButton.Size = new System.Drawing.Size(46, 50);
       this.offhookButton.TabIndex = 20;
@@ -232,9 +233,9 @@ namespace Gui
       // 
       // OKbutton
       // 
-      this.OKbutton.Location = new System.Drawing.Point(159, 282);
+      this.OKbutton.Location = new System.Drawing.Point(157, 279);
       this.OKbutton.Name = "OKbutton";
-      this.OKbutton.Size = new System.Drawing.Size(56, 35);
+      this.OKbutton.Size = new System.Drawing.Size(55, 47);
       this.OKbutton.TabIndex = 21;
       this.OKbutton.Text = "OK";
       this.OKbutton.UseVisualStyleBackColor = true;
@@ -244,9 +245,10 @@ namespace Gui
       // 
       this.Cancel.BackColor = System.Drawing.Color.Red;
       this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.Cancel.Location = new System.Drawing.Point(297, 335);
+      this.Cancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+      this.Cancel.Location = new System.Drawing.Point(280, 308);
       this.Cancel.Name = "Cancel";
-      this.Cancel.Size = new System.Drawing.Size(48, 49);
+      this.Cancel.Size = new System.Drawing.Size(46, 50);
       this.Cancel.TabIndex = 22;
       this.Cancel.Text = "Esc";
       this.Cancel.UseVisualStyleBackColor = false;
@@ -254,17 +256,18 @@ namespace Gui
       // 
       // buttonSettings
       // 
-      this.buttonSettings.Location = new System.Drawing.Point(42, 286);
+      this.buttonSettings.BackColor = System.Drawing.Color.DarkSeaGreen;
+      this.buttonSettings.Location = new System.Drawing.Point(55, 253);
       this.buttonSettings.Name = "buttonSettings";
-      this.buttonSettings.Size = new System.Drawing.Size(58, 29);
+      this.buttonSettings.Size = new System.Drawing.Size(43, 29);
       this.buttonSettings.TabIndex = 23;
       this.buttonSettings.Text = "Menu";
-      this.buttonSettings.UseVisualStyleBackColor = true;
+      this.buttonSettings.UseVisualStyleBackColor = false;
       this.buttonSettings.Click += new System.EventHandler(this.buttonSettings_Click);
       // 
       // leftNav
       // 
-      this.leftNav.Location = new System.Drawing.Point(123, 285);
+      this.leftNav.Location = new System.Drawing.Point(121, 288);
       this.leftNav.Name = "leftNav";
       this.leftNav.Size = new System.Drawing.Size(30, 29);
       this.leftNav.TabIndex = 24;
@@ -274,7 +277,7 @@ namespace Gui
       // 
       // rightNav
       // 
-      this.rightNav.Location = new System.Drawing.Point(221, 285);
+      this.rightNav.Location = new System.Drawing.Point(218, 288);
       this.rightNav.Name = "rightNav";
       this.rightNav.Size = new System.Drawing.Size(30, 29);
       this.rightNav.TabIndex = 25;
@@ -294,7 +297,7 @@ namespace Gui
       // 
       // downNav
       // 
-      this.downNav.Location = new System.Drawing.Point(166, 323);
+      this.downNav.Location = new System.Drawing.Point(166, 328);
       this.downNav.Name = "downNav";
       this.downNav.Size = new System.Drawing.Size(38, 23);
       this.downNav.TabIndex = 27;
@@ -308,7 +311,7 @@ namespace Gui
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.WhiteSmoke;
       this.CancelButton = this.Cancel;
-      this.ClientSize = new System.Drawing.Size(356, 557);
+      this.ClientSize = new System.Drawing.Size(365, 539);
       this.Controls.Add(this.downNav);
       this.Controls.Add(this.upNav);
       this.Controls.Add(this.rightNav);
