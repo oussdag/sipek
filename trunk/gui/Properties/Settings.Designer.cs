@@ -25,42 +25,6 @@ namespace Gui.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.0.0.0")]
-        public string cfgSipProxy {
-            get {
-                return ((string)(this["cfgSipProxy"]));
-            }
-            set {
-                this["cfgSipProxy"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string cfgSipUsername {
-            get {
-                return ((string)(this["cfgSipUsername"]));
-            }
-            set {
-                this["cfgSipUsername"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string cfgSipPassword {
-            get {
-                return ((string)(this["cfgSipPassword"]));
-            }
-            set {
-                this["cfgSipPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5060")]
         public int cfgSipPort {
             get {
@@ -73,54 +37,6 @@ namespace Gui.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool cfgSipRegister {
-            get {
-                return ((bool)(this["cfgSipRegister"]));
-            }
-            set {
-                this["cfgSipRegister"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3600")]
-        public int cfgSipRegPeriod {
-            get {
-                return ((int)(this["cfgSipRegPeriod"]));
-            }
-            set {
-                this["cfgSipRegPeriod"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5060")]
-        public int cfgSipProxyPort {
-            get {
-                return ((int)(this["cfgSipProxyPort"]));
-            }
-            set {
-                this["cfgSipProxyPort"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SIPek")]
-        public string cfgSipDisplayName {
-            get {
-                return ((string)(this["cfgSipDisplayName"]));
-            }
-            set {
-                this["cfgSipDisplayName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int cfgRingMode {
             get {
@@ -128,6 +44,93 @@ namespace Gui.Properties {
             }
             set {
                 this["cfgRingMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>192.168.60.216</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountAddresses {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountAddresses"]));
+            }
+            set {
+                this["cfgSipAccountAddresses"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>5060</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountPorts {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountPorts"]));
+            }
+            set {
+                this["cfgSipAccountPorts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountUsername {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountUsername"]));
+            }
+            set {
+                this["cfgSipAccountUsername"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountPassword {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountPassword"]));
+            }
+            set {
+                this["cfgSipAccountPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountNames {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountNames"]));
+            }
+            set {
+                this["cfgSipAccountNames"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountRegPeriod {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountRegPeriod"]));
+            }
+            set {
+                this["cfgSipAccountRegPeriod"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int cfgSipAccountDefault {
+            get {
+                return ((int)(this["cfgSipAccountDefault"]));
+            }
+            set {
+                this["cfgSipAccountDefault"] = value;
             }
         }
     }

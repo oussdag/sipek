@@ -37,6 +37,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="calllog.cs" />
     <Compile Include="callManager.cs" />
     <Compile Include="callmenus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

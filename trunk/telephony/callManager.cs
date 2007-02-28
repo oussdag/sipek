@@ -118,9 +118,9 @@ namespace Telephony
 
     public void updateConfig(System.Configuration.ApplicationSettingsBase config)
     {
-      _sipProxy = config["cfgSipProxy"].ToString();
-      _sipProxyPort = (int)config["cfgSipProxyPort"];
-      _sipName = config["cfgSipDisplayName"].ToString();
+      _sipProxy = ((System.Collections.Specialized.StringCollection)config["cfgSipAccountAddresses"])[0].ToString();
+      _sipProxyPort = int.Parse(((System.Collections.Specialized.StringCollection)config["cfgSipAccountPorts"])[0].ToString());
+      _sipName = ((System.Collections.Specialized.StringCollection)config["cfgSipAccountNames"])[0].ToString();
     }
 
     public void updateGui()

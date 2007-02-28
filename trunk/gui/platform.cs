@@ -17,7 +17,7 @@
  */
 
 using MenuDesigner;
-using System.Windows.Forms;
+using System.Timers;
 using System;
 
 namespace Gui
@@ -83,7 +83,12 @@ namespace Gui
     {
       mdeleg = deleg;
       mtimer = new Timer();
-      mtimer.Tick += new EventHandler(timeout);
+      mtimer.Elapsed += new ElapsedEventHandler(mtimer_Elapsed);
+    }
+
+    void mtimer_Elapsed(object sender, ElapsedEventArgs e)
+    {
+      if (mdeleg != null) mdeleg();
     }
 
     public override void startMillis(int timeout)
@@ -95,12 +100,6 @@ namespace Gui
     public override void abort()
     {
       mtimer.Stop();
-    }
-
-    private void timeout(Object obj, EventArgs args)
-    {
-      this.abort();
-      if (mdeleg != null) mdeleg();
     }
   }
 
