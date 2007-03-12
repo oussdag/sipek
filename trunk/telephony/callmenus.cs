@@ -366,6 +366,7 @@ namespace Telephony
   public class CActivePage : CTelephonyPage
   {
     CText _duration;
+    CLink _hold;
 
     public CActivePage()
       : base(ECallPages.P_ACTIVE, "Connected...")
@@ -378,12 +379,26 @@ namespace Telephony
       decor.OnTimeout += new NoParamDelegate(decor_OnTimeout);
 
       add(decor);
+
+      _hold = new CLink("Hold");
+      _hold.Softkey += new UintDelegate(_hold_Softkey);
+      _hold.PosY = 3;
+    }
+
+    bool _hold_Softkey(int keyId)
+    {
+      return true;
     }
 
     bool decor_OnTimeout()
     {
  	    _duration.Caption = CCallManager.getInstance().getCurrentCall().Duration.Seconds.ToString();
       return true;
+    }
+
+    public override void  onEntry()
+    {
+ 	    base.onEntry();
     }
 
   }
