@@ -1,4 +1,4 @@
-namespace Gui
+namespace Sipek
 {
   partial class PhoneForm
   {
@@ -211,7 +211,7 @@ namespace Gui
       // clearButton
       // 
       this.clearButton.BackColor = System.Drawing.Color.OrangeRed;
-      this.clearButton.Location = new System.Drawing.Point(266, 253);
+      this.clearButton.Location = new System.Drawing.Point(256, 318);
       this.clearButton.Name = "clearButton";
       this.clearButton.Size = new System.Drawing.Size(48, 30);
       this.clearButton.TabIndex = 19;
@@ -223,7 +223,7 @@ namespace Gui
       // 
       this.offhookButton.BackColor = System.Drawing.Color.DarkSeaGreen;
       this.offhookButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-      this.offhookButton.Location = new System.Drawing.Point(42, 308);
+      this.offhookButton.Location = new System.Drawing.Point(42, 253);
       this.offhookButton.Name = "offhookButton";
       this.offhookButton.Size = new System.Drawing.Size(46, 50);
       this.offhookButton.TabIndex = 20;
@@ -246,7 +246,7 @@ namespace Gui
       this.Cancel.BackColor = System.Drawing.Color.Red;
       this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
       this.Cancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-      this.Cancel.Location = new System.Drawing.Point(280, 308);
+      this.Cancel.Location = new System.Drawing.Point(280, 253);
       this.Cancel.Name = "Cancel";
       this.Cancel.Size = new System.Drawing.Size(46, 50);
       this.Cancel.TabIndex = 22;
@@ -257,7 +257,7 @@ namespace Gui
       // buttonSettings
       // 
       this.buttonSettings.BackColor = System.Drawing.Color.DarkSeaGreen;
-      this.buttonSettings.Location = new System.Drawing.Point(55, 253);
+      this.buttonSettings.Location = new System.Drawing.Point(63, 319);
       this.buttonSettings.Name = "buttonSettings";
       this.buttonSettings.Size = new System.Drawing.Size(43, 29);
       this.buttonSettings.TabIndex = 23;

@@ -7,8 +7,8 @@
     <ProjectGuid>{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gui</RootNamespace>
-    <AssemblyName>Gui</AssemblyName>
+    <RootNamespace>Sipek</RootNamespace>
+    <AssemblyName>Sipek</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <TargetZone>LocalIntranet</TargetZone>
     <GenerateManifests>false</GenerateManifests>
@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="accounts.cs" />
+    <Compile Include="calllog.cs" />
+    <Compile Include="callManager.cs" />
+    <Compile Include="callmenus.cs" />
     <Compile Include="menus.cs" />
     <Compile Include="phonebook.cs" />
     <Compile Include="PhoneForm.cs">
@@ -84,12 +87,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\telephony\Telephony.csproj">
-      <Project>{BA2217E5-D47A-48F0-B253-017C039CF1C1}</Project>
-      <Name>Telephony</Name>
-    </ProjectReference>
+    <Compile Include="callProxy.cs" />
+    <Compile Include="callStateMachine.cs" />
+    <Compile Include="callStates.cs" />
+    <Compile Include="callInterface.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

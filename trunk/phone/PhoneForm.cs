@@ -20,12 +20,21 @@ using System;
 using System.Windows.Forms;
 
 using MenuDesigner;
-using Telephony;
+using Sipek;
 
-namespace Gui
+namespace Sipek
 {
   public partial class PhoneForm : Form
   {
+    private static PhoneForm _form = null;
+
+    public static PhoneForm PhoneFormInstance
+    {
+      get 
+      {
+        return _form; 
+      }
+    }
 
     protected CComponentController control;
     private int _caretPos = -1;
@@ -41,6 +50,7 @@ namespace Gui
     /// </summary>
     public PhoneForm()
     {
+      _form = this;
       InitializeComponent();
 
       ///////////////////////////////////////////////////////////////
@@ -211,10 +221,10 @@ namespace Gui
       control = CComponentController.getInstance();
 
       Renderer renderer = new Renderer(this);
-      CTimerFactoryImpl tmrFactory = new CTimerFactoryImpl();
+      CFactoryImpl factory = new CFactoryImpl();
 
       control.attach(renderer);
-      control.setTimerFactory(tmrFactory);
+      control.Factory = factory;
       control.Language = _langEN;
 
       // Create menu pages...
@@ -233,8 +243,6 @@ namespace Gui
       // set active page...
       control.setActivePage((int)EPages.P_INIT);
 
-      // update telephony
-      CCallManager.getInstance().updateConfig(Properties.Settings.Default);
       // initialize telephony...
       CCallManager.getInstance().initialize();
 
