@@ -20,7 +20,7 @@ using MenuDesigner;
 using System.Timers;
 using System;
 
-namespace Gui
+namespace Sipek
 {
 
   #region Internationalization
@@ -53,21 +53,25 @@ namespace Gui
 
   #endregion Internationalization
 
-  #region TimerImplementation
+  #region FactoryImplementation
   ///////////////////////////////////////////////////////////////////////////////////////
   /// <summary>
   /// 
   /// </summary>
-  public class CTimerFactoryImpl : CTimerFactory
+  public class CFactoryImpl : CControllerFactory
   {
-    public CTimerFactoryImpl()
+    public CFactoryImpl()
       : base()
     { }
 
-    protected override CComponentTimer createTimer(NoParamDelegate deleg)
+    protected override CComponentTimer createTimer(VoidDelegate deleg)
     {
       return new CTimerImpl(deleg);
     }
+/*    protected override CSynchronizer createSynchronizerImpl()
+    {
+      return new CSynchronizerImpl();
+    }*/
   }
 
   /// <summary>
@@ -75,10 +79,10 @@ namespace Gui
   /// </summary>
   public class CTimerImpl : CComponentTimer
   {
-    NoParamDelegate mdeleg;
+    VoidDelegate mdeleg;
     Timer mtimer;
 
-    public CTimerImpl(NoParamDelegate deleg)
+    public CTimerImpl(VoidDelegate deleg)
       : base()
     {
       mdeleg = deleg;
@@ -102,8 +106,17 @@ namespace Gui
       mtimer.Stop();
     }
   }
-
-  #endregion TimerImplementation
+  /*
+  public class CSynchronizerImpl : CSynchronizer
+  {
+    public override void invoke(VoidIntDelegate del, int id)
+    {
+      //PhoneForm.PhoneFormInstance.Invoke(del, new object[] { id });
+      del(id);
+    }
+  }
+  */
+  #endregion FactoryImplementation
 
   #region Rendering
 
@@ -296,4 +309,4 @@ namespace Gui
   #endregion Rendering
 
 
-} // namespace Gui
+} // namespace Sipek

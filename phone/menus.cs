@@ -17,10 +17,10 @@
  */
 
 using MenuDesigner;
-using Telephony;
+using Sipek;
 using System.Collections.ObjectModel;
 
-namespace Gui
+namespace Sipek
 {
   public enum EPages : int
   {
@@ -67,7 +67,7 @@ namespace Gui
       add(scrollingtext);
 
 
-      this.Ok += new NoParamDelegate(okhandler);
+      this.Ok += new VoidDelegate(okhandler);
     }
 
     private bool okhandler()
@@ -92,7 +92,7 @@ namespace Gui
       _timedate.PosY = 0;
       _timedate.Caption = System.DateTime.Now.ToShortDateString() + " " + System.DateTime.Now.ToShortTimeString();
       CTimeoutDecorator timeDecor = new CTimeoutDecorator(_timedate, 1000, true);
-      timeDecor.OnTimeout += new NoParamDelegate(timeDateHandler);
+      timeDecor.OnTimeout += new VoidDelegate(timeDateHandler);
       this.add(timeDecor);
 
       CText title = new CText("SIPek", EAlignment.justify_center);
@@ -118,18 +118,16 @@ namespace Gui
 
       CLink mlinkLines = new CLink("Accounts", 0);
       mlinkLines.PosY = 6;
-      this.add(mlinkLines);
+      //this.add(mlinkLines);
 
       // Initialize handlers
-      Digitkey += new UintDelegate(digitkeyHandler);
-      Offhook += new NoParamDelegate(IdlePage_Offhook);
-      Menu += new NoParamDelegate(IdlePage_Menu);
+      Digitkey += new BoolIntDelegate(digitkeyHandler);
+      Offhook += new VoidDelegate(IdlePage_Offhook);
+      Menu += new VoidDelegate(IdlePage_Menu);
     }
 
     public override void onEntry()
     {
-      base.onEntry();
-      
       switch (Properties.Settings.Default.cfgRingMode)
       {
         case (int)ERingModes.ESILENT:
@@ -141,7 +139,9 @@ namespace Gui
         case (int)ERingModes.EBEEP:
           _linkRinger.Caption = "Beep";
           break;
-      }
+      }      
+      
+      base.onEntry();
     }
 
     bool IdlePage_Menu()
@@ -199,7 +199,7 @@ namespace Gui
     {
       _criteria = new CEditField(">", "", EEditMode.alphanum_low, true);
       _criteria.PosY = 1;
-      _criteria.Digitkey += new UintDelegate(_criteria_Digitkey);
+      _criteria.Digitkey += new BoolIntDelegate(_criteria_Digitkey);
       add(_criteria);
 
       _list = new CSelectList(7);
@@ -215,11 +215,11 @@ namespace Gui
       CLink modifyLink = new CLink("Modify");
       modifyLink.PosY = 3;
       modifyLink.LinkKey = modifyLink.PosY;
-      modifyLink.Softkey += new UintDelegate(modifyLink_Softkey);
+      modifyLink.Softkey += new BoolIntDelegate(modifyLink_Softkey);
       modifyLink.Align = EAlignment.justify_right;
       add(modifyLink);
 
-      Menu += new NoParamDelegate(CPhonebookPage_Menu);
+      Menu += new VoidDelegate(CPhonebookPage_Menu);
     }
 
     public override void onEntry()
@@ -234,8 +234,8 @@ namespace Gui
         recordLink.subItems[0] = item.LastName;
         recordLink.subItems[1] = item.FirstName;
         recordLink.subItems[2] = item.Number;
-        recordLink.Ok += new NoParamDelegate(recordLink_Ok);
-        recordLink.Softkey += new UintDelegate(recordLink_Softkey);
+        recordLink.Ok += new VoidDelegate(recordLink_Ok);
+        recordLink.Softkey += new BoolIntDelegate(recordLink_Softkey);
         _list.add(recordLink);
       }
 
@@ -333,13 +333,13 @@ namespace Gui
       saveLink.PosY = 8;
       saveLink.LinkKey = saveLink.PosY;
       saveLink.Align = EAlignment.justify_right;
-      saveLink.Softkey += new UintDelegate(saveLink_Softkey);
+      saveLink.Softkey += new BoolIntDelegate(saveLink_Softkey);
       add(saveLink);
 
       CLink deleteLink = new CLink("Delete!");
       deleteLink.PosY = 9;
       deleteLink.LinkKey = deleteLink.PosY;
-      deleteLink.Softkey += new UintDelegate(deleteLink_Softkey);
+      deleteLink.Softkey += new BoolIntDelegate(deleteLink_Softkey);
       add(deleteLink);
     }
 
@@ -395,10 +395,10 @@ namespace Gui
       detailsLink.PosY = 3;
       detailsLink.LinkKey = detailsLink.PosY;
       detailsLink.Align = EAlignment.justify_right;
-      detailsLink.Softkey += new UintDelegate(detailsLink_Softkey);
+      detailsLink.Softkey += new BoolIntDelegate(detailsLink_Softkey);
       add(detailsLink);
 
-      Menu += new NoParamDelegate(CCalllogPage_Menu);
+      Menu += new VoidDelegate(CCalllogPage_Menu);
     }
 
     public override void onEntry()
@@ -413,8 +413,8 @@ namespace Gui
         //recordLink.subItems[0] = item.LastName;
         //recordLink.subItems[1] = item.FirstName;
         recordLink.subItems[2] = item.Number;
-        recordLink.Ok += new NoParamDelegate(recordLink_Ok);
-        recordLink.Softkey += new UintDelegate(recordLink_Softkey);
+        recordLink.Ok += new VoidDelegate(recordLink_Ok);
+        recordLink.Softkey += new BoolIntDelegate(recordLink_Softkey);
         _list.add(recordLink);
       }
 
@@ -518,7 +518,7 @@ namespace Gui
       add(addproxyLink);
 
       // ok handler
-      this.Ok += new NoParamDelegate(CSIPSettings_Ok);
+      this.Ok += new VoidDelegate(CSIPSettings_Ok);
     }
 
     public override void onEntry()
@@ -592,7 +592,7 @@ namespace Gui
       _editperiod.LinkKey = _editperiod.PosY;
       add(_editperiod);
 
-      this.Ok += new NoParamDelegate(CSIPProxySettings_Ok);
+      this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
     }
 
     public override void onEntry()
@@ -618,8 +618,6 @@ namespace Gui
 
       Properties.Settings.Default.Save();
 
-      CCallManager.getInstance().updateConfig(Properties.Settings.Default);
-
       _controller.previousPage();
 
       return true;
@@ -643,19 +641,19 @@ namespace Gui
       _silentCb = new CCheckBox("Silent");
       _silentCb.PosY = 3;
       _silentCb.LinkKey = _silentCb.PosY;
-      _silentCb.Softkey += new UintDelegate(_silentCb_Softkey);
+      _silentCb.Softkey += new BoolIntDelegate(_silentCb_Softkey);
       _radio.add(_silentCb);
 
       _melodyCb = new CCheckBox("Melody");
       _melodyCb.PosY = 4;
       _melodyCb.LinkKey = _melodyCb.PosY;
-      _melodyCb.Softkey += new UintDelegate(_melodyCb_Softkey);
+      _melodyCb.Softkey += new BoolIntDelegate(_melodyCb_Softkey);
       _radio.add(_melodyCb);
       
       _beepCb = new CCheckBox("Beep");
       _beepCb.PosY = 5;
       _beepCb.LinkKey = _beepCb.PosY;
-      _beepCb.Softkey += new UintDelegate(_beepCb_Softkey);
+      _beepCb.Softkey += new BoolIntDelegate(_beepCb_Softkey);
       _radio.add(_beepCb);
 
       add(_radio);
@@ -663,22 +661,25 @@ namespace Gui
 
     bool _beepCb_Softkey(int keyId)
     {
-      Properties.Settings.Default.cfgRingMode = 2;
+      Properties.Settings.Default.cfgRingMode = (int)ERingModes.EBEEP;
       Properties.Settings.Default.Save();
+      _controller.previousPage();
       return true;
     }
 
     bool _melodyCb_Softkey(int keyId)
     {
-      Properties.Settings.Default.cfgRingMode = 1;
+      Properties.Settings.Default.cfgRingMode = (int)ERingModes.EMELODY;
       Properties.Settings.Default.Save();
+      _controller.previousPage();
       return true;
     }
 
     bool _silentCb_Softkey(int keyId)
     {
-      Properties.Settings.Default.cfgRingMode = 0;
+      Properties.Settings.Default.cfgRingMode = (int)ERingModes.ESILENT;
       Properties.Settings.Default.Save();
+      _controller.previousPage();
       return true;
     }
 
@@ -703,4 +704,4 @@ namespace Gui
   
   }
 
-} // namespace Gui
+} // namespace Sipek

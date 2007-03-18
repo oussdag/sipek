@@ -1,9 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual C# Express 2005
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gui", "gui\Gui.csproj", "{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telephony", "telephony\Telephony.csproj", "{BA2217E5-D47A-48F0-B253-017C039CF1C1}"
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sipek", "phone\Sipek.csproj", "{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BA2217E5-D47A-48F0-B253-017C039CF1C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA2217E5-D47A-48F0-B253-017C039CF1C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA2217E5-D47A-48F0-B253-017C039CF1C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA2217E5-D47A-48F0-B253-017C039CF1C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

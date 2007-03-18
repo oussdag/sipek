@@ -20,7 +20,7 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Gui
+namespace Sipek
 {
 
   public class CPhonebookRecord
@@ -171,4 +171,4 @@ namespace Gui
 
   }
 
-} // namespace Gui
+} // namespace Sipek
