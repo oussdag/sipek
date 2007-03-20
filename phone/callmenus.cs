@@ -105,7 +105,7 @@ namespace Sipek
 	    _digits.Caption = currentCall.CallingNo;
 
       // get name from phonebook...
-      //_name.Caption = currentCall.CallingNo;
+      //_id.Caption = currentCall.CallingNo;
 
 	    // call sessions...
       _sessions.Caption = (CCallManager.getInstance().getCurrentCallIndex()).ToString() 

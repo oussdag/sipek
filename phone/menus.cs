@@ -33,6 +33,7 @@ namespace Sipek
     P_SIPPROXYSETTINGS,
     P_RINGMODE,
     P_CALLLOG,
+    P_ACCOUNTS,
   }
   public enum ERingModes : int
   {
@@ -84,6 +85,8 @@ namespace Sipek
   {
     CText _timedate;
     CLink _linkRinger;
+    CText _statusSymbol;
+    CLink _linkAccounts;
 
     public IdlePage()
       : base((int)EPages.P_IDLE)
@@ -116,9 +119,13 @@ namespace Sipek
       mlinkCalls.LinkKey = mlinkCalls.PosY;
       this.add(mlinkCalls);
 
-      CLink mlinkLines = new CLink("Accounts", 0);
-      mlinkLines.PosY = 6;
-      //this.add(mlinkLines);
+      _linkAccounts = new CLink("Accounts", (int)EPages.P_ACCOUNTS);
+      _linkAccounts.PosY = 6;
+      this.add(_linkAccounts);
+
+      _statusSymbol = new CText("", EAlignment.justify_right);
+      _statusSymbol.PosY = 0;
+      this.add(_statusSymbol);
 
       // Initialize handlers
       Digitkey += new BoolIntDelegate(digitkeyHandler);
@@ -128,6 +135,7 @@ namespace Sipek
 
     public override void onEntry()
     {
+      // get ringer mode
       switch (Properties.Settings.Default.cfgRingMode)
       {
         case (int)ERingModes.ESILENT:
@@ -141,6 +149,21 @@ namespace Sipek
           break;
       }      
       
+      // get registration status
+      ERegistrationState regState = CAccounts.getInstance().DefAccount.RegState;
+      switch (regState)
+      {
+        case ERegistrationState.ERegistered:
+          _statusSymbol.Caption = "OK";
+          break;
+        case ERegistrationState.ENotRegistered:
+          _statusSymbol.Caption = "FAIL";
+          break;
+      }
+      
+      // get default account
+      _linkAccounts.Caption = CAccounts.getInstance().DefAccount.Name;
+
       base.onEntry();
     }
 
@@ -186,6 +209,44 @@ namespace Sipek
 
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CAccountsPage : CPage
+  {
+    CRadioButtonGroup _radio;
+
+    public CAccountsPage()
+      : base((int)EPages.P_ACCOUNTS, "Accounts")
+    {
+      _radio = new CRadioButtonGroup();
+      _radio.PosY = 1;
+      _radio.Menu += new VoidDelegate(_radio_Menu);
+      add(_radio);
+    }
+
+    bool _radio_Menu()
+    {
+      _controller.showPage((int)EPages.P_SIPPROXYSETTINGS);
+      return false;
+    }
+
+    public override void onEntry()
+    {
+      _radio.removeAll();
+
+      for (int i=0; i<CAccounts.getInstance().getSize(); i++)
+      {
+        bool ischecked = (i == CAccounts.getInstance().DefAccountIndex) ? true : false;
+        CCheckBox item = new CCheckBox(CAccounts.getInstance()[i].Name, -1, ischecked);
+        item.PosY = _radio.PosY + i;
+        _radio.add(item);
+      }
+
+      base.onEntry();
+    }
+
+  }
 
   /// <summary>
   /// 
@@ -561,23 +622,28 @@ namespace Sipek
     CCheckBox _checkRegister;
     CEditField _editperiod;
     CEditField _editDisplayName;
+    CEditField _editId;
 
     public CSIPProxySettings()
       : base((int)EPages.P_SIPPROXYSETTINGS, "SIP Proxy Settings")
     {
-      _editDisplayName = new CEditField("Name>", "");
+      _editDisplayName = new CEditField("Name>", "",true);
       _editDisplayName.PosY = 1;
       _editDisplayName.LinkKey = _editDisplayName.PosY;
       add(_editDisplayName);
 
+      _editId = new CEditField("Id>", "");
+      _editId.PosY = 3;
+      _editId.LinkKey = _editId.PosY;
+      add(_editId);
+
       _editProxyAddress = new CIpAddressEdit("Proxy>");
-      _editProxyAddress.PosY = 3;
-      _editProxyAddress.Focused = true;
+      _editProxyAddress.PosY = 5;
       _editProxyAddress.LinkKey = _editProxyAddress.PosY;
       add(_editProxyAddress);
 
       _editProxyPort = new CEditField("Port>", "", EEditMode.numeric);
-      _editProxyPort.PosY = 5;
+      _editProxyPort.PosY = 7;
       _editProxyPort.LinkKey = _editProxyPort.PosY;
       add(_editProxyPort);
 
@@ -585,7 +651,7 @@ namespace Sipek
       _checkRegister = new CCheckBox("Register");
       _checkRegister.PosY = 7;
       _checkRegister.LinkKey = _checkRegister.PosY;
-      add(_checkRegister);
+      //add(_checkRegister);
 
       _editperiod = new CEditField("Period>", "", EEditMode.numeric);
       _editperiod.PosY = 9;
@@ -597,24 +663,23 @@ namespace Sipek
 
     public override void onEntry()
     {
-      _editperiod.Caption = CAccounts.getInstance()[0].Period.ToString(); // Properties.Settings.Default.cfgSipAccountRegPeriod.ToString();
-      _editDisplayName.Caption = CAccounts.getInstance()[0].Name; // Properties.Settings.Default.cfgSipAccountDisplayName[0];
-      _editProxyAddress.Caption = CAccounts.getInstance()[0].Address;
-      _editProxyPort.Caption = CAccounts.getInstance()[0].Port.ToString();
-      _editperiod.Caption = CAccounts.getInstance()[0].Period.ToString();
+      _editperiod.Caption = CAccounts.getInstance().DefAccount.Period.ToString(); // Properties.Settings.Default.cfgSipAccountRegPeriod.ToString();
+      _editId.Caption = CAccounts.getInstance().DefAccount.Id; 
+      _editDisplayName.Caption = CAccounts.getInstance().DefAccount.Name; // Properties.Settings.Default.cfgSipAccountDisplayName[0];
+      _editProxyAddress.Caption = CAccounts.getInstance().DefAccount.Address;
+      _editProxyPort.Caption = CAccounts.getInstance().DefAccount.Port.ToString();
+      _editperiod.Caption = CAccounts.getInstance().DefAccount.Period.ToString();
 
       base.onEntry();
     }
 
     bool CSIPProxySettings_Ok()
     {
-      CAccount acc = new CAccount();
-      acc.Address = _editProxyAddress.Caption;
-      acc.Port = int.Parse(_editProxyPort.Caption);
-      acc.Name = _editDisplayName.Caption;
-      acc.Period = int.Parse(_editperiod.Caption);
-
-      CAccounts.getInstance()[0] = acc;
+      CAccounts.getInstance().DefAccount.Address = _editProxyAddress.Caption;
+      CAccounts.getInstance().DefAccount.Port = int.Parse(_editProxyPort.Caption);
+      CAccounts.getInstance().DefAccount.Name = _editDisplayName.Caption;
+      CAccounts.getInstance().DefAccount.Period = int.Parse(_editperiod.Caption);
+      CAccounts.getInstance().DefAccount.Id = _editId.Caption;
 
       Properties.Settings.Default.Save();
 

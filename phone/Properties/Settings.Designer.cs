@@ -77,6 +77,10 @@ namespace Sipek.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
         public global::System.Collections.Specialized.StringCollection cfgSipAccountUsername {
             get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountUsername"]));
@@ -88,6 +92,10 @@ namespace Sipek.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
         public global::System.Collections.Specialized.StringCollection cfgSipAccountPassword {
             get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountPassword"]));
@@ -113,6 +121,10 @@ namespace Sipek.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
         public global::System.Collections.Specialized.StringCollection cfgSipAccountRegPeriod {
             get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountRegPeriod"]));
@@ -131,6 +143,25 @@ namespace Sipek.Properties {
             }
             set {
                 this["cfgSipAccountDefault"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>0</string>
+  <string>0</string>
+  <string>0</string>
+  <string>0</string>
+  <string>0</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountIds {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountIds"]));
+            }
+            set {
+                this["cfgSipAccountIds"] = value;
             }
         }
     }

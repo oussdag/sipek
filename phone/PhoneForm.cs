@@ -237,6 +237,7 @@ namespace Sipek
       new CSIPProxySettings();
       new CRingModePage();
       new CCalllogPage();
+      new CAccountsPage();
 
       control.initialize();
 
