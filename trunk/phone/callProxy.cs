@@ -46,7 +46,7 @@ namespace Sipek
     
     // call API
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_registerAccount(string uri, string reguri);
+    private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
 
     [DllImport("pjsipDll.dll")]
     private static extern int dll_makeCall(int callId, string number);
@@ -116,9 +116,10 @@ namespace Sipek
     //
     public static int registerAccount(int accountId)
     {
-      string uri = "sip:" + CCallManager.getInstance().SipName + "@" + CCallManager.getInstance().SipProxy;
-      string reguri = "sip:" + CCallManager.getInstance().SipProxy + ":"+CCallManager.getInstance().SipProxyPort;
-      dll_registerAccount(uri, reguri);
+      string uri = "sip:" + CAccounts.getInstance()[accountId].Id + "@" + CAccounts.getInstance()[accountId].Address;
+      string reguri = "sip:" + CAccounts.getInstance()[accountId].Address; // +":" + CCallManager.getInstance().SipProxyPort;
+      //dll_registerAccount(uri, reguri);
+      dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
       return 1;
     }
 
@@ -197,6 +198,16 @@ namespace Sipek
 
     private static int onRegStateChanged(int accId, int regState)
     {
+      switch (regState)
+      {
+        case 200: 
+            CAccounts.getInstance()[accId].RegState = ERegistrationState.ERegistered;
+          break;
+        default:
+          CAccounts.getInstance()[accId].RegState = ERegistrationState.ENotRegistered;
+          break;
+      }
+      CCallManager.getInstance().updateGui();
       return 1;
     }
 
