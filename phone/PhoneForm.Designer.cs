@@ -63,7 +63,7 @@ namespace Sipek
       this.richTextBox1.Location = new System.Drawing.Point(42, 12);
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
-      this.richTextBox1.Size = new System.Drawing.Size(284, 235);
+      this.richTextBox1.Size = new System.Drawing.Size(284, 248);
       this.richTextBox1.TabIndex = 0;
       this.richTextBox1.Text = "";
       this.richTextBox1.WordWrap = false;
@@ -82,7 +82,7 @@ namespace Sipek
       this.panel2.Controls.Add(this.digitKey3);
       this.panel2.Controls.Add(this.digitKey2);
       this.panel2.Controls.Add(this.digitKey1);
-      this.panel2.Location = new System.Drawing.Point(86, 364);
+      this.panel2.Location = new System.Drawing.Point(86, 377);
       this.panel2.Name = "panel2";
       this.panel2.Size = new System.Drawing.Size(201, 167);
       this.panel2.TabIndex = 18;
@@ -211,7 +211,7 @@ namespace Sipek
       // clearButton
       // 
       this.clearButton.BackColor = System.Drawing.Color.OrangeRed;
-      this.clearButton.Location = new System.Drawing.Point(256, 318);
+      this.clearButton.Location = new System.Drawing.Point(256, 331);
       this.clearButton.Name = "clearButton";
       this.clearButton.Size = new System.Drawing.Size(48, 30);
       this.clearButton.TabIndex = 19;
@@ -223,7 +223,7 @@ namespace Sipek
       // 
       this.offhookButton.BackColor = System.Drawing.Color.DarkSeaGreen;
       this.offhookButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-      this.offhookButton.Location = new System.Drawing.Point(42, 253);
+      this.offhookButton.Location = new System.Drawing.Point(42, 266);
       this.offhookButton.Name = "offhookButton";
       this.offhookButton.Size = new System.Drawing.Size(46, 50);
       this.offhookButton.TabIndex = 20;
@@ -233,7 +233,7 @@ namespace Sipek
       // 
       // OKbutton
       // 
-      this.OKbutton.Location = new System.Drawing.Point(157, 279);
+      this.OKbutton.Location = new System.Drawing.Point(157, 292);
       this.OKbutton.Name = "OKbutton";
       this.OKbutton.Size = new System.Drawing.Size(55, 47);
       this.OKbutton.TabIndex = 21;
@@ -246,7 +246,7 @@ namespace Sipek
       this.Cancel.BackColor = System.Drawing.Color.Red;
       this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
       this.Cancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-      this.Cancel.Location = new System.Drawing.Point(280, 253);
+      this.Cancel.Location = new System.Drawing.Point(280, 266);
       this.Cancel.Name = "Cancel";
       this.Cancel.Size = new System.Drawing.Size(46, 50);
       this.Cancel.TabIndex = 22;
@@ -257,7 +257,7 @@ namespace Sipek
       // buttonSettings
       // 
       this.buttonSettings.BackColor = System.Drawing.Color.DarkSeaGreen;
-      this.buttonSettings.Location = new System.Drawing.Point(63, 319);
+      this.buttonSettings.Location = new System.Drawing.Point(63, 332);
       this.buttonSettings.Name = "buttonSettings";
       this.buttonSettings.Size = new System.Drawing.Size(43, 29);
       this.buttonSettings.TabIndex = 23;
@@ -267,7 +267,7 @@ namespace Sipek
       // 
       // leftNav
       // 
-      this.leftNav.Location = new System.Drawing.Point(121, 288);
+      this.leftNav.Location = new System.Drawing.Point(121, 301);
       this.leftNav.Name = "leftNav";
       this.leftNav.Size = new System.Drawing.Size(30, 29);
       this.leftNav.TabIndex = 24;
@@ -277,7 +277,7 @@ namespace Sipek
       // 
       // rightNav
       // 
-      this.rightNav.Location = new System.Drawing.Point(218, 288);
+      this.rightNav.Location = new System.Drawing.Point(218, 301);
       this.rightNav.Name = "rightNav";
       this.rightNav.Size = new System.Drawing.Size(30, 29);
       this.rightNav.TabIndex = 25;
@@ -287,7 +287,7 @@ namespace Sipek
       // 
       // upNav
       // 
-      this.upNav.Location = new System.Drawing.Point(166, 253);
+      this.upNav.Location = new System.Drawing.Point(166, 266);
       this.upNav.Name = "upNav";
       this.upNav.Size = new System.Drawing.Size(38, 23);
       this.upNav.TabIndex = 26;
@@ -297,7 +297,7 @@ namespace Sipek
       // 
       // downNav
       // 
-      this.downNav.Location = new System.Drawing.Point(166, 328);
+      this.downNav.Location = new System.Drawing.Point(166, 341);
       this.downNav.Name = "downNav";
       this.downNav.Size = new System.Drawing.Size(38, 23);
       this.downNav.TabIndex = 27;
@@ -311,7 +311,7 @@ namespace Sipek
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.WhiteSmoke;
       this.CancelButton = this.Cancel;
-      this.ClientSize = new System.Drawing.Size(365, 539);
+      this.ClientSize = new System.Drawing.Size(365, 552);
       this.Controls.Add(this.downNav);
       this.Controls.Add(this.upNav);
       this.Controls.Add(this.rightNav);

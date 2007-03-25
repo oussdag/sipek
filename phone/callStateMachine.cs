@@ -88,6 +88,10 @@ namespace Sipek
       set { _duration = value; }
       get { return _duration; }
     }
+    public System.TimeSpan RuntimeDuration
+    {
+      get { return System.DateTime.Now.Subtract(Time); }
+    }
     #endregion
 
     #region Constructor

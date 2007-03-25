@@ -36,6 +36,8 @@ namespace Sipek
 
     private int _currentSession = -1;
 
+    private bool _initialized = false;
+
     #endregion
 
 
@@ -58,7 +60,10 @@ namespace Sipek
     {
       get { return CAccounts.getInstance()[0].Name; }
     }
-
+    public int SipPort
+    {
+      get { return Properties.Settings.Default.cfgSipPort; }
+    }
     #endregion Properties
 
 
@@ -75,15 +80,6 @@ namespace Sipek
 
     private CCallManager()
     {
-    }
-    #endregion Constructor
-
-
-    #region Methods
-
-
-    public void initialize()
-    {
       // Create menu pages...
       new CConnectingPage();
       new CRingingPage();
@@ -93,10 +89,28 @@ namespace Sipek
       new CIncomingPage();
       new CPreDialPage();
 
-
       // init SIP
       CCallProxy.initialize();
-      CCallProxy.registerAccount(0);
+    }
+    #endregion Constructor
+
+
+    #region Methods
+
+
+    public void initialize()
+    {
+      if (!_initialized)
+      {
+        CCallProxy.registerAccount(0);
+      }
+      else
+      {
+        // todo unregister
+        // reregister
+        CCallProxy.registerAccount(0);
+      }
+      _initialized = true;
 
       // Initialize call table
       _calls = new Dictionary<int, CStateMachine>();

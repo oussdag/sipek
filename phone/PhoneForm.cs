@@ -57,7 +57,7 @@ namespace Sipek
       // sasacoh coding
       ///////////////////////////////////////////////////////////////
       string str = new string(' ', 255);
-      richTextBox1.Lines = new string[] { str, str, str, str, str, str, str, str, str, str };
+      richTextBox1.Lines = new string[] { str, str, str, str, str, str, str, str, str, str, str };
       _buttons = new System.Collections.Generic.List<Button>();
     }
 
@@ -235,6 +235,7 @@ namespace Sipek
       new CMenuPage();
       new CSIPSettings();
       new CSIPProxySettings();
+      new CSIPProxySettingsMore();
       new CRingModePage();
       new CCalllogPage();
       new CAccountsPage();

@@ -145,7 +145,7 @@ namespace Sipek
 
     private void formWriter(int xaxis, int yaxis, string text)
     {
-      if ((!mform.IsDisposed)&&(yaxis < maxLines)&&(xaxis < maxColumns))
+      if ((!mform.IsDisposed)&&(yaxis <= maxLines)&&(xaxis <= maxColumns))
         mform.Invoke(new writerDelegate(mform.writeText), new object[3] { xaxis, yaxis, text });
     }
 

@@ -34,6 +34,7 @@ namespace Sipek
     P_RINGMODE,
     P_CALLLOG,
     P_ACCOUNTS,
+    P_SIPPROXYSETTINGSMORE,
   }
   public enum ERingModes : int
   {
@@ -590,7 +591,7 @@ namespace Sipek
 
       for (int i = 0; i < accounts.getSize(); i++ )
       {
-        CLink accLink = new CLink(accounts[i].Name + " " + accounts[i].Address, 0); // todo
+        CLink accLink = new CLink(accounts[i].Name, (int)EPages.P_SIPPROXYSETTINGS); // todo
         _list.add(accLink);
       }
 
@@ -617,7 +618,8 @@ namespace Sipek
   /// </summary>
   public class CSIPProxySettings : CPage
   {
-    CIpAddressEdit _editProxyAddress;
+    //CIpAddressEdit _editProxyAddress;
+    CEditField _editProxyAddress;
     CEditField _editProxyPort;
     CCheckBox _checkRegister;
     CEditField _editperiod;
@@ -637,7 +639,8 @@ namespace Sipek
       _editId.LinkKey = _editId.PosY;
       add(_editId);
 
-      _editProxyAddress = new CIpAddressEdit("Proxy>");
+      //_editProxyAddress = new CIpAddressEdit("Proxy>");
+      _editProxyAddress = new CEditField("Proxy>","");
       _editProxyAddress.PosY = 5;
       _editProxyAddress.LinkKey = _editProxyAddress.PosY;
       add(_editProxyAddress);
@@ -658,6 +661,12 @@ namespace Sipek
       _editperiod.LinkKey = _editperiod.PosY;
       add(_editperiod);
 
+
+      CLink moreLink = new CLink("More", (int)EPages.P_SIPPROXYSETTINGSMORE);
+      moreLink.PosY = 10;
+      moreLink.Align = EAlignment.justify_right;
+      add(moreLink);
+
       this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
     }
 
@@ -675,20 +684,79 @@ namespace Sipek
 
     bool CSIPProxySettings_Ok()
     {
-      CAccounts.getInstance().DefAccount.Address = _editProxyAddress.Caption;
-      CAccounts.getInstance().DefAccount.Port = int.Parse(_editProxyPort.Caption);
-      CAccounts.getInstance().DefAccount.Name = _editDisplayName.Caption;
-      CAccounts.getInstance().DefAccount.Period = int.Parse(_editperiod.Caption);
-      CAccounts.getInstance().DefAccount.Id = _editId.Caption;
+      CAccount account = CAccounts.getInstance().DefAccount;
+      account.Address = _editProxyAddress.Caption;
+      account.Port = int.Parse(_editProxyPort.Caption);
+      account.Name = _editDisplayName.Caption;
+      account.Period = int.Parse(_editperiod.Caption);
+      account.Id = _editId.Caption;
 
-      Properties.Settings.Default.Save();
+      int defIndex = CAccounts.getInstance().DefAccountIndex;
+      CAccounts.getInstance()[defIndex] = account;
 
+      CAccounts.getInstance().save();
+ 
       _controller.previousPage();
 
       return true;
     }
   }
 
+  /// <summary>
+  /// CSIPProxySettingsMore
+  /// </summary>
+  public class CSIPProxySettingsMore : CPage
+  {
+    CEditField _editUserName;
+    CEditField _editPassword;
+
+    public CSIPProxySettingsMore()
+      : base((int)EPages.P_SIPPROXYSETTINGSMORE, "SIP Proxy Settings")
+    {
+      _editUserName = new CEditField("Username>", "", true);
+      _editUserName.PosY = 1;
+      _editUserName.LinkKey = _editUserName.PosY;
+      add(_editUserName);
+
+      _editPassword = new CEditField("Password>", "");
+      _editPassword.PosY = 3;
+      _editPassword.LinkKey = _editPassword.PosY;
+      add(_editPassword);
+
+      CLink moreLink = new CLink("Back", (int)EPages.P_SIPPROXYSETTINGS);
+      moreLink.PosY = 10;
+      moreLink.Align = EAlignment.justify_right;
+      add(moreLink);
+
+      this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
+    }
+
+    public override void onEntry()
+    {
+      _editUserName.Caption = CAccounts.getInstance().DefAccount.Username;
+      _editPassword.Caption = CAccounts.getInstance().DefAccount.Password; 
+
+      base.onEntry();
+    }
+
+    bool CSIPProxySettings_Ok()
+    {
+      CAccount account = CAccounts.getInstance().DefAccount; 
+      account.Username = _editUserName.Caption;
+      account.Password = _editPassword.Caption;
+
+      int defIndex = CAccounts.getInstance().DefAccountIndex;
+      CAccounts.getInstance()[defIndex] = account;
+
+      CAccounts.getInstance().save();
+
+      _controller.previousPage();
+      // todo!!!
+      //CCallManager.getInstance().initialize();
+
+      return true;
+    }
+  }
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   public class CRingModePage : CPage

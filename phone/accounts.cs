@@ -14,6 +14,7 @@ namespace Sipek
   {
     // runtime data
     ERegistrationState _registrationState = ERegistrationState.ENotRegistered;
+    int _index = 0;
 
     // configuration data 
     private string _name;
@@ -66,6 +67,12 @@ namespace Sipek
     }
     
     // runtime data
+    public int Index
+    {
+      get { return _index; }
+      set { _index = value; }
+    }
+
     public ERegistrationState RegState 
     {
       get { return _registrationState; }
@@ -84,7 +91,7 @@ namespace Sipek
 
     public CAccount DefAccount
     {
-      get { return this[_defaccountId]; } // todo!!!
+      get { return this[_defaccountId]; }
     }
 
     public int DefAccountIndex
@@ -119,6 +126,7 @@ namespace Sipek
         account.Port = Int16.Parse(Properties.Settings.Default.cfgSipAccountPorts[i]);
         account.Username = Properties.Settings.Default.cfgSipAccountUsername[i];
         account.Password = Properties.Settings.Default.cfgSipAccountPassword[i];
+        account.Index = i;
 
         _accounts.Add(i, account);
       }
@@ -141,6 +149,7 @@ namespace Sipek
       set
       {
         CAccount account = _accounts[index];
+
         Properties.Settings.Default.cfgSipAccountNames[index] = account.Name = value.Name;
         Properties.Settings.Default.cfgSipAccountIds[index] = account.Id = value.Id;
         Properties.Settings.Default.cfgSipAccountAddresses[index] = account.Address = value.Address;
@@ -155,6 +164,22 @@ namespace Sipek
     public int getSize()
     {
       return Properties.Settings.Default.cfgSipAccountNames.Count;
+    }
+
+    public void save()
+    {
+      int count = Properties.Settings.Default.cfgSipAccountAddresses.Count;
+      for (int index = 0; index < count; index++)
+      {
+        Properties.Settings.Default.cfgSipAccountAddresses[index] = this[index].Address;
+        Properties.Settings.Default.cfgSipAccountPorts[index] = this[index].Port.ToString();
+        Properties.Settings.Default.cfgSipAccountNames[index] = this[index].Name;
+        Properties.Settings.Default.cfgSipAccountRegPeriod[index] = this[index].Period.ToString();
+        Properties.Settings.Default.cfgSipAccountIds[index] = this[index].Id;
+        Properties.Settings.Default.cfgSipAccountUsername[index] = this[index].Username;
+        Properties.Settings.Default.cfgSipAccountPassword[index] = this[index].Password;
+        Properties.Settings.Default.Save();
+      }
     }
 
   }
