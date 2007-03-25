@@ -17,6 +17,7 @@
  */
 
 using MenuDesigner;
+using System;
 
 namespace Sipek
 {
@@ -400,7 +401,9 @@ namespace Sipek
 
     bool decor_OnTimeout()
     {
- 	    _duration.Caption = CCallManager.getInstance().getCurrentCall().Duration.Seconds.ToString();
+      int seconds = CCallManager.getInstance().getCurrentCall().RuntimeDuration.Seconds;
+      int minutes = CCallManager.getInstance().getCurrentCall().RuntimeDuration.Minutes;
+      _duration.Caption = String.Format("{0:00}:{1:00}", minutes, seconds);
       return true;
     }
 

@@ -28,7 +28,7 @@ namespace Sipek
   public class CCallProxy : CTelephonyInterface
   {    
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_init();
+    private static extern int dll_init(int listenPort);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_main();
     [DllImport("pjsipDll.dll")]
@@ -100,7 +100,8 @@ namespace Sipek
       onRegStateCallback( rsDel );
 
       // Initialize pjsip...
-      dll_init();
+      int port = Properties.Settings.Default.cfgSipPort;
+      dll_init(port);
       dll_main();
     }
 
@@ -119,7 +120,8 @@ namespace Sipek
       string uri = "sip:" + CAccounts.getInstance()[accountId].Id + "@" + CAccounts.getInstance()[accountId].Address;
       string reguri = "sip:" + CAccounts.getInstance()[accountId].Address; // +":" + CCallManager.getInstance().SipProxyPort;
       //dll_registerAccount(uri, reguri);
-      dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
+      //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
+      dll_registerAccount(uri, reguri, CAccounts.getInstance()[accountId].Address, CAccounts.getInstance()[accountId].Username, CAccounts.getInstance()[accountId].Password);
       return 1;
     }
 
