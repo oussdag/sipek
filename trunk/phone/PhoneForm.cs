@@ -244,10 +244,6 @@ namespace Sipek
 
       // set active page...
       control.setActivePage((int)EPages.P_INIT);
-
-      // initialize telephony...
-      CCallManager.getInstance().initialize();
-
     }
 
     private void rightNav_Click(object sender, EventArgs e)
