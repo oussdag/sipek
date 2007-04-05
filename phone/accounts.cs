@@ -116,7 +116,7 @@ namespace Sipek
     protected CAccounts()
     {
       _accounts = new Dictionary<int, CAccount>();
-      int count = Properties.Settings.Default.cfgSipAccountNames.Count;
+      int count = Properties.Settings.Default.cfgSipAccountAddresses.Count;
       for (int i = 0; i < count; i++)
       {
         CAccount account = new CAccount();

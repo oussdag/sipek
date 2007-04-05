@@ -75,6 +75,8 @@ namespace Sipek
     private bool okhandler()
     {
       _controller.showPage((int)EPages.P_IDLE);
+      // initialize telephony...
+      CCallManager.getInstance().initialize();
       return true; 
     }
   }
