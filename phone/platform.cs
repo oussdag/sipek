@@ -81,6 +81,7 @@ namespace Sipek
   {
     VoidDelegate mdeleg;
     Timer mtimer;
+    int _pageId;
 
     public CTimerImpl(VoidDelegate deleg)
       : base()
@@ -92,6 +93,12 @@ namespace Sipek
 
     void mtimer_Elapsed(object sender, ElapsedEventArgs e)
     {
+      // check if page is not actual anymore
+      if (_pageId != CComponentController.getInstance().Page.Id)
+      {
+        return;
+      }
+
       if (mdeleg != null) mdeleg();
     }
 
@@ -99,6 +106,7 @@ namespace Sipek
     {
       mtimer.Interval = timeout;
       mtimer.Start();
+      _pageId = CComponentController.getInstance().Page.Id;
     }
 
     public override void abort()
@@ -134,8 +142,8 @@ namespace Sipek
     delegate void writerDelegate(int xaxis, int posY, string text);
     delegate void setCursorDelegate(int xaxis, int yaxis);
     delegate void setSelectionDelegate(int xaxis, int yaxis, int length);
-    delegate void drawButtonDelegate(int xaxis, int yaxis);
-    delegate void eraseButtonDelegate();
+    //delegate void drawButtonDelegate(int xaxis, int yaxis);
+    //delegate void eraseButtonDelegate();
 
     public Renderer(PhoneForm form)
       : base()
@@ -159,6 +167,7 @@ namespace Sipek
       mform.Invoke(new setSelectionDelegate(mform.setSelection), new object[3] { xaxis, yaxis, length});
     }
 
+    /*
     private void formDrawButton(int xaxis, int yaxis)
     {
       mform.Invoke(new drawButtonDelegate(mform.drawButton), new object[2] { xaxis, yaxis});
@@ -168,6 +177,7 @@ namespace Sipek
     {
       mform.Invoke(new eraseButtonDelegate(mform.eraseButton));
     }
+    */ 
     ///////////////////////////////////////////////////////////////////////////////////////
 
     public void drawText(int positionId, string caption, EAlignment justify)
@@ -181,6 +191,7 @@ namespace Sipek
         case EAlignment.justify_right: xaxis = maxColumns  - caption.Length; break;
         case EAlignment.justify_center: xaxis = (maxColumns - caption.Length) / 2; break;
       }
+      if (xaxis < 0) xaxis = 0;
       formWriter(xaxis, positionId, caption);
     }
 
@@ -196,6 +207,7 @@ namespace Sipek
       int xaxis = 0;
       if (justify == EAlignment.justify_right) xaxis = maxColumns - caption.Length;
       if (justify == EAlignment.justify_center) xaxis = (maxColumns - caption.Length) / 2;
+      if (xaxis < 0) xaxis = 0;
       formWriter(xaxis, positionId, new string(' ', caption.Length));
     }
 
@@ -240,13 +252,13 @@ namespace Sipek
       else if (justify == EAlignment.justify_center)
         x = (maxColumns) / 2;
 
-      formDrawButton(x, positionId);
+      //formDrawButton(x, positionId);
     }
 
     public void eraseLink(int positionId, string caption, EAlignment justify)
     {
       this.eraseText(positionId, caption, justify);
-      formErasebutton();
+      //formErasebutton();
     }
 
     public void drawEdit(int positionId, string prompt, string caption, int cursor_position, bool selected, EEditMode mode)

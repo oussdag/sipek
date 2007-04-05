@@ -201,8 +201,17 @@ namespace Sipek
       string path = "/phonebook/record" + "[name='" + name + "']";
       XmlNode node = _xmlDocument.SelectSingleNode(path);
       _xmlDocument.DocumentElement.RemoveChild(node);
+
+      save();
     }
 
+    public void clearAll()
+    {
+      XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
+      _xmlDocument.DocumentElement.RemoveAll();
+
+      save();
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////
     public void addCall(ECallType type, string number, DateTime time, TimeSpan duration)
