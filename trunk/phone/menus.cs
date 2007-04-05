@@ -66,17 +66,21 @@ namespace Sipek
       txt.PosY = 5;
       txt.PosX = 10;
       CHorizontalScroller scrollingtext = new CHorizontalScroller(txt, 10, 200);
-      add(scrollingtext);
-
+      // add(scrollingtext); // solve problem with remaining dots 
 
       this.Ok += new VoidDelegate(okhandler);
+    }
+
+    public override void onEntry()
+    {
+ 	    base.onEntry();
+      // initialize telephony...
+      CCallManager.getInstance().initialize();
     }
 
     private bool okhandler()
     {
       _controller.showPage((int)EPages.P_IDLE);
-      // initialize telephony...
-      CCallManager.getInstance().initialize();
       return true; 
     }
   }
@@ -106,24 +110,24 @@ namespace Sipek
       add(title);
 
       CLink mlinkPhonebook = new CLink("Phonebook", (int)EPages.P_PHONEBOOK);
-      mlinkPhonebook.PosY = 8;
+      mlinkPhonebook.PosY = 9;
       mlinkPhonebook.LinkKey = mlinkPhonebook.PosY;
       this.add(mlinkPhonebook);
 
       _linkRinger = new CLink("Ring Mode", (int)EPages.P_RINGMODE);
       _linkRinger.Align = EAlignment.justify_right;
-      _linkRinger.PosY = 7;
+      _linkRinger.PosY = 8;
       _linkRinger.LinkKey = _linkRinger.PosY;
       this.add(_linkRinger);
 
       CLink mlinkCalls = new CLink("Calls", (int)EPages.P_CALLLOG);
       mlinkCalls.Align = EAlignment.justify_right;
-      mlinkCalls.PosY = 9;
+      mlinkCalls.PosY = 10;
       mlinkCalls.LinkKey = mlinkCalls.PosY;
       this.add(mlinkCalls);
 
       _linkAccounts = new CLink("Accounts", (int)EPages.P_ACCOUNTS);
-      _linkAccounts.PosY = 6;
+      _linkAccounts.PosY = 7;
       this.add(_linkAccounts);
 
       _statusSymbol = new CText("", EAlignment.justify_right);
@@ -271,13 +275,13 @@ namespace Sipek
       add(_list);
 
       CLink addNewLink = new CLink("Add New", (int)EPages.P_PHONEBOOKEDIT);
-      addNewLink.PosY = 2;
+      addNewLink.PosY = 3;
       addNewLink.LinkKey = addNewLink.PosY;
       //addNewLink.Align = EAlignment.justify_right;
       add(addNewLink);
 
       CLink modifyLink = new CLink("Modify");
-      modifyLink.PosY = 3;
+      modifyLink.PosY = 4;
       modifyLink.LinkKey = modifyLink.PosY;
       modifyLink.Softkey += new BoolIntDelegate(modifyLink_Softkey);
       modifyLink.Align = EAlignment.justify_right;
@@ -325,6 +329,8 @@ namespace Sipek
       CPhonebookEditPage page = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
 
       CLink selitem = (CLink)_list.Selected;
+      if (selitem == null) return true;
+
       page.LastName = selitem.subItems[0];
       page.FirstName = selitem.subItems[1];
       page.Number = selitem.subItems[2];
@@ -451,16 +457,16 @@ namespace Sipek
     public CCalllogPage()
       : base((int)EPages.P_CALLLOG, "Call Register")
     {
-      _list = new CSelectList(7);
+      _list = new CSelectList(5);
       _list.PosY = 4;
       add(_list);
 
-      CLink detailsLink = new CLink("Details");
-      detailsLink.PosY = 3;
-      detailsLink.LinkKey = detailsLink.PosY;
-      detailsLink.Align = EAlignment.justify_right;
-      detailsLink.Softkey += new BoolIntDelegate(detailsLink_Softkey);
-      add(detailsLink);
+      CLink clearLink = new CLink("Clear All");
+      clearLink.PosY = 10;
+      clearLink.LinkKey = clearLink.PosY;
+      clearLink.Align = EAlignment.justify_right;
+      clearLink.Softkey += new BoolIntDelegate(clearLink_Softkey);
+      add(clearLink);
 
       Menu += new VoidDelegate(CCalllogPage_Menu);
     }
@@ -487,7 +493,8 @@ namespace Sipek
 
     bool recordLink_Softkey(int keyId)
     {
-      return recordLink_Ok();
+      if (10 > keyId) return recordLink_Ok();
+      return false;
     }
 
     bool recordLink_Ok()
@@ -499,17 +506,9 @@ namespace Sipek
       return true;
     }
 
-    bool detailsLink_Softkey(int keyId)
+    bool clearLink_Softkey(int keyId)
     {
-/*      
-      CPhonebookEditPage page = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
-      CLink selitem = (CLink)_list.Selected;
-      page.LastName = selitem.subItems[0];
-      page.FirstName = selitem.subItems[1];
-      page.Number = selitem.subItems[2];
-      
-      _controller.showPage(page.Id);
-*/
+      if (10 == keyId) CCallLog.getInstance().clearAll();
       return true;
     }
 
@@ -536,16 +535,16 @@ namespace Sipek
       : base((int)EPages.P_MENU, "Settings")
     {
       CLink linkNetwork = new CLink("Network", 0);
-      linkNetwork.PosY = 5;
+      linkNetwork.PosY = 7;
       add(linkNetwork);
 
       CLink linkSound = new CLink("Sound", 0);
-      linkSound.PosY = 6;
+      linkSound.PosY = 8;
       linkSound.Align = EAlignment.justify_right;
       add(linkSound);
 
       CLink linkSIP = new CLink("SIP", (int)EPages.P_SIPSETTINGS);
-      linkSIP.PosY = 7;
+      linkSIP.PosY = 9;
       linkSIP.LinkKey = linkSIP.PosY;
       add(linkSIP);
 
@@ -653,9 +652,9 @@ namespace Sipek
       add(_editProxyPort);
 
 
-      _checkRegister = new CCheckBox("Register");
-      _checkRegister.PosY = 7;
-      _checkRegister.LinkKey = _checkRegister.PosY;
+      //_checkRegister = new CCheckBox("Register");
+      //_checkRegister.PosY = 7;
+      //_checkRegister.LinkKey = _checkRegister.PosY;
       //add(_checkRegister);
 
       _editperiod = new CEditField("Period>", "", EEditMode.numeric);
@@ -716,12 +715,12 @@ namespace Sipek
       : base((int)EPages.P_SIPPROXYSETTINGSMORE, "SIP Proxy Settings")
     {
       _editUserName = new CEditField("Username>", "", true);
-      _editUserName.PosY = 1;
+      _editUserName.PosY = 3;
       _editUserName.LinkKey = _editUserName.PosY;
       add(_editUserName);
 
       _editPassword = new CEditField("Password>", "");
-      _editPassword.PosY = 3;
+      _editPassword.PosY = 5;
       _editPassword.LinkKey = _editPassword.PosY;
       add(_editPassword);
 
@@ -774,19 +773,19 @@ namespace Sipek
       _radio = new CRadioButtonGroup();
 
       _silentCb = new CCheckBox("Silent");
-      _silentCb.PosY = 3;
+      _silentCb.PosY = 5;
       _silentCb.LinkKey = _silentCb.PosY;
       _silentCb.Softkey += new BoolIntDelegate(_silentCb_Softkey);
       _radio.add(_silentCb);
 
       _melodyCb = new CCheckBox("Melody");
-      _melodyCb.PosY = 4;
+      _melodyCb.PosY = 7;
       _melodyCb.LinkKey = _melodyCb.PosY;
       _melodyCb.Softkey += new BoolIntDelegate(_melodyCb_Softkey);
       _radio.add(_melodyCb);
       
       _beepCb = new CCheckBox("Beep");
-      _beepCb.PosY = 5;
+      _beepCb.PosY = 9;
       _beepCb.LinkKey = _beepCb.PosY;
       _beepCb.Softkey += new BoolIntDelegate(_beepCb_Softkey);
       _radio.add(_beepCb);

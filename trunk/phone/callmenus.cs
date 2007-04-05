@@ -58,8 +58,6 @@ namespace Sipek
       _sessions.PosY = 0;
       this.add(_sessions);
 
-
-
 	    _digits = new CText("");
       _digits.Align = EAlignment.justify_center;
 	    _digits.PosY = 5;
@@ -78,7 +76,7 @@ namespace Sipek
 	    _endCall = new CLink("End Call");
       _endCall.Align = EAlignment.justify_right;
       _endCall.Softkey += new BoolIntDelegate(endCallHandler);
-      _endCall.PosY = 9;
+      _endCall.PosY = 10;
       _endCall.LinkKey = _endCall.PosY;
       this.add(_endCall);
       
@@ -195,22 +193,22 @@ namespace Sipek
       clearHistory(false);
 
       CLink linkHide = new CLink("Hide Number", 0);
-      linkHide.PosY = 6;
+      linkHide.PosY = 5;
       this.add(linkHide);
 
       CLink dialing_phbook = new CLink("Phonebook"/*, P_PBOOK*/);
-      dialing_phbook.PosY = 8;
+      dialing_phbook.PosY = 7;
       this.add(dialing_phbook);
 
       CLink linkCall = new CLink("Calls");
       linkCall.Align = EAlignment.justify_right;
       linkCall.Softkey += new BoolIntDelegate(callHandler);
-      linkCall.PosY = 7;
+      linkCall.PosY = 8;
       this.add(linkCall);
 
       CLink linkSave = new CLink("Save");
       linkSave.Align = EAlignment.justify_right;
-      linkSave.PosY = 9;
+      linkSave.PosY = 10;
       this.add(linkSave);
 
       _editField = new CEditField(">", "", EEditMode.numeric, true);
@@ -391,7 +389,8 @@ namespace Sipek
 
       _hold = new CLink("Hold");
       _hold.Softkey += new BoolIntDelegate(_hold_Softkey);
-      _hold.PosY = 3;
+      _hold.PosY = 7;
+      add(_hold);
     }
 
     bool _hold_Softkey(int keyId)
@@ -425,7 +424,7 @@ namespace Sipek
     {
       CLink accept_call = new CLink("Accept");
       accept_call.Softkey += new BoolIntDelegate(accept_call_Softkey);
-      accept_call.PosY = 8;
+      accept_call.PosY = 7;
       accept_call.LinkKey = accept_call.PosY;
       this.add(accept_call);
     }

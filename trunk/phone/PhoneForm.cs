@@ -39,7 +39,7 @@ namespace Sipek
     protected CComponentController control;
     private int _caretPos = -1;
     private int _selection = -1;
-    private System.Collections.Generic.List<Button> _buttons;
+    //private System.Collections.Generic.List<Button> _buttons;
 
     // languages
     public static CLanguage _langEN = new CEnLanguage();
@@ -58,7 +58,7 @@ namespace Sipek
       ///////////////////////////////////////////////////////////////
       string str = new string(' ', 255);
       richTextBox1.Lines = new string[] { str, str, str, str, str, str, str, str, str, str, str };
-      _buttons = new System.Collections.Generic.List<Button>();
+      //_buttons = new System.Collections.Generic.List<Button>();
     }
 
     public void clearScreen()
@@ -90,7 +90,7 @@ namespace Sipek
       _selection = startX + startY * 256;
       richTextBox1.Select(_selection, length);
     }
-
+/*
     public void drawButton(int x, int y)
     {
       Button menuButton = new Button();
@@ -119,7 +119,7 @@ namespace Sipek
       }
       _buttons.Clear();
     }
-
+ */
     private void digitKey1_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_1);
@@ -266,5 +266,49 @@ namespace Sipek
       control.getAccessIf().onUpKey();
     }
 
+    private void button0_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(0);
+    }
+
+    private void button3_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(3);
+    }
+
+    private void button4_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(4);
+    }
+    
+    private void button5_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(5);
+    }
+
+    private void button6_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(6);
+    }
+
+    private void button7_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(7);
+    }
+
+    private void button8_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(8);
+    }
+
+    private void button9_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(9);
+    }
+
+    private void button10_Click(object sender, EventArgs e)
+    {
+      control.getAccessIf().onSoftKey(10);
+    }
   }
 }

@@ -28,6 +28,7 @@ namespace Sipek
     /// </summary>
     private void InitializeComponent()
     {
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PhoneForm));
       this.richTextBox1 = new System.Windows.Forms.RichTextBox();
       this.panel2 = new System.Windows.Forms.Panel();
       this.digitKeyH = new System.Windows.Forms.Button();
@@ -51,6 +52,15 @@ namespace Sipek
       this.rightNav = new System.Windows.Forms.Button();
       this.upNav = new System.Windows.Forms.Button();
       this.downNav = new System.Windows.Forms.Button();
+      this.button0 = new System.Windows.Forms.Button();
+      this.button5 = new System.Windows.Forms.Button();
+      this.button6 = new System.Windows.Forms.Button();
+      this.button7 = new System.Windows.Forms.Button();
+      this.button8 = new System.Windows.Forms.Button();
+      this.button10 = new System.Windows.Forms.Button();
+      this.button9 = new System.Windows.Forms.Button();
+      this.button3 = new System.Windows.Forms.Button();
+      this.button4 = new System.Windows.Forms.Button();
       this.panel2.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -65,7 +75,7 @@ namespace Sipek
       this.richTextBox1.ReadOnly = true;
       this.richTextBox1.Size = new System.Drawing.Size(284, 248);
       this.richTextBox1.TabIndex = 0;
-      this.richTextBox1.Text = "";
+      this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
       this.richTextBox1.WordWrap = false;
       // 
       // panel2
@@ -305,6 +315,87 @@ namespace Sipek
       this.downNav.UseVisualStyleBackColor = true;
       this.downNav.Click += new System.EventHandler(this.downNav_Click);
       // 
+      // button0
+      // 
+      this.button0.Location = new System.Drawing.Point(325, 13);
+      this.button0.Name = "button0";
+      this.button0.Size = new System.Drawing.Size(37, 23);
+      this.button0.TabIndex = 28;
+      this.button0.UseVisualStyleBackColor = true;
+      this.button0.Click += new System.EventHandler(this.button0_Click);
+      // 
+      // button5
+      // 
+      this.button5.Location = new System.Drawing.Point(4, 125);
+      this.button5.Name = "button5";
+      this.button5.Size = new System.Drawing.Size(37, 23);
+      this.button5.TabIndex = 29;
+      this.button5.UseVisualStyleBackColor = true;
+      this.button5.Click += new System.EventHandler(this.button5_Click);
+      // 
+      // button6
+      // 
+      this.button6.Location = new System.Drawing.Point(325, 148);
+      this.button6.Name = "button6";
+      this.button6.Size = new System.Drawing.Size(37, 23);
+      this.button6.TabIndex = 30;
+      this.button6.UseVisualStyleBackColor = true;
+      this.button6.Click += new System.EventHandler(this.button6_Click);
+      // 
+      // button7
+      // 
+      this.button7.Location = new System.Drawing.Point(4, 168);
+      this.button7.Name = "button7";
+      this.button7.Size = new System.Drawing.Size(37, 23);
+      this.button7.TabIndex = 31;
+      this.button7.UseVisualStyleBackColor = true;
+      this.button7.Click += new System.EventHandler(this.button7_Click);
+      // 
+      // button8
+      // 
+      this.button8.Location = new System.Drawing.Point(325, 191);
+      this.button8.Name = "button8";
+      this.button8.Size = new System.Drawing.Size(37, 23);
+      this.button8.TabIndex = 32;
+      this.button8.UseVisualStyleBackColor = true;
+      this.button8.Click += new System.EventHandler(this.button8_Click);
+      // 
+      // button10
+      // 
+      this.button10.Location = new System.Drawing.Point(325, 234);
+      this.button10.Name = "button10";
+      this.button10.Size = new System.Drawing.Size(37, 23);
+      this.button10.TabIndex = 33;
+      this.button10.UseVisualStyleBackColor = true;
+      this.button10.Click += new System.EventHandler(this.button10_Click);
+      // 
+      // button9
+      // 
+      this.button9.Location = new System.Drawing.Point(4, 212);
+      this.button9.Name = "button9";
+      this.button9.Size = new System.Drawing.Size(37, 23);
+      this.button9.TabIndex = 34;
+      this.button9.UseVisualStyleBackColor = true;
+      this.button9.Click += new System.EventHandler(this.button9_Click);
+      // 
+      // button3
+      // 
+      this.button3.Location = new System.Drawing.Point(4, 82);
+      this.button3.Name = "button3";
+      this.button3.Size = new System.Drawing.Size(37, 23);
+      this.button3.TabIndex = 35;
+      this.button3.UseVisualStyleBackColor = true;
+      this.button3.Click += new System.EventHandler(this.button3_Click);
+      // 
+      // button4
+      // 
+      this.button4.Location = new System.Drawing.Point(325, 102);
+      this.button4.Name = "button4";
+      this.button4.Size = new System.Drawing.Size(37, 23);
+      this.button4.TabIndex = 36;
+      this.button4.UseVisualStyleBackColor = true;
+      this.button4.Click += new System.EventHandler(this.button4_Click);
+      // 
       // PhoneForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -312,6 +403,15 @@ namespace Sipek
       this.BackColor = System.Drawing.Color.WhiteSmoke;
       this.CancelButton = this.Cancel;
       this.ClientSize = new System.Drawing.Size(365, 552);
+      this.Controls.Add(this.button4);
+      this.Controls.Add(this.button3);
+      this.Controls.Add(this.button9);
+      this.Controls.Add(this.button10);
+      this.Controls.Add(this.button8);
+      this.Controls.Add(this.button7);
+      this.Controls.Add(this.button6);
+      this.Controls.Add(this.button5);
+      this.Controls.Add(this.button0);
       this.Controls.Add(this.downNav);
       this.Controls.Add(this.upNav);
       this.Controls.Add(this.rightNav);
@@ -357,6 +457,15 @@ namespace Sipek
     private System.Windows.Forms.Button rightNav;
     private System.Windows.Forms.Button upNav;
     private System.Windows.Forms.Button downNav;
+    private System.Windows.Forms.Button button0;
+    private System.Windows.Forms.Button button5;
+    private System.Windows.Forms.Button button6;
+    private System.Windows.Forms.Button button7;
+    private System.Windows.Forms.Button button8;
+    private System.Windows.Forms.Button button10;
+    private System.Windows.Forms.Button button9;
+    private System.Windows.Forms.Button button3;
+    private System.Windows.Forms.Button button4;
   }
 }
 

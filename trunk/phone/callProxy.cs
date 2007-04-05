@@ -119,7 +119,6 @@ namespace Sipek
     {
       string uri = "sip:" + CAccounts.getInstance()[accountId].Id + "@" + CAccounts.getInstance()[accountId].Address;
       string reguri = "sip:" + CAccounts.getInstance()[accountId].Address; // +":" + CCallManager.getInstance().SipProxyPort;
-      //dll_registerAccount(uri, reguri);
       //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
       dll_registerAccount(uri, reguri, CAccounts.getInstance()[accountId].Address, CAccounts.getInstance()[accountId].Username, CAccounts.getInstance()[accountId].Password);
       return 1;
@@ -190,8 +189,12 @@ namespace Sipek
       return 1;
     }
 
-    private static int onCallIncoming(int callId, string number)
+    private static int onCallIncoming(int callId, string uri)
     {
+      string number = uri.Replace("<sip:","");
+
+      number = number.Remove(number.IndexOf('@'));
+
       CStateMachine sm = CCallManager.getInstance().createSession(callId, number);
       sm.getState().incomingCall(number);
       return 1;
