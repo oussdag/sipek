@@ -1,5 +1,5 @@
 #summary Simple is great - SIPek.
-#labels Featured
+#labels Deprecated
 
 = Introduction =
 
