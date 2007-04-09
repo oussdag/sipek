@@ -88,6 +88,7 @@ namespace Sipek
       new CDialPage();
       new CIncomingPage();
       new CPreDialPage();
+      new CHoldingPage();
 
       // init SIP
       CCallProxy.initialize();
@@ -150,6 +151,9 @@ namespace Sipek
           break;
         case CAbstractState.EStateId.INCOMING:
           CComponentController.getInstance().showPage((int)ECallPages.P_INCOMING);
+          break;
+        case CAbstractState.EStateId.HOLDING:
+          CComponentController.getInstance().showPage((int)ECallPages.P_HOLDING);
           break;
       }
     }

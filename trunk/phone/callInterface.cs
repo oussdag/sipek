@@ -32,6 +32,10 @@ namespace Sipek
 
     bool acceptCall();
 
+    bool holdCall();
+
+    bool retrieveCall();
+
     #endregion Methods
   }
 
@@ -47,6 +51,8 @@ namespace Sipek
 
     void onReleased();
 
+    void onHoldConfirm();
+    
     #endregion Methods
   }
 
