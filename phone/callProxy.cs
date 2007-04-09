@@ -26,7 +26,16 @@ using System.Net.Sockets;
 namespace Sipek
 {
   public class CCallProxy : CTelephonyInterface
-  {    
+  {
+
+    // callback delegates
+    delegate int GetConfigData(int cfgId);
+    delegate int OnRegStateChanged(int accountId, int regState);
+    delegate int OnCallStateChanged(int callId, int stateId);
+    delegate int OnCallIncoming(int callId, string number);
+    delegate int OnCallHoldConfirm(int callId);
+
+
     [DllImport("pjsipDll.dll")]
     private static extern int dll_init(int listenPort);
     [DllImport("pjsipDll.dll")]
@@ -43,6 +52,8 @@ namespace Sipek
     private static extern int onCallIncoming(OnCallIncoming cb);
     [DllImport("pjsipDll.dll")]
     private static extern int getConfigDataCallback(GetConfigData cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int onCallHoldConfirmCallback(OnCallHoldConfirm cb);
     
     // call API
     [DllImport("pjsipDll.dll")]
@@ -54,12 +65,10 @@ namespace Sipek
     private static extern int dll_releaseCall(int callId);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_answerCall(int callId, int code);
-
-    // callback delegates
-    delegate int GetConfigData(int cfgId);
-    delegate int OnRegStateChanged(int accountId, int regState);
-    delegate int OnCallStateChanged(int callId, int stateId);
-    delegate int OnCallIncoming(int callId, string number);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_holdCall(int callId);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_retrieveCall(int callId);
 
 
     #region Variables
@@ -71,6 +80,7 @@ namespace Sipek
     static OnRegStateChanged rsDel;
     static OnCallIncoming ciDel;
     static GetConfigData gdDel;
+    static OnCallHoldConfirm chDel;
 
     #endregion Variables
 
@@ -93,11 +103,13 @@ namespace Sipek
       csDel = new OnCallStateChanged(onCallStateChanged);
       rsDel = new OnRegStateChanged(onRegStateChanged);
       gdDel = new GetConfigData(getConfigData);
+      chDel = new OnCallHoldConfirm(onCallHoldConfirm);
 
       // register callbacks (delegates)
       onCallIncoming( ciDel );
       onCallStateCallback( csDel );
       onRegStateCallback( rsDel );
+      onCallHoldConfirmCallback(chDel);
 
       // Initialize pjsip...
       int port = Properties.Settings.Default.cfgSipPort;
@@ -148,7 +160,18 @@ namespace Sipek
       dll_answerCall(_line, 200);
       return true;
     }
-
+    
+    public bool holdCall()
+    {
+      dll_holdCall(_line);
+      return true;
+    }
+    
+    public bool retrieveCall()
+    {
+      dll_retrieveCall(_line);
+      return true;
+    }
     #endregion Methods
 
 
@@ -193,7 +216,19 @@ namespace Sipek
     {
       string number = uri.Replace("<sip:","");
 
-      number = number.Remove(number.IndexOf('@'));
+      int atPos = number.IndexOf('@');
+      if (atPos >= 0)
+      {
+        number = number.Remove(atPos);
+      }
+      else 
+      { 
+        int semiPos = number.IndexOf(';');
+        if (semiPos >= 0)
+        {
+          number = number.Remove(semiPos);
+        }
+      }
 
       CStateMachine sm = CCallManager.getInstance().createSession(callId, number);
       sm.getState().incomingCall(number);
@@ -223,8 +258,14 @@ namespace Sipek
       return 1;
     }
 
-    #endregion Callbacks
+    private static int onCallHoldConfirm(int callId)
+    {
+      CStateMachine sm = CCallManager.getInstance().getCall(callId);
+      if (sm != null) sm.getState().onHoldConfirm();
+      return 1;
+    }
 
+    #endregion Callbacks
 
   }
 

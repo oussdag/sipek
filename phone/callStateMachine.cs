@@ -36,6 +36,7 @@ namespace Sipek
     private CActiveState _stateActive;
     private CReleasedState _stateReleased;
     private CIncomingState _stateIncoming;
+    private CHoldingState _stateHolding;
 
     private ECallType _callType;
     private System.DateTime _timestamp;
@@ -106,6 +107,7 @@ namespace Sipek
       _stateCalling = new CConnectingState(this);
       _stateReleased = new CReleasedState(this);
       _stateIncoming = new CIncomingState(this);
+      _stateHolding = new CHoldingState(this);
       _state = _stateIdle;
 
       Time = System.DateTime.Now;
@@ -145,6 +147,7 @@ namespace Sipek
         case CAbstractState.EStateId.ACTIVE: changeState(_stateActive); break;
         case CAbstractState.EStateId.RELEASED: changeState(_stateReleased); break;
         case CAbstractState.EStateId.INCOMING: changeState(_stateIncoming); break;
+        case CAbstractState.EStateId.HOLDING: changeState(_stateHolding); break;
       }
       CCallManager.getInstance().updateGui();
     }

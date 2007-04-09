@@ -30,7 +30,8 @@ namespace Sipek
     P_RINGING,
     P_ACTIVE,
     P_RELEASED,
-    P_INCOMING
+    P_INCOMING,
+    P_HOLDING
   }
 
   public abstract class CTelephonyPage : CPage
@@ -41,7 +42,8 @@ namespace Sipek
     protected CText _name;
     protected CLink _endCall;
     protected CLink _sessions;
-  	
+
+    protected CStateMachine _currentCall = null;
 
     public CTelephonyPage(ECallPages pageId, string pageName) 
       : base((int)pageId, false,true)
@@ -92,16 +94,16 @@ namespace Sipek
       base.onEntry();
 
       // get current call instance
-      CStateMachine currentCall = CCallManager.getInstance().getCurrentCall();
+      _currentCall = CCallManager.getInstance().getCurrentCall();
 
-      if (currentCall == null) return;
+      if (_currentCall == null) return;
 
 	    // info...
 	    string sinfo = ""/*currentCall->GetCallInfo()*/;
 	    _info.Caption = sinfo;
 
 	    // digits...
-	    _digits.Caption = currentCall.CallingNo;
+	    _digits.Caption = _currentCall.CallingNo;
 
       // get name from phonebook...
       //_id.Caption = currentCall.CallingNo;
@@ -395,6 +397,7 @@ namespace Sipek
 
     bool _hold_Softkey(int keyId)
     {
+      _currentCall.getState().holdCall();
       return true;
     }
 
@@ -435,5 +438,30 @@ namespace Sipek
       return true;
     }
   }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CHoldingPage : CTelephonyPage
+  {
+    CLink _hold;
+
+    public CHoldingPage()
+      : base(ECallPages.P_HOLDING, "Holding...")
+    {
+      _hold = new CLink("Retrieve");
+      _hold.Softkey += new BoolIntDelegate(_hold_Softkey);
+      _hold.PosY = 7;
+      add(_hold);
+    }
+
+    bool _hold_Softkey(int keyId)
+    {
+      _currentCall.getState().retrieveCall();
+      return true;
+    }
+
+  }
+
 
 } // namespace Sipek

@@ -34,7 +34,8 @@ namespace Sipek
       ALERTING, 
       ACTIVE,
       RELEASED,
-      INCOMING
+      INCOMING,
+      HOLDING
     }
 
     #region Properties
@@ -78,6 +79,8 @@ namespace Sipek
 
     public virtual bool endCall()
     {
+      _smref.SigProxy.endCall();
+      _smref.destroy();
       return true;
     }
 
@@ -92,6 +95,17 @@ namespace Sipek
       return true;
     }
 
+    public virtual bool holdCall()
+    {
+      return true;
+    }
+    
+    public virtual bool retrieveCall()
+    {
+      return true;
+    }    
+
+    #endregion Methods
 
     #region Callbacks
 
@@ -110,11 +124,11 @@ namespace Sipek
     public virtual void onReleased()
     { 
     }
-
-
+    
+    public virtual void onHoldConfirm()
+    {
+    }
     #endregion Callbacks
-
-    #endregion Methods
   }
 
   /// <summary>
@@ -145,14 +159,6 @@ namespace Sipek
       return _smref.SigProxy.makeCall(dialedNo);
     }
 
-    public override bool endCall()
-    {
-      _smref.destroy();
-
-      return _smref.SigProxy.endCall();
-    }
-
-
     public override void incomingCall(string callingNo)
     {
       _smref.SigProxy.alerted();
@@ -180,13 +186,6 @@ namespace Sipek
 
     public override void onExit()
     {
-    }
-
-    public override bool endCall()
-    {
-      _smref.SigProxy.endCall();
-      _smref.destroy();
-      return true;
     }
 
     public override void onReleased()
@@ -218,13 +217,6 @@ namespace Sipek
 
     public override void onExit()
     {
-    }
-
-    public override bool endCall()
-    {
-      _smref.SigProxy.endCall();
-      _smref.destroy();
-      return true;
     }
 
     public override void onConnect()
@@ -264,9 +256,17 @@ namespace Sipek
     {
       _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
 
-      _smref.SigProxy.endCall();
-      _smref.destroy();
-      return true;
+      return base.endCall();
+    }
+
+    public override bool holdCall()
+    {
+      return _smref.SigProxy.holdCall();
+    }
+
+    public override void onHoldConfirm()
+    {
+      _smref.changeState(EStateId.HOLDING);
     }
 
     public override void onReleased()
@@ -275,6 +275,7 @@ namespace Sipek
 
       _smref.destroy();
     }
+
 
   }
 
@@ -321,13 +322,6 @@ namespace Sipek
     {
     }
 
-    public override bool endCall()
-    {
-      _smref.SigProxy.endCall();
-      _smref.destroy();
-      return true;
-    }
-
     public override bool acceptCall()
     {
       _smref.Type = ECallType.EReceived;
@@ -339,6 +333,34 @@ namespace Sipek
     }
 
 
+
+  }
+
+    /// <summary>
+  /// CIdleState
+  /// </summary>
+  public class CHoldingState : CAbstractState
+  {
+    public CHoldingState(CStateMachine sm)
+      : base(sm)
+    {
+      StateId = EStateId.HOLDING;
+    }
+
+    public override void onEntry()
+    {
+    }
+
+    public override void onExit()
+    {
+    }
+
+    public override bool retrieveCall()
+    {
+      _smref.SigProxy.retrieveCall();
+      _smref.changeState(EStateId.ACTIVE);
+      return true;
+    }
 
   }
 

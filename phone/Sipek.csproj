@@ -57,7 +57,7 @@
   <ItemGroup>
     <Reference Include="pjsipDll, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\pjsipWrapper\Debug\pjsipDll.dll</HintPath>
+      <HintPath>..\lib\pjsipDll.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
