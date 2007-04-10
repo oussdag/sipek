@@ -3,22 +3,52 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sipek", "phone\Sipek.csproj", "{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SipekSetup", "setup\SipekSetup.vdproj", "{61648C39-C8C0-49C5-9018-90F02D982FD1}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "setup\SipekSetup.vdproj", "{61648C39-C8C0-49C5-9018-90F02D982FD1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pjsipDll", "pjsipWrapper\pjsipDll.vcproj", "{4D8648B1-99DC-4218-9422-C196EC55AF07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|Win32 = Debug|Win32
 		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}.Release|Win32.ActiveCfg = Release|Any CPU
 		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Debug|Any CPU.ActiveCfg = Debug
 		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Debug|Any CPU.Build.0 = Debug
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Debug|Mixed Platforms.Build.0 = Debug
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Debug|Win32.ActiveCfg = Debug
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Debug|Win32.Build.0 = Debug
 		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Any CPU.ActiveCfg = Release
 		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Any CPU.Build.0 = Release
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Mixed Platforms.ActiveCfg = Release
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Mixed Platforms.Build.0 = Release
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Win32.ActiveCfg = Release
+		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Win32.Build.0 = Release
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Debug|Win32.Build.0 = Debug|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Release|Any CPU.ActiveCfg = Release|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Release|Win32.ActiveCfg = Release|Win32
+		{4D8648B1-99DC-4218-9422-C196EC55AF07}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
