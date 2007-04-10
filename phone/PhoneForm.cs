@@ -39,7 +39,6 @@ namespace Sipek
     protected CComponentController control;
     private int _caretPos = -1;
     private int _selection = -1;
-    //private System.Collections.Generic.List<Button> _buttons;
 
     // languages
     public static CLanguage _langEN = new CEnLanguage();
@@ -90,36 +89,6 @@ namespace Sipek
       _selection = startX + startY * 256;
       richTextBox1.Select(_selection, length);
     }
-/*
-    public void drawButton(int x, int y)
-    {
-      Button menuButton = new Button();
-      menuButton.Location = new System.Drawing.Point(x * 13, 14 + y * 22);
-      menuButton.Size = new System.Drawing.Size(41, 23);
-      menuButton.Click += new EventHandler(menuButton_Click);
-      menuButton.BackColor = System.Drawing.Color.DarkGray;
-      _buttons.Add(menuButton);
-      this.Controls.Add(menuButton);
-    }
-
-    void menuButton_Click(object sender, EventArgs e)
-    {
-      Button origin = (Button)sender;
-      int orgy = origin.Location.Y;
-      int y = (orgy - 14) / 22;
-
-      control.getAccessIf().onSoftKey(y);
-    }
-
-    public void eraseButton()
-    {
-      foreach (Button btn in _buttons)
-      {
-        this.Controls.Remove(btn);
-      }
-      _buttons.Clear();
-    }
- */
     private void digitKey1_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_1);

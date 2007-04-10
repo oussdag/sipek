@@ -142,8 +142,6 @@ namespace Sipek
     delegate void writerDelegate(int xaxis, int posY, string text);
     delegate void setCursorDelegate(int xaxis, int yaxis);
     delegate void setSelectionDelegate(int xaxis, int yaxis, int length);
-    //delegate void drawButtonDelegate(int xaxis, int yaxis);
-    //delegate void eraseButtonDelegate();
 
     public Renderer(PhoneForm form)
       : base()
@@ -153,8 +151,16 @@ namespace Sipek
 
     private void formWriter(int xaxis, int yaxis, string text)
     {
-      if ((!mform.IsDisposed)&&(yaxis <= maxLines)&&(xaxis <= maxColumns))
-        mform.Invoke(new writerDelegate(mform.writeText), new object[3] { xaxis, yaxis, text });
+      if ((yaxis <= maxLines) && (xaxis <= maxColumns) && (mform._closing == false))
+      {
+        try
+        {
+          mform.Invoke(new writerDelegate(mform.writeText), new object[3] { xaxis, yaxis, text });
+        }
+        catch (ObjectDisposedException e)
+        { 
+        }
+      }
     }
 
     private void formSetCursor(int xaxis, int yaxis)
