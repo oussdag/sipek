@@ -151,7 +151,7 @@ namespace Sipek
 
     private void formWriter(int xaxis, int yaxis, string text)
     {
-      if ((yaxis <= maxLines) && (xaxis <= maxColumns) && (mform._closing == false))
+      if ((yaxis <= maxLines) && (xaxis <= maxColumns) )
       {
         try
         {
