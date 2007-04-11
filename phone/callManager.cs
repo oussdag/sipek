@@ -127,35 +127,13 @@ namespace Sipek
       // get current session
       if (_currentSession < 0)
       {
-        CComponentController.getInstance().showPage((int)2);
+        // todo::: showHomePage
+        CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
         return;
       }
 
       CStateMachine call = getCall(_currentSession);
-      switch (call.getStateId())
-      {
-        case CAbstractState.EStateId.IDLE:
-          CComponentController.getInstance().showPage((int)2);
-          break;
-        case CAbstractState.EStateId.CONNECTING:
-          CComponentController.getInstance().showPage((int)ECallPages.P_CONNECTING);
-          break;
-        case CAbstractState.EStateId.ALERTING:
-           CComponentController.getInstance().showPage((int)ECallPages.P_RINGING);
-          break;
-        case CAbstractState.EStateId.ACTIVE:
-          CComponentController.getInstance().showPage((int)ECallPages.P_ACTIVE);
-          break;
-        case CAbstractState.EStateId.RELEASED:
-          CComponentController.getInstance().showPage((int)ECallPages.P_RELEASED);
-          break;
-        case CAbstractState.EStateId.INCOMING:
-          CComponentController.getInstance().showPage((int)ECallPages.P_INCOMING);
-          break;
-        case CAbstractState.EStateId.HOLDING:
-          CComponentController.getInstance().showPage((int)ECallPages.P_HOLDING);
-          break;
-      }
+      if (call != null) CComponentController.getInstance().showPage( (int)call.getStateId() );
     }
 
     public CStateMachine getCurrentCall()

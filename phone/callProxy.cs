@@ -132,7 +132,10 @@ namespace Sipek
       string uri = "sip:" + CAccounts.getInstance()[accountId].Id + "@" + CAccounts.getInstance()[accountId].Address;
       string reguri = "sip:" + CAccounts.getInstance()[accountId].Address; // +":" + CCallManager.getInstance().SipProxyPort;
       //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
-      dll_registerAccount(uri, reguri, CAccounts.getInstance()[accountId].Address, CAccounts.getInstance()[accountId].Username, CAccounts.getInstance()[accountId].Password);
+      string domain = CAccounts.getInstance()[accountId].Domain;
+      string username = CAccounts.getInstance()[accountId].Username;
+      string password = CAccounts.getInstance()[accountId].Password;
+      dll_registerAccount(uri, reguri, domain, username, password);
       return 1;
     }
 

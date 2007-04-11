@@ -204,7 +204,6 @@ namespace Sipek
       new CMenuPage();
       new CSIPSettings();
       new CSIPProxySettings();
-      new CSIPProxySettingsMore();
       new CRingModePage();
       new CCalllogPage();
       new CAccountsPage();
@@ -213,6 +212,8 @@ namespace Sipek
 
       // set active page...
       control.setActivePage((int)EPages.P_INIT);
+
+      control.HomePageId = (int)EPages.P_IDLE;
     }
 
     private void rightNav_Click(object sender, EventArgs e)

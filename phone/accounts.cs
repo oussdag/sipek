@@ -42,6 +42,7 @@ namespace Sipek
     private int _period = 3600;
     private string _username;
     private string _password;
+    private string _domain;
 
     public string Name
     {
@@ -83,7 +84,13 @@ namespace Sipek
       get { return _password; }
       set { _password = value; }
     }
-    
+
+    public string Domain
+    {
+      get { return _domain; }
+      set { _domain = value; }
+    }
+
     // runtime data
     public int Index
     {
@@ -101,6 +108,9 @@ namespace Sipek
     }
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
   public class CAccounts
   {
     private static CAccounts _instance = null;
@@ -144,6 +154,8 @@ namespace Sipek
         account.Port = Int16.Parse(Properties.Settings.Default.cfgSipAccountPorts[i]);
         account.Username = Properties.Settings.Default.cfgSipAccountUsername[i];
         account.Password = Properties.Settings.Default.cfgSipAccountPassword[i];
+        account.Domain = Properties.Settings.Default.cfgSipAccountDomains[i];
+        account.Period = Int16.Parse(Properties.Settings.Default.cfgSipAccountRegPeriod[i]);
         account.Index = i;
 
         _accounts.Add(i, account);
@@ -161,6 +173,8 @@ namespace Sipek
         account.Port = Int16.Parse(Properties.Settings.Default.cfgSipAccountPorts[index]);
         account.Username = Properties.Settings.Default.cfgSipAccountUsername[index];
         account.Password = Properties.Settings.Default.cfgSipAccountPassword[index];
+        account.Domain = Properties.Settings.Default.cfgSipAccountDomains[index];
+        account.Period = Int16.Parse(Properties.Settings.Default.cfgSipAccountRegPeriod[index]);
 
         return account;
       }
@@ -175,7 +189,9 @@ namespace Sipek
         Properties.Settings.Default.cfgSipAccountPorts[index] = value.Port.ToString();
         Properties.Settings.Default.cfgSipAccountUsername[index] = account.Username = value.Username;
         Properties.Settings.Default.cfgSipAccountPassword[index] = account.Password = value.Password;
-
+        Properties.Settings.Default.cfgSipAccountDomains[index] = account.Domain = value.Domain;
+        account.Period = value.Period;
+        Properties.Settings.Default.cfgSipAccountRegPeriod[index] = value.Period.ToString();
       }
     }
 
@@ -196,6 +212,7 @@ namespace Sipek
         Properties.Settings.Default.cfgSipAccountIds[index] = this[index].Id;
         Properties.Settings.Default.cfgSipAccountUsername[index] = this[index].Username;
         Properties.Settings.Default.cfgSipAccountPassword[index] = this[index].Password;
+        Properties.Settings.Default.cfgSipAccountDomains[index] = this[index].Domain;
         Properties.Settings.Default.Save();
       }
     }
