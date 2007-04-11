@@ -744,6 +744,8 @@ namespace Sipek
  
       _controller.previousPage();
 
+      CCallManager.getInstance().initialize();
+
       return true;
     }
   }

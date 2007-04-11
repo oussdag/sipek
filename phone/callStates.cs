@@ -20,6 +20,20 @@
 namespace Sipek
 {
   /// <summary>
+  /// 
+  /// </summary>
+  public enum EStateId  : int 
+  {
+    IDLE = 1, // associated with home page = P_IDLE
+    CONNECTING = 1974,
+    ALERTING, 
+    ACTIVE,
+    RELEASED,
+    INCOMING,
+    HOLDING
+  }  
+  
+  /// <summary>
   /// CAbstractState implements two interfaces CTelephonyInterface and CTelephonyCallback. 
   /// The first interface is used for sending requests to call server, where the second is used to 
   /// signal event from call server. 
@@ -27,16 +41,7 @@ namespace Sipek
   /// </summary>
   public abstract class CAbstractState : CTelephonyInterface, CTelephonyCallback
   {
-    public enum EStateId  
-    {
-      IDLE = 1, // associated with home page = P_IDLE
-      CONNECTING = 1974,
-      ALERTING, 
-      ACTIVE,
-      RELEASED,
-      INCOMING,
-      HOLDING
-    }
+
 
     #region Properties
     private EStateId _stateId = EStateId.IDLE;
@@ -331,8 +336,6 @@ namespace Sipek
       _smref.changeState(EStateId.ACTIVE);
       return true;
     }
-
-
 
   }
 

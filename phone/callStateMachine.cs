@@ -93,6 +93,20 @@ namespace Sipek
     {
       get { return System.DateTime.Now.Subtract(Time); }
     }
+    
+    private bool _isHeld = false;
+    public bool IsHeld
+    {
+      get { return _isHeld; }
+      set { _isHeld = value; }
+    }
+
+    private bool _is3Pty = false;
+    public bool Is3Pty
+    {
+      get { return _is3Pty; }
+      set { _is3Pty = value; }
+    }
     #endregion
 
     #region Constructor
@@ -124,7 +138,7 @@ namespace Sipek
       return _state;
     }
 
-    public CAbstractState.EStateId getStateId()
+    public EStateId getStateId()
     {
       return _state.StateId;
     }
@@ -137,17 +151,17 @@ namespace Sipek
     }
 
 
-    public void changeState(CAbstractState.EStateId stateId)
+    public void changeState(EStateId stateId)
     {
       switch (stateId) 
       {
-        case CAbstractState.EStateId.IDLE:  changeState(_stateIdle); break;
-        case CAbstractState.EStateId.CONNECTING: changeState(_stateCalling); break;
-        case CAbstractState.EStateId.ALERTING: changeState(_stateAlerting); break;
-        case CAbstractState.EStateId.ACTIVE: changeState(_stateActive); break;
-        case CAbstractState.EStateId.RELEASED: changeState(_stateReleased); break;
-        case CAbstractState.EStateId.INCOMING: changeState(_stateIncoming); break;
-        case CAbstractState.EStateId.HOLDING: changeState(_stateHolding); break;
+        case EStateId.IDLE:  changeState(_stateIdle); break;
+        case EStateId.CONNECTING: changeState(_stateCalling); break;
+        case EStateId.ALERTING: changeState(_stateAlerting); break;
+        case EStateId.ACTIVE: changeState(_stateActive); break;
+        case EStateId.RELEASED: changeState(_stateReleased); break;
+        case EStateId.INCOMING: changeState(_stateIncoming); break;
+        case EStateId.HOLDING: changeState(_stateHolding); break;
       }
       CCallManager.getInstance().updateGui();
     }
@@ -163,7 +177,7 @@ namespace Sipek
 
       CallingNo = "";
       Incoming = false;
-      changeState(CAbstractState.EStateId.IDLE);
+      changeState(EStateId.IDLE);
       CCallManager.getInstance().destroySession(Session);
     }
 

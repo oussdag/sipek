@@ -78,7 +78,13 @@ namespace Sipek
       return _instance;
     }
 
-    private CCallManager()
+    #endregion Constructor
+
+
+    #region Methods
+
+
+    public void initialize()
     {
       // Create menu pages...
       new CConnectingPage();
@@ -90,36 +96,28 @@ namespace Sipek
       new CPreDialPage();
       new CHoldingPage();
 
-      // init SIP
-      CCallProxy.initialize();
-    }
-    #endregion Constructor
-
-
-    #region Methods
-
-
-    public void initialize()
-    {
+      // Initialize call table
+      _calls = new Dictionary<int, CStateMachine>();
+      
+      ///
       if (!_initialized)
       {
-        CCallProxy.registerAccount(0);
+        CPjSipProxy.initialize();
+        CPjSipProxy.registerAccount(0);
       }
       else
       {
         // todo unregister
+        CPjSipProxy.restart();
         // reregister
-        CCallProxy.registerAccount(0);
+        CPjSipProxy.registerAccount(0);
       }
       _initialized = true;
-
-      // Initialize call table
-      _calls = new Dictionary<int, CStateMachine>();
     }
 
     public void shutdown()
     {
-      CCallProxy.shutdown();
+      CPjSipProxy.shutdown();
     }
 
     public void updateGui()
@@ -133,7 +131,29 @@ namespace Sipek
       }
 
       CStateMachine call = getCall(_currentSession);
-      if (call != null) CComponentController.getInstance().showPage( (int)call.getStateId() );
+      if (call != null)
+      {
+        int stateId = (int)call.getStateId();
+        if (stateId == (int)EStateId.IDLE)
+        {
+          if (Count == 0)
+          {
+            CComponentController.getInstance().showPage(stateId);
+          }
+          else
+          {
+            _calls.GetEnumerator().MoveNext();
+            _currentSession = _calls.GetEnumerator().Current.Key;
+
+            CStateMachine nextcall = getCall(_currentSession);
+            //if (nextcall != null) CComponentController.getInstance().showPage((int)nextcall.getStateId());
+          }
+        }
+        else
+        {
+          CComponentController.getInstance().showPage(stateId);
+        }
+      }
     }
 
     public CStateMachine getCurrentCall()
@@ -185,7 +205,7 @@ namespace Sipek
 
      public void destroySession(int session)
     {
-      _calls.Remove(_currentSession);
+      _calls.Remove(session);
       if (_calls.Count == 0)
       {
         _currentSession = -1;
@@ -195,6 +215,7 @@ namespace Sipek
         // select other session
         _currentSession = _calls.GetEnumerator().Current.Key;
       }
+      updateGui();
     }
 
     public void onUserRelease()
@@ -256,7 +277,21 @@ namespace Sipek
       _calls.Remove(session);
     }
 
+    public int getNoCallsInState(EStateId stateId)
+    {
+      int cnt = 0;
+      foreach (KeyValuePair<int, CStateMachine> kvp in _calls)
+      {
+        if (stateId == kvp.Value.getStateId())
+        {
+          cnt++;
+        }
+      }
+      return cnt;
+    }
+
     #endregion Methods
+
 
   }
 

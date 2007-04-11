@@ -29,12 +29,14 @@ namespace Sipek
   {
     P_DIALING = 100,
     P_PREDIALING,
-    P_CONNECTING = CAbstractState.EStateId.CONNECTING,
-    P_RINGING = CAbstractState.EStateId.ALERTING,
-    P_ACTIVE = CAbstractState.EStateId.ACTIVE,
-    P_RELEASED = CAbstractState.EStateId.RELEASED,
-    P_INCOMING = CAbstractState.EStateId.INCOMING,
-    P_HOLDING = CAbstractState.EStateId.HOLDING
+    P_CONNECTING = EStateId.CONNECTING,
+    P_RINGING = EStateId.ALERTING,
+    P_ACTIVE = EStateId.ACTIVE,
+    P_RELEASED = EStateId.RELEASED,
+    P_INCOMING = EStateId.INCOMING,
+    P_HOLDING = EStateId.HOLDING,
+    P_XFERLIST,
+    P_XFERDIAL
   }
 
   public abstract class CTelephonyPage : CPage
@@ -47,6 +49,7 @@ namespace Sipek
     protected CLink _sessions;
 
     protected CStateMachine _currentCall = null;
+    protected CCallManager _callManager = CCallManager.getInstance();
 
     public CTelephonyPage(ECallPages pageId, string pageName) 
       : base((int)pageId, false,true)
@@ -93,7 +96,7 @@ namespace Sipek
 	  }
 
     public override void onEntry() 
-    { 
+    {
       base.onEntry();
 
       // get current call instance
@@ -112,8 +115,8 @@ namespace Sipek
       //_id.Caption = currentCall.CallingNo;
 
 	    // call sessions...
-      _sessions.Caption = (CCallManager.getInstance().getCurrentCallIndex()).ToString() 
-          + "/" + CCallManager.getInstance().Count.ToString();
+      _sessions.Caption = _callManager.getCurrentCallIndex().ToString()
+        + "/" + _callManager.Count.ToString();
     }
 
 
@@ -379,6 +382,7 @@ namespace Sipek
   {
     CText _duration;
     CLink _hold;
+    CLink _xfer;
 
     public CActivePage()
       : base(ECallPages.P_ACTIVE, "Connected...")
@@ -396,6 +400,11 @@ namespace Sipek
       _hold.Softkey += new BoolIntDelegate(_hold_Softkey);
       _hold.PosY = 7;
       add(_hold);
+
+      _xfer = new CLink("Transfer");
+      //_xfer.Softkey += new BoolIntDelegate(_xfer_Softkey);
+      _xfer.PosY = 9;
+      add(_xfer);
     }
 
     bool _hold_Softkey(int keyId)
@@ -414,11 +423,118 @@ namespace Sipek
 
     public override void  onEntry()
     {
- 	    base.onEntry();
+      base.onEntry();
+
+      // check if held
+      if (_currentCall.IsHeld)
+      {
+        this.mText = "Held...";
+      }
+      else
+      {
+        mText = "Connected...";
+      }
+
+      // multicall options
+      if (_callManager.Count > 1)
+      {
+        // check if 3pty == 2 connected calls
+        if (_currentCall.Is3Pty)
+        {
+          _hold.Caption = "3Pty Split";
+          this.mText = "3-Party";
+        }
+        else if (_callManager.Count == 2)
+        {
+          // Hold/swap
+          _hold.Caption = "Hold";
+        }
+
+        // not blind transfer
+        _xfer.Link = (int)ECallPages.P_XFERLIST;
+      }
+      else
+      {
+        // Hold/swap
+        _hold.Caption = "Hold";
+
+        // blind transfer
+        _xfer.Link = (int)ECallPages.P_XFERDIAL;
+      }
+
     }
 
   }
 
+
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CHoldingPage : CTelephonyPage
+  {
+    CLink _hold;
+    CLink _xfer;
+
+    public CHoldingPage()
+      : base(ECallPages.P_HOLDING, "Holding...")
+    {
+      _hold = new CLink("Retrieve");
+      _hold.Softkey += new BoolIntDelegate(_hold_Softkey);
+      _hold.PosY = 7;
+      add(_hold);
+
+      _xfer = new CLink("Transfer");
+      _xfer.Softkey += new BoolIntDelegate(_xfer_Softkey);
+      _xfer.PosY = 9;
+      add(_xfer);
+
+      Digitkey += new BoolIntDelegate(CHoldingPage_Digitkey);
+    }
+
+    bool _xfer_Softkey(int keyId)
+    {
+
+      return true;
+    }
+
+    public override void onEntry()
+    {
+      base.onEntry();
+
+      if (_callManager.Count > 1)
+      {
+        // trigger transfer handling...
+        _xfer.Link = (int)ECallPages.P_XFERLIST;
+        // check if 1 call in active => show swap!
+        if (_callManager.getNoCallsInState(EStateId.ACTIVE) == 1)
+        {
+          _hold.Caption = "Swap";
+          //_hold.SoftKeyFPtr = &swapFctr;
+        }
+
+      }
+      else if (1 == _callManager.Count)
+      {
+        // open dial number edit!!!
+        _xfer.Link = (int)ECallPages.P_XFERDIAL;
+      }
+    }
+
+    bool CHoldingPage_Digitkey(int keyId)
+    {
+      CPreDialPage page = (CPreDialPage)_controller.getPage((int)ECallPages.P_PREDIALING);
+      page.setDigits(keyId.ToString());
+      _controller.showPage(page.Id);
+      return true;
+    }
+
+    bool _hold_Softkey(int keyId)
+    {
+      _currentCall.getState().retrieveCall();
+      return true;
+    }
+  }
 
   /// <summary>
   /// 
@@ -440,31 +556,7 @@ namespace Sipek
       CCallManager.getInstance().onUserAnswer();
       return true;
     }
-  }
-
-  /// <summary>
-  /// 
-  /// </summary>
-  public class CHoldingPage : CTelephonyPage
-  {
-    CLink _hold;
-
-    public CHoldingPage()
-      : base(ECallPages.P_HOLDING, "Holding...")
-    {
-      _hold = new CLink("Retrieve");
-      _hold.Softkey += new BoolIntDelegate(_hold_Softkey);
-      _hold.PosY = 7;
-      add(_hold);
-    }
-
-    bool _hold_Softkey(int keyId)
-    {
-      _currentCall.getState().retrieveCall();
-      return true;
-    }
-
-  }
+  }  
 
 
 } // namespace Sipek
