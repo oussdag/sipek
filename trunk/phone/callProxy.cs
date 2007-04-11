@@ -25,36 +25,11 @@ using System.Net.Sockets;
 
 namespace Sipek
 {
+  /// <summary>
+  /// 
+  /// </summary>
   public class CCallProxy : CTelephonyInterface
   {
-
-    // callback delegates
-    delegate int GetConfigData(int cfgId);
-    delegate int OnRegStateChanged(int accountId, int regState);
-    delegate int OnCallStateChanged(int callId, int stateId);
-    delegate int OnCallIncoming(int callId, string number);
-    delegate int OnCallHoldConfirm(int callId);
-
-
-    [DllImport("pjsipDll.dll")]
-    private static extern int dll_init(int listenPort);
-    [DllImport("pjsipDll.dll")]
-    private static extern int dll_main();
-    [DllImport("pjsipDll.dll")]
-    private static extern int dll_shutdown();
-    
-    // callbacks
-    [DllImport("pjsipDll.dll")]
-    private static extern int onCallStateCallback(OnCallStateChanged cb);
-    [DllImport("pjsipDll.dll")]
-    private static extern int onRegStateCallback(OnRegStateChanged cb);
-    [DllImport("pjsipDll.dll")]
-    private static extern int onCallIncoming(OnCallIncoming cb);
-    [DllImport("pjsipDll.dll")]
-    private static extern int getConfigDataCallback(GetConfigData cb);
-    [DllImport("pjsipDll.dll")]
-    private static extern int onCallHoldConfirmCallback(OnCallHoldConfirm cb);
-    
     // call API
     [DllImport("pjsipDll.dll")]
     private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
@@ -70,20 +45,8 @@ namespace Sipek
     [DllImport("pjsipDll.dll")]
     private static extern int dll_retrieveCall(int callId);
 
-
-    #region Variables
-    
     // identify line
     private int _line;
-
-    static OnCallStateChanged csDel;
-    static OnRegStateChanged rsDel;
-    static OnCallIncoming ciDel;
-    static GetConfigData gdDel;
-    static OnCallHoldConfirm chDel;
-
-    #endregion Variables
-
 
     #region Constructor
 
@@ -96,48 +59,6 @@ namespace Sipek
 
 
     #region Methods
-
-    public static void initialize()
-    {
-      ciDel = new OnCallIncoming(onCallIncoming);
-      csDel = new OnCallStateChanged(onCallStateChanged);
-      rsDel = new OnRegStateChanged(onRegStateChanged);
-      gdDel = new GetConfigData(getConfigData);
-      chDel = new OnCallHoldConfirm(onCallHoldConfirm);
-
-      // register callbacks (delegates)
-      onCallIncoming( ciDel );
-      onCallStateCallback( csDel );
-      onRegStateCallback( rsDel );
-      onCallHoldConfirmCallback(chDel);
-
-      // Initialize pjsip...
-      int port = Properties.Settings.Default.cfgSipPort;
-      dll_init(port);
-      dll_main();
-    }
-
-    public static bool shutdown()
-    {
-      dll_shutdown();
-      return true;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////
-    // Call API
-    //
-    public static int registerAccount(int accountId)
-    {
-      string uri = "sip:" + CAccounts.getInstance()[accountId].Id + "@" + CAccounts.getInstance()[accountId].Address;
-      string reguri = "sip:" + CAccounts.getInstance()[accountId].Address; // +":" + CCallManager.getInstance().SipProxyPort;
-      //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
-      string domain = CAccounts.getInstance()[accountId].Domain;
-      string username = CAccounts.getInstance()[accountId].Username;
-      string password = CAccounts.getInstance()[accountId].Password;
-      dll_registerAccount(uri, reguri, domain, username, password);
-      return 1;
-    }
 
     public int makeCall(string dialedNo)
     {
@@ -175,8 +96,109 @@ namespace Sipek
       dll_retrieveCall(_line);
       return true;
     }
+
     #endregion Methods
 
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public static class CPjSipProxy
+  {
+
+    #region Wrapper functions
+    // callback delegates
+    delegate int GetConfigData(int cfgId);
+    delegate int OnRegStateChanged(int accountId, int regState);
+    delegate int OnCallStateChanged(int callId, int stateId);
+    delegate int OnCallIncoming(int callId, string number);
+    delegate int OnCallHoldConfirm(int callId);
+
+
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_init(int listenPort);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_main();
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_shutdown();
+    
+    // callbacks
+    [DllImport("pjsipDll.dll")]
+    private static extern int onCallStateCallback(OnCallStateChanged cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int onRegStateCallback(OnRegStateChanged cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int onCallIncoming(OnCallIncoming cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int getConfigDataCallback(GetConfigData cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int onCallHoldConfirmCallback(OnCallHoldConfirm cb);
+    
+    // call API
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
+    
+    #endregion Wrapper functions
+
+    #region Variables
+
+    static OnCallStateChanged csDel = new OnCallStateChanged(onCallStateChanged);
+    static OnRegStateChanged rsDel = new OnRegStateChanged(onRegStateChanged);
+    static OnCallIncoming ciDel = new OnCallIncoming(onCallIncoming);
+    static GetConfigData gdDel = new GetConfigData(getConfigData);
+    static OnCallHoldConfirm chDel = new OnCallHoldConfirm(onCallHoldConfirm);
+
+    #endregion Variables
+
+    #region Methods
+
+    public static void initialize()
+    {
+      // register callbacks (delegates)
+      onCallIncoming( ciDel );
+      onCallStateCallback( csDel );
+      onRegStateCallback( rsDel );
+      onCallHoldConfirmCallback(chDel);
+
+      // Initialize pjsip...
+      int port = Properties.Settings.Default.cfgSipPort;
+      dll_init(port);
+      dll_main();
+    }
+
+    public static int shutdown()
+    {
+      return dll_shutdown();
+    }
+
+    public static void restart()
+    {
+      shutdown();
+
+      int port = Properties.Settings.Default.cfgSipPort;
+
+      dll_init(port);
+      dll_main();
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
+    // Call API
+    //
+    public static int registerAccount(int accountId)
+    {
+      string uri = "sip:" + CAccounts.getInstance()[accountId].Id + "@" + CAccounts.getInstance()[accountId].Address;
+      string reguri = "sip:" + CAccounts.getInstance()[accountId].Address; // +":" + CCallManager.getInstance().SipProxyPort;
+      //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
+      string domain = CAccounts.getInstance()[accountId].Domain;
+      string username = CAccounts.getInstance()[accountId].Username;
+      string password = CAccounts.getInstance()[accountId].Password;
+      dll_registerAccount(uri, reguri, domain, username, password);
+      return 1;
+    }
+
+    #endregion Methods
 
     #region Callbacks
 
