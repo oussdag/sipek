@@ -21,17 +21,20 @@ using System;
 
 namespace Sipek
 {
+
+  /// <summary>
+  /// Associate call menu id's with call states.
+  /// </summary>
   public enum ECallPages : int
   {
     P_DIALING = 100,
     P_PREDIALING,
-    P_CALLING,
-    P_CONNECTING,
-    P_RINGING,
-    P_ACTIVE,
-    P_RELEASED,
-    P_INCOMING,
-    P_HOLDING
+    P_CONNECTING = CAbstractState.EStateId.CONNECTING,
+    P_RINGING = CAbstractState.EStateId.ALERTING,
+    P_ACTIVE = CAbstractState.EStateId.ACTIVE,
+    P_RELEASED = CAbstractState.EStateId.RELEASED,
+    P_INCOMING = CAbstractState.EStateId.INCOMING,
+    P_HOLDING = CAbstractState.EStateId.HOLDING
   }
 
   public abstract class CTelephonyPage : CPage

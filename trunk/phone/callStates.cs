@@ -27,10 +27,10 @@ namespace Sipek
   /// </summary>
   public abstract class CAbstractState : CTelephonyInterface, CTelephonyCallback
   {
-    public enum EStateId
+    public enum EStateId  
     {
-      IDLE,
-      CONNECTING,
+      IDLE = 1, // associated with home page = P_IDLE
+      CONNECTING = 1974,
       ALERTING, 
       ACTIVE,
       RELEASED,

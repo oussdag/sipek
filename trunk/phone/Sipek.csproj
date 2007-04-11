@@ -75,6 +75,7 @@
     <Compile Include="calllog.cs" />
     <Compile Include="callManager.cs" />
     <Compile Include="callmenus.cs" />
+    <Compile Include="extendedControls.cs" />
     <Compile Include="menus.cs" />
     <Compile Include="phonebook.cs" />
     <Compile Include="PhoneForm.cs">

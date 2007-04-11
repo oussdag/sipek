@@ -157,7 +157,7 @@ namespace Sipek
         {
           mform.Invoke(new writerDelegate(mform.writeText), new object[3] { xaxis, yaxis, text });
         }
-        catch (ObjectDisposedException e)
+        catch (Exception e)
         { 
         }
       }
