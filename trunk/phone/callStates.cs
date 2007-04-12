@@ -226,6 +226,7 @@ namespace Sipek
 
     public override void onConnect()
     {
+      _smref.Time = System.DateTime.Now;
       _smref.changeState(EStateId.ACTIVE);
     }
 
@@ -250,7 +251,6 @@ namespace Sipek
 
     public override void onEntry()
     {
-      _smref.Time = System.DateTime.Now;
     }
 
     public override void onExit()

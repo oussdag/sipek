@@ -152,4 +152,84 @@ namespace Sipek
     }
     
   }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CDoubleLink : CLink
+  {
+    private CLink _link1;
+	  private CLink _link2;
+
+    public CDoubleLink(string caption_1, string caption_2)
+      : this(caption_1, caption_2, EAlignment.justify_left, EAlignment.justify_left)
+    {
+    }
+
+    public CDoubleLink(string caption_1, string caption_2, EAlignment alignmode1, EAlignment alignmode2)
+      : base("")
+    {
+      _link1 = new CLink(caption_1);
+      _link1.Align = alignmode1;
+	    _link2 = new CLink(caption_2);
+      _link2.Align = alignmode2;
+    }
+
+    // overriden
+    public override int Size
+    {
+	    get { return 2; }
+    }
+
+    public override int PosY
+    {
+      get
+      {
+        return base.PosY;
+      }
+      set
+      {
+        base.PosY = value;
+	      _link1.PosY = value;
+	      _link2.PosY = value + 1;
+      }
+    }
+
+    public override void  onDraw(CObserver renderer)
+    {
+      renderer.drawText(PosY, _controller.translate(_link1.Caption), EAlignment.justify_left);
+      renderer.drawText(PosY + 1, _controller.translate(_link2.Caption), EAlignment.justify_left);
+      if ((_link1.Caption.Substring(0,3) != "---")||(_link2.Caption.Substring(0,3) != "---"))
+      {
+        renderer.drawLink(PosY, "", EAlignment.justify_left);
+        renderer.drawLink(PosY + 1, "", EAlignment.justify_right);
+      }
+    }
+
+    public override void onErase(CObserver renderer)
+    {
+      renderer.eraseText(PosY, _controller.translate(_link1.Caption), EAlignment.justify_left);
+      renderer.eraseText(PosY + 1, _controller.translate(_link2.Caption), EAlignment.justify_left);
+
+      if (((_link1.Caption).Substring(0, 3) != "---") || ((_link2.Caption).Substring(0, 3) != "---"))
+      {
+        renderer.eraseLink(PosY, "", EAlignment.justify_left);
+        renderer.eraseLink(PosY + 1, "", EAlignment.justify_right);
+      }
+    }
+
+    public override bool onSoftKey(int id)
+    {
+	    if (id == _link1.LinkKey) 
+	    {
+		    return base.onSoftKey(id);
+	    }
+	    else if  (id == _link2.LinkKey) 
+	    {
+		    return base.onSoftKey(id-1);
+	    }
+	    return false;
+    }
+  }
+
 }

@@ -148,6 +148,13 @@ namespace Sipek
       Digitkey += new BoolIntDelegate(digitkeyHandler);
       Offhook += new VoidDelegate(IdlePage_Offhook);
       Menu += new VoidDelegate(IdlePage_Menu);
+      Ok += new VoidDelegate(IdlePage_Ok);
+    }
+
+    bool IdlePage_Ok()
+    {
+      _controller.showPage((int)EPages.P_CALLLOG);
+      return true;
     }
 
     public override void onEntry()
@@ -469,8 +476,8 @@ namespace Sipek
     public CCalllogPage()
       : base((int)EPages.P_CALLLOG, "Call Register")
     {
-      _list = new CSelectList(5);
-      _list.PosY = 4;
+      _list = new CSelectList(8,2);
+      _list.PosY = 1;
       add(_list);
 
       CLink clearLink = new CLink("Clear All");
@@ -491,13 +498,18 @@ namespace Sipek
 
       foreach (CCallRecord item in results)
       {
-        CLink recordLink = new CLink(item.Name + " " + item.Number + " " + item.Time);
+        CDoubleLink recordLink = new CDoubleLink(item.Number + " " + item.Name , " " + item.Time.ToString());
         //recordLink.subItems[0] = item.LastName;
         //recordLink.subItems[1] = item.FirstName;
         recordLink.subItems[2] = item.Number;
         recordLink.Ok += new VoidDelegate(recordLink_Ok);
         recordLink.Softkey += new BoolIntDelegate(recordLink_Softkey);
         _list.add(recordLink);
+      }
+      if (results.Count > 3)
+      {
+        CDoubleLink separator1 = new CDoubleLink("------------------------", "------------------------", EAlignment.justify_center, EAlignment.justify_center);
+        _list.add(separator1);
       }
 
       base.onEntry();

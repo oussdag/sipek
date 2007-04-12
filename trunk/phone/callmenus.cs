@@ -68,12 +68,12 @@ namespace Sipek
 
 	    _digits = new CText("");
       _digits.Align = EAlignment.justify_center;
-	    _digits.PosY = 5;
+	    _digits.PosY = 1;
 	    this.add(_digits);
 
       _name = new CText("");
       _name.Align = EAlignment.justify_center;
-      _name.PosY = 6;
+      _name.PosY = 2;
       this.add(_name);
 
 	    _info = new CText("");
@@ -201,11 +201,11 @@ namespace Sipek
       clearHistory(false);
 
       CLink linkHide = new CLink("Hide Number", 0);
-      linkHide.PosY = 5;
+      linkHide.PosY = 7;
       this.add(linkHide);
 
       CLink dialing_phbook = new CLink("Phonebook"/*, P_PBOOK*/);
-      dialing_phbook.PosY = 7;
+      dialing_phbook.PosY = 9;
       this.add(dialing_phbook);
 
       CLink linkCall = new CLink("Calls");
@@ -415,8 +415,8 @@ namespace Sipek
 
     bool decor_OnTimeout()
     {
-      int seconds = CCallManager.getInstance().getCurrentCall().RuntimeDuration.Seconds;
-      int minutes = CCallManager.getInstance().getCurrentCall().RuntimeDuration.Minutes;
+      int seconds = _currentCall.RuntimeDuration.Seconds;
+      int minutes = _currentCall.RuntimeDuration.Minutes;
       _duration.Caption = String.Format("{0:00}:{1:00}", minutes, seconds);
       return true;
     }
@@ -556,7 +556,104 @@ namespace Sipek
       CCallManager.getInstance().onUserAnswer();
       return true;
     }
-  }  
+  }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CXferDialingPage : CTelephonyPage
+  {
+    private CEditField _editField;
+
+    public CXferDialingPage()
+      : base(ECallPages.P_XFERDIAL, "Transfer...")
+    {
+      this.clearHistory(false);
+
+      CLink phbookLink = new CLink("Phonebook", (int)EPages.P_PHONEBOOK);
+      phbookLink.PosY = 9;
+      this.add(phbookLink);
+
+      CLink callRegLink = new CLink("Calls", (int)EPages.P_CALLLOG);
+      callRegLink.Align = EAlignment.justify_right;
+      callRegLink.PosY = 8;
+      this.add(callRegLink);
+
+      _editField = new CEditField(">", "", EEditMode.numeric, true);
+      _editField.PosY = 2;
+      _editField.Ok += new VoidDelegate(_editField_Ok);
+      this.add(_editField);
+
+      // remove unneeded controls
+      remove(this._name);
+    }
+
+    bool _editField_Ok()
+    {
+      // TODO:::implement blind transfer
+      return true;
+    }
+  }
+
+
+  public class CXferListPage : CTelephonyPage
+  {
+
+    private CSelectList _xfer2List;
+
+    public CXferListPage()
+      : base(ECallPages.P_XFERLIST, "Transfer to...")
+    {
+      this.clearHistory(false);
+
+      // remove end call link from CTelephony
+      this.remove(_endCall);
+      this.remove(_sessions);
+      this.remove(_name);
+      this.remove(_digits);
+
+      _xfer2List = new CSelectList(5);
+      _xfer2List.PosY = 1;
+      this.add(_xfer2List);
+
+      CLink blind = new CLink("Enter number", (int)ECallPages.P_XFERDIAL);
+      blind.Align = EAlignment.justify_right;
+      blind.PosY = 10;
+      this.add(blind);
+
+      // handlers
+      Ok += new VoidDelegate(CXferListPage_Ok);
+    }
+
+    bool CXferListPage_Ok()
+    {
+      CLink selection = (CLink)_xfer2List.Selected;
+      // TODO:::implement attended transfer
+      return true;
+    }
+
+    public override void onEntry()
+    {
+      base.onEntry();
+
+      int callnums = _callManager.getNoCallsInState(EStateId.HOLDING | EStateId.ACTIVE);
+
+      _xfer2List.removeAll();
+      /*
+      for (int i = 0; i < callnums; i++)
+      {
+        // Do not add current call!!!
+        CCallStateMachine call = _callManager.getCall(i, ui_holding_state | ui_talk_state);
+        if (muiHandler->getCurrentSID() != automaton->getSession())
+        {
+          ItString dn = automaton->getCallingNumber();
+          CLink* link = new CLink(dn, align_left);
+          link->mTag = (void*)automaton->getSession();
+          _xfer2List->add(link);
+        }
+      }
+      */
+    }
+  }
 
 } // namespace Sipek

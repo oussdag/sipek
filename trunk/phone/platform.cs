@@ -234,12 +234,15 @@ namespace Sipek
       drawText(posX, posY, " ");
     }
 
-    public void drawSelection(int position, int type)
+    public void drawSelection(int position, int wide)
     {
-      formSetSelection(0, position, maxColumns);
+      for (int i = 0; i < wide; i++)
+      {
+        formSetSelection(0, position + i, maxColumns);
+      }
     }
 
-    public void eraseSelection(int position, int type)
+    public void eraseSelection(int position, int wide)
     {
       eraseText(0, position, " ");
     }
