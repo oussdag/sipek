@@ -95,6 +95,8 @@ namespace Sipek
       new CIncomingPage();
       new CPreDialPage();
       new CHoldingPage();
+      new CXferDialingPage();
+      new CXferListPage();
 
       // Initialize call table
       _calls = new Dictionary<int, CStateMachine>();
@@ -182,7 +184,7 @@ namespace Sipek
 
     public void createSession(string number)
     {
-      CStateMachine call = createCall();
+      CStateMachine call = createCall(0);
       int newsession = call.getState().makeCall(number);
       if (newsession != -1)
       {
@@ -195,7 +197,7 @@ namespace Sipek
     
     public CStateMachine createSession(int sessionId, string number)
     {
-      CStateMachine call = createCall();
+      CStateMachine call = createCall(sessionId);
       call.Session = sessionId;
       _calls.Add(sessionId, call);
       _currentSession = sessionId;
@@ -221,7 +223,7 @@ namespace Sipek
     public void onUserRelease()
     {
       CStateMachine call = getCall(_currentSession);
-      call.getState().endCall();
+      if (call != null) call.getState().endCall();
     }
 
     public void onUserAnswer()
@@ -266,9 +268,9 @@ namespace Sipek
     }
     /////////////////////////////////////////////////////////////////////
 
-    private CStateMachine createCall()
+    private CStateMachine createCall(int sessionId)
     {
-      CStateMachine call = new CStateMachine(new CCallProxy(0));
+      CStateMachine call = new CStateMachine(new CCallProxy(sessionId));
       return call;
     }
 

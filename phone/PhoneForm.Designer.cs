@@ -73,6 +73,7 @@ namespace Sipek
       this.richTextBox1.Location = new System.Drawing.Point(42, 12);
       this.richTextBox1.Name = "richTextBox1";
       this.richTextBox1.ReadOnly = true;
+      this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
       this.richTextBox1.Size = new System.Drawing.Size(284, 248);
       this.richTextBox1.TabIndex = 0;
       this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
