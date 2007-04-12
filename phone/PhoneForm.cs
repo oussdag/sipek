@@ -280,5 +280,46 @@ namespace Sipek
     {
       control.getAccessIf().onSoftKey(10);
     }
+
+    private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
+    {
+      if ((e.KeyChar >= 0x30) && (e.KeyChar <= 0x39))
+      {
+        control.getAccessIf().onDigitKey(e.KeyChar - 0x30);
+      }
+      else if (e.KeyChar == 0x08)
+      {
+        clearButton_Click(sender, e);
+      }
+      else if (e.KeyChar == 0x0D)
+      { 
+        OKbutton_Click(sender, e);
+      } 
+    }
+
+    private void richTextBox1_Leave(object sender, EventArgs e)
+    {
+      richTextBox1.Focus();
+    }
+
+    private void richTextBox1_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.KeyValue == 37)
+      {
+        leftNav_Click(sender, e);
+      }
+      else if (e.KeyValue == 39)
+      {
+        rightNav_Click(sender, e); 
+      }
+      else if (e.KeyValue == 38)
+      {
+        upNav_Click(sender, e);
+      }
+      else if (e.KeyValue == 40)
+      {
+        downNav_Click(sender, e);
+      }
+    }
   }
 }

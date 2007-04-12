@@ -249,16 +249,29 @@ namespace Sipek
       _radio.PosY = 1;
       _radio.Menu += new VoidDelegate(_radio_Menu);
       add(_radio);
+
+      CLink linkConfigure = new CLink("Edit Account");
+      linkConfigure.Align = EAlignment.justify_right;
+      linkConfigure.PosY = 10;
+      linkConfigure.Softkey += new BoolIntDelegate(linkConfigure_Softkey);
+      add(linkConfigure);
+    }
+
+    bool linkConfigure_Softkey(int keyId)
+    {
+      return _radio_Menu();
     }
 
     bool _radio_Menu()
     {
       _controller.showPage((int)EPages.P_SIPPROXYSETTINGS);
-      return false;
+      return true;
     }
 
     public override void onEntry()
     {
+      int cnt = 0;
+
       _radio.removeAll();
 
       for (int i=0; i<CAccounts.getInstance().getSize(); i++)
@@ -267,7 +280,10 @@ namespace Sipek
         CCheckBox item = new CCheckBox(CAccounts.getInstance()[i].Name, -1, ischecked);
         item.PosY = _radio.PosY + i;
         _radio.add(item);
+         if (ischecked) cnt++;
       }
+      
+      mText = "Accounts (" + cnt + ")";
 
       base.onEntry();
     }
