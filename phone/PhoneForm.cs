@@ -76,6 +76,8 @@ namespace Sipek
       // use stored value to prevent selection overridance
       if (_caretPos >= 0) richTextBox1.Select(_caretPos, 1);
       if (_selection >= 0) richTextBox1.Select(_selection, 23);
+
+      this.richTextBox1.Focus();
     }
 
     public void setCursor(int xaxis, int yaxis)
@@ -204,9 +206,12 @@ namespace Sipek
       new CMenuPage();
       new CSIPSettings();
       new CSIPProxySettings();
+      new CSIPProxySettings2nd();
+      new CSIPProxySettings3rd();
       new CRingModePage();
       new CCalllogPage();
       new CAccountsPage();
+      new CServicesPage();
 
       control.initialize();
 
@@ -294,13 +299,19 @@ namespace Sipek
       else if (e.KeyChar == 0x0D)
       { 
         OKbutton_Click(sender, e);
-      } 
+      }
+      else if ((e.KeyChar >= 'A') && (e.KeyChar <= 'z'))
+      {
+        control.getAccessIf().onCharKey(e.KeyChar);
+      }
+      
     }
 
-    private void richTextBox1_Leave(object sender, EventArgs e)
+/*    private void richTextBox1_Leave(object sender, EventArgs e)
     {
       richTextBox1.Focus();
     }
+ */ 
 
     private void richTextBox1_KeyDown(object sender, KeyEventArgs e)
     {

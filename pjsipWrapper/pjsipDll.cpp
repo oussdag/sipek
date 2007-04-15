@@ -17,14 +17,12 @@
 */
 
 #include "pjsipDll.h"
-
 #include <pjsua-lib/pjsua.h>
-
 #include <string>
 
 using namespace std;
 
-#define THIS_FILE	"pjsua.c"
+#define THIS_FILE	"pjsipDll.cpp"
 #define NO_LIMIT	(int)0x7FFFFFFF
 
 // global function pointers
@@ -667,4 +665,29 @@ int dll_retrieveCall(int callId)
 {
   pjsua_call_reinvite(callId, PJ_TRUE, NULL);
   return 1;
+}
+
+int dll_xferCall(int callid, char* uri)
+{
+  pjsua_msg_data msg_data;
+  pjsip_generic_string_hdr refer_sub;
+  pj_str_t STR_REFER_SUB = { "Refer-Sub", 9 };
+  pj_str_t STR_FALSE = { "false", 5 };
+  pjsua_call_info ci;
+
+  pjsua_call_get_info(callid, &ci);
+
+  //ui_input_url("Transfer to URL", buf, sizeof(buf), &result);
+
+  pjsua_msg_data_init(&msg_data);
+  if (app_config.no_refersub) 
+  {
+    // Add Refer-Sub: false in outgoing REFER request
+    pjsip_generic_string_hdr_init2(&refer_sub, &STR_REFER_SUB, &STR_FALSE);
+    pj_list_push_back(&msg_data.hdr_list, &refer_sub);
+  }
+
+  pj_str_t tmp = pj_str(uri);
+  pj_status_t st = pjsua_call_xfer( callid, &tmp, &msg_data);
+  return st;
 }

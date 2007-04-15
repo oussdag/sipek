@@ -108,8 +108,15 @@ namespace Sipek
     public virtual bool retrieveCall()
     {
       return true;
-    }    
-
+    }
+    public virtual bool xferCall(string number)
+    {
+      return true;
+    }
+    public virtual bool xferCallSession(int session)
+    {
+      return true;
+    }
     #endregion Methods
 
     #region Callbacks
@@ -269,6 +276,12 @@ namespace Sipek
       return _smref.SigProxy.holdCall();
     }
 
+    public override bool xferCall(string number)
+    {
+      return _smref.SigProxy.xferCall(number);
+    }
+
+
     public override void onHoldConfirm()
     {
       _smref.changeState(EStateId.HOLDING);
@@ -280,8 +293,6 @@ namespace Sipek
 
       _smref.destroy();
     }
-
-
   }
 
 

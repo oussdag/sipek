@@ -38,6 +38,8 @@ namespace Sipek
     P_CALLLOG,
     P_ACCOUNTS,
     P_SIPPROXYSETTINGSMORE,
+    P_SERVICES,
+    P_REDIRECT
   }
 
   public enum ERingModes : int
@@ -240,13 +242,13 @@ namespace Sipek
   /// </summary>
   public class CAccountsPage : CPage
   {
-    CRadioButtonGroup _radio;
+    CSelectList _radio;
 
     public CAccountsPage()
       : base((int)EPages.P_ACCOUNTS, "Accounts")
     {
-      _radio = new CRadioButtonGroup();
-      _radio.PosY = 1;
+      _radio = new CSelectList(5,1);
+      _radio.PosY = 3;
       _radio.Menu += new VoidDelegate(_radio_Menu);
       add(_radio);
 
@@ -264,6 +266,9 @@ namespace Sipek
 
     bool _radio_Menu()
     {
+      CSIPProxySettings page = (CSIPProxySettings)_controller.getPage((int)EPages.P_SIPPROXYSETTINGS);
+      int aindex = int.Parse(_radio.Selected.subItems[0]);
+      page.setAccountIndex(aindex);
       _controller.showPage((int)EPages.P_SIPPROXYSETTINGS);
       return true;
     }
@@ -278,7 +283,9 @@ namespace Sipek
       {
         bool ischecked = (i == CAccounts.getInstance().DefAccountIndex) ? true : false;
         CCheckBox item = new CCheckBox(CAccounts.getInstance()[i].Name, -1, ischecked);
-        item.PosY = _radio.PosY + i;
+        if (item.Caption.Length == 0) item.Caption = "empty";
+        item.subItems[0] = i.ToString();
+        //item.PosY = _radio.PosY + i*2;
         _radio.add(item);
          if (ischecked) cnt++;
       }
@@ -585,11 +592,35 @@ namespace Sipek
 
       CLink linkSIP = new CLink("SIP", (int)EPages.P_SIPSETTINGS);
       linkSIP.PosY = 9;
-      linkSIP.LinkKey = linkSIP.PosY;
       add(linkSIP);
 
+      CLink linkServices = new CLink("Services", (int)EPages.P_SERVICES); 
+      linkServices.PosY = 10;
+      linkServices.Align = EAlignment.justify_right;
+      add(linkServices);
     }
 
+  }
+
+  public class CServicesPage : CPage
+  {
+    public CServicesPage()
+      : base((int)EPages.P_SERVICES, "Services")
+    {
+      CLink linkRedirect = new CLink("Redirect", 0);
+      linkRedirect.PosY = 7;
+      add(linkRedirect);
+
+      CCheckBox linkDND = new CCheckBox("Do Not Disturb", 0);
+      linkDND.PosY = 8;
+      linkDND.Align = EAlignment.justify_right;
+      add(linkDND);
+
+      CCheckBox linkAA = new CCheckBox("Auto Answer", 0);
+      linkAA.PosY = 9;
+      add(linkAA);
+
+    }
   }
 
   public class CSIPSettings : CPage
@@ -657,116 +688,78 @@ namespace Sipek
   /// <summary>
   /// 
   /// </summary>
-  public class CSIPProxySettings : CExtendedPage
+  public class CSIPProxySettings : CPage
   {
+    int _accountIndex = -1;
     //CIpAddressEdit _editProxyAddress;
     CEditField _editProxyAddress;
     CEditField _editProxyPort;
     //CCheckBox _checkRegister;
     CEditField _editDisplayName;
     CEditField _editId;
-    // 2nd
-    CEditField _editUserName;
-    CEditField _editPassword;
-    // 3rd
-    CEditField _editDomain;
-    CEditField _editperiod;
 
     public CSIPProxySettings()
-      : base((int)EPages.P_SIPPROXYSETTINGS)
+      : base((int)EPages.P_SIPPROXYSETTINGS,"Settings")
     {
       // create 1st page
-      CPage firstPage = new CPage((int)EPages.P_SIPPROXYSETTINGS_1st, "Proxy Settings");
-
       _editDisplayName = new CEditField("Name>", "",true);
       _editDisplayName.PosY = 3;
       _editDisplayName.LinkKey = _editDisplayName.PosY;
-      firstPage.add(_editDisplayName);
+      this.add(_editDisplayName);
 
       _editId = new CEditField("Id>", "");
       _editId.PosY = 5;
       _editId.LinkKey = _editId.PosY;
-      firstPage.add(_editId);
+      this.add(_editId);
 
       //_editProxyAddress = new CIpAddressEdit("Proxy>");
       _editProxyAddress = new CEditField("Proxy>","");
       _editProxyAddress.PosY = 7;
       _editProxyAddress.LinkKey = _editProxyAddress.PosY;
-      firstPage.add(_editProxyAddress);
+      this.add(_editProxyAddress);
 
       _editProxyPort = new CEditField("Port>", "", EEditMode.numeric);
       _editProxyPort.PosY = 9;
       _editProxyPort.LinkKey = _editProxyPort.PosY;
-      firstPage.add(_editProxyPort);
+      this.add(_editProxyPort);
 
-      add(firstPage);
-
-
-      ////////////
-      // 2nd page
-      CPage secondPage = new CPage((int)EPages.P_SIPPROXYSETTINGS_2nd, "Authorization");
-
-      _editUserName = new CEditField("Username>", "", true);
-      _editUserName.PosY = 5;
-      _editUserName.LinkKey = _editUserName.PosY;
-      secondPage.add(_editUserName);
-
-      _editPassword = new CEditField("Password>", "");
-      _editPassword.PosY = 7;
-      _editPassword.LinkKey = _editPassword.PosY;
-      secondPage.add(_editPassword);
-
-      add(secondPage);
-
-
-      ////////////
-      // 3rd page
-      CPage thirdPage = new CPage((int)EPages.P_SIPPROXYSETTINGS_3rd, "More...");
-
-      _editDomain = new CEditField("Domain>", "", true);
-      _editDomain.PosY = 5;
-      _editDomain.LinkKey = _editDomain.PosY;
-      thirdPage.add(_editDomain);
-
-      _editperiod = new CEditField("Reg. Period>", "", EEditMode.numeric);
-      _editperiod.PosY = 7;
-      _editperiod.LinkKey = _editperiod.PosY;
-      thirdPage.add(_editperiod);
-
-      add(thirdPage);
+      CLink linkNext = new CLink("More...");
+      linkNext.PosY = 10;
+      linkNext.Align = EAlignment.justify_right;
+      linkNext.Softkey += new BoolIntDelegate(linkNext_Softkey);
+      add(linkNext);
 
       this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
     }
 
+    bool linkNext_Softkey(int keyId)
+    {
+      CSIPProxySettings2nd page = (CSIPProxySettings2nd)_controller.getPage((int)EPages.P_SIPPROXYSETTINGS_2nd);
+      page.setAccountIndex(_accountIndex);
+      _controller.showPage((int)EPages.P_SIPPROXYSETTINGS_2nd);
+      return true;
+    }
+
     public override void onEntry()
     {
-      _editId.Caption = CAccounts.getInstance().DefAccount.Id; 
-      _editDisplayName.Caption = CAccounts.getInstance().DefAccount.Name; // Properties.Settings.Default.cfgSipAccountDisplayName[0];
-      _editProxyAddress.Caption = CAccounts.getInstance().DefAccount.Address;
-      _editProxyPort.Caption = CAccounts.getInstance().DefAccount.Port.ToString();
-      
-      _editUserName.Caption = CAccounts.getInstance().DefAccount.Username;
-      _editPassword.Caption = CAccounts.getInstance().DefAccount.Password;
+      if (_accountIndex == -1) _accountIndex = CAccounts.getInstance().DefAccount.Index;
 
-      _editperiod.Caption = CAccounts.getInstance().DefAccount.Period.ToString();
-      _editDomain.Caption = CAccounts.getInstance().DefAccount.Domain.ToString();
+      _editId.Caption = CAccounts.getInstance()[_accountIndex].Id;
+      _editDisplayName.Caption = CAccounts.getInstance()[_accountIndex].Name; // Properties.Settings.Default.cfgSipAccountDisplayName[0];
+      _editProxyAddress.Caption = CAccounts.getInstance()[_accountIndex].Address;
+      _editProxyPort.Caption = CAccounts.getInstance()[_accountIndex].Port.ToString();
       base.onEntry();
     }
 
     bool CSIPProxySettings_Ok()
     {
-      CAccount account = CAccounts.getInstance().DefAccount;
+      CAccount account = CAccounts.getInstance()[_accountIndex];
       account.Address = _editProxyAddress.Caption;
       account.Port = int.Parse(_editProxyPort.Caption);
       account.Name = _editDisplayName.Caption;
       account.Id = _editId.Caption;
-      account.Username = _editUserName.Caption;
-      account.Password = _editPassword.Caption;
-      account.Period = int.Parse(_editperiod.Caption);
-      account.Domain = _editDomain.Caption;
 
-      int defIndex = CAccounts.getInstance().DefAccountIndex;
-      CAccounts.getInstance()[defIndex] = account;
+      CAccounts.getInstance()[_accountIndex] = account;
 
       CAccounts.getInstance().save();
  
@@ -776,8 +769,146 @@ namespace Sipek
 
       return true;
     }
+
+    public void setAccountIndex(int index)
+    {
+      _accountIndex = index;
+    }
   }
  
+
+    /// <summary>
+  /// 
+  /// </summary>
+  public class CSIPProxySettings2nd : CPage
+  {
+    // 2nd
+    private CEditField _editUserName;
+    private CEditField _editPassword;
+    private int _accountIndex = -1;
+
+    
+    public CSIPProxySettings2nd()
+      : base((int)EPages.P_SIPPROXYSETTINGS_2nd, "Settings")
+    {
+      ////////////
+      // 2nd page
+      _editUserName = new CEditField("Username>", "", true);
+      _editUserName.PosY = 5;
+      _editUserName.LinkKey = _editUserName.PosY;
+      this.add(_editUserName);
+
+      _editPassword = new CEditField("Password>", "");
+      _editPassword.PosY = 7;
+      _editPassword.LinkKey = _editPassword.PosY;
+      this.add(_editPassword);
+
+      CLink linkNext = new CLink("More...");
+      linkNext.PosY = 10;
+      linkNext.Align = EAlignment.justify_right;
+      linkNext.Softkey += new BoolIntDelegate(linkNext_Softkey);
+      add(linkNext);
+    }
+
+    bool linkNext_Softkey(int keyId)
+    {
+      CSIPProxySettings3rd page = (CSIPProxySettings3rd)_controller.getPage((int)EPages.P_SIPPROXYSETTINGS_3rd);
+      page.setAccountIndex(_accountIndex);
+      _controller.showPage((int)EPages.P_SIPPROXYSETTINGS_3rd);
+      return true;
+    }
+
+    public override void onEntry()
+    {
+      if (_accountIndex == -1) _accountIndex = CAccounts.getInstance().DefAccount.Index;
+
+      _editUserName.Caption = CAccounts.getInstance()[_accountIndex].Username;
+      _editPassword.Caption = CAccounts.getInstance()[_accountIndex].Password;
+
+      base.onEntry();
+    }
+
+    bool CSIPProxySettings_Ok()
+    {
+      CAccount account = CAccounts.getInstance()[_accountIndex];
+
+      account.Username = _editUserName.Caption;
+      account.Password = _editPassword.Caption;
+
+      CAccounts.getInstance()[_accountIndex] = account;
+
+      CAccounts.getInstance().save();
+
+      _controller.previousPage();
+
+      CCallManager.getInstance().initialize();
+
+      return true;
+    }
+    public void setAccountIndex(int index)
+    {
+      _accountIndex = index;
+    }
+  }
+
+  public class CSIPProxySettings3rd : CPage
+  {
+    // 3rd
+    private CEditField _editDomain;
+    private CEditField _editperiod;
+    private int _accountIndex = -1;
+
+    public CSIPProxySettings3rd()
+      : base((int)EPages.P_SIPPROXYSETTINGS_3rd, "Settings")
+    {
+      _editDomain = new CEditField("Domain>", "", true);
+      _editDomain.PosY = 5;
+      _editDomain.LinkKey = _editDomain.PosY;
+      this.add(_editDomain);
+
+      _editperiod = new CEditField("Reg. Period>", "", EEditMode.numeric);
+      _editperiod.PosY = 7;
+      _editperiod.LinkKey = _editperiod.PosY;
+      this.add(_editperiod);
+      
+      CLink linkNext = new CLink("More...", (int)EPages.P_SIPPROXYSETTINGS);
+      linkNext.PosY = 10;
+      linkNext.Align = EAlignment.justify_right;
+      add(linkNext);
+    }
+
+    public override void onEntry()
+    {
+      if (_accountIndex == -1) _accountIndex = CAccounts.getInstance().DefAccount.Index;
+
+      _editperiod.Caption = CAccounts.getInstance()[_accountIndex].Period.ToString();
+      _editDomain.Caption = CAccounts.getInstance()[_accountIndex].Domain.ToString();
+
+      base.onEntry();
+    }
+
+    bool CSIPProxySettings_Ok()
+    {
+      CAccount account = CAccounts.getInstance()[_accountIndex];
+
+      account.Period = int.Parse(_editperiod.Caption);
+      account.Domain = _editDomain.Caption;
+
+      CAccounts.getInstance()[_accountIndex] = account;
+
+      CAccounts.getInstance().save();
+
+      _controller.previousPage();
+
+      CCallManager.getInstance().initialize();
+
+      return true;
+    }
+    public void setAccountIndex(int index)
+    {
+      _accountIndex = index;
+    }
+  }
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   public class CRingModePage : CPage

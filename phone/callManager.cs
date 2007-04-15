@@ -86,24 +86,25 @@ namespace Sipek
 
     public void initialize()
     {
-      // Create menu pages...
-      new CConnectingPage();
-      new CRingingPage();
-      new CReleasedPage();
-      new CActivePage();
-      new CDialPage();
-      new CIncomingPage();
-      new CPreDialPage();
-      new CHoldingPage();
-      new CXferDialingPage();
-      new CXferListPage();
-
-      // Initialize call table
-      _calls = new Dictionary<int, CStateMachine>();
-      
+     
       ///
       if (!_initialized)
       {
+        // Create menu pages...
+        new CConnectingPage();
+        new CRingingPage();
+        new CReleasedPage();
+        new CActivePage();
+        new CDialPage();
+        new CIncomingPage();
+        new CPreDialPage();
+        new CHoldingPage();
+        new CXferDialingPage();
+        new CXferListPage();
+
+        // Initialize call table
+        _calls = new Dictionary<int, CStateMachine>(); 
+        
         CPjSipProxy.initialize();
         CPjSipProxy.registerAccount(0);
       }

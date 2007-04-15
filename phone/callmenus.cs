@@ -586,11 +586,17 @@ namespace Sipek
 
       // remove unneeded controls
       remove(this._name);
+      remove(this._sessions);
     }
 
     bool _editField_Ok()
     {
-      // TODO:::implement blind transfer
+      // blind transfer
+      if (_editField.Caption.Length > 0)
+      {
+        _currentCall.getState().xferCall(_editField.Caption);
+      }
+      _controller.previousPage();
       return true;
     }
   }
