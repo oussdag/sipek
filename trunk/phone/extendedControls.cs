@@ -28,6 +28,7 @@ namespace Sipek
     private List<CPage> _embeddedPages;
     private int _currentIndex = -1;
     private CLink _linkNext;
+    private bool _internalMove = false;
 
     public CExtendedPage(int pageId)
       : base(pageId)
@@ -78,6 +79,15 @@ namespace Sipek
       base.remove(page);
     }
 
+    public override void onEntry()
+    {
+      if (!_internalMove) base.onEntry();
+    }
+    public override void onExit()
+    {
+      if (!_internalMove) base.onExit();
+    }
+
     public override bool onRightKey()
     {
       bool status = _embeddedPages[_currentIndex].onRightKey();
@@ -114,6 +124,7 @@ namespace Sipek
       {
         _currentIndex = 0;
       }
+      _internalMove = true;
     }
 
     private void backward()
@@ -127,7 +138,8 @@ namespace Sipek
       else
       {
         _currentIndex = _embeddedPages.Count - 1;
-      }  
+      }
+      _internalMove = true;
     }
 
     public override bool onSoftKey(int id)
@@ -144,6 +156,11 @@ namespace Sipek
     public override bool onDigitKey(int id)
     {
       return _embeddedPages[_currentIndex].onDigitKey(id);
+    }
+    
+    public override bool onCharKey(int id)
+    {
+      return _embeddedPages[_currentIndex].onCharKey(id);
     }
 
     public override bool onClearKey()

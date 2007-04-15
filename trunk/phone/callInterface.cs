@@ -22,8 +22,6 @@ namespace Sipek
 
   interface CTelephonyInterface
   {
-    #region Methods
-
     int makeCall(string dialedNo);
 
     bool endCall();
@@ -36,7 +34,9 @@ namespace Sipek
 
     bool retrieveCall();
 
-    #endregion Methods
+    bool xferCall(string number);
+
+    bool xferCallSession(int session);
   }
 
   interface CTelephonyCallback

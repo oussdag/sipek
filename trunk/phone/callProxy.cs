@@ -35,7 +35,7 @@ namespace Sipek
     private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
 
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_makeCall(int callId, string number);
+    private static extern int dll_makeCall(int callId, string uri);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_releaseCall(int callId);
     [DllImport("pjsipDll.dll")]
@@ -44,6 +44,8 @@ namespace Sipek
     private static extern int dll_holdCall(int callId);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_retrieveCall(int callId);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_xferCall(int callId, string uri);
 
     // identify line
     private int _line;
@@ -96,7 +98,20 @@ namespace Sipek
       dll_retrieveCall(_line);
       return true;
     }
-
+          
+    public bool xferCall(string number)
+    {
+      string uri = "sip:" + number + "@" + CCallManager.getInstance().SipProxy;
+      dll_xferCall(_line, uri);
+      return true;
+    }
+    
+    public bool xferCallSession(int session)
+    {
+      //string uri = "sip:" + number + "@" + CCallManager.getInstance().SipProxy;
+      //dll_xferCall(_line, uri);
+      return true;
+    }
     #endregion Methods
 
   }
