@@ -38,3 +38,4 @@ extern "C" PJSIPDLL_DLL_API int dll_answerCall(int callId, int code);
 extern "C" PJSIPDLL_DLL_API int dll_holdCall(int callId);
 extern "C" PJSIPDLL_DLL_API int dll_retrieveCall(int callId);
 extern "C" PJSIPDLL_DLL_API int dll_xferCall(int callid, char* uri);
+extern "C" PJSIPDLL_DLL_API int dll_xferCallWithReplaces(int callId, int dstSession);

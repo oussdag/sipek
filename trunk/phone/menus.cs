@@ -251,22 +251,37 @@ namespace Sipek
   /// </summary>
   public class CAccountsPage : CPage
   {
-    CSelectList _radio;
+    CSelectList _list;
+    CRadioButtonGroup _radio;
 
     public CAccountsPage()
       : base((int)EPages.P_ACCOUNTS, "Accounts")
     {
-      _radio = new CSelectList(5,1);
-      _radio.PosY = 3;
-      add(_radio);
+      _radio = new CRadioButtonGroup();
 
-      CLink linkConfigure = new CLink("Edit Account");
+      _list = new CSelectList(_radio, 5);
+      _list.PosY = 3;
+      add(_list);
+
+      CLink linkConfigure = new CLink("Edit");
       linkConfigure.Align = EAlignment.justify_right;
       linkConfigure.PosY = 10;
       linkConfigure.Softkey += new BoolIntDelegate(linkConfigure_Softkey);
       add(linkConfigure);
 
       this.Menu += new VoidDelegate(_radio_Menu);
+      this.Ok += new VoidDelegate(CAccountsPage_Ok);
+    }
+
+    bool CAccountsPage_Ok()
+    {
+      if (_list.Selected == null) return true;
+      int aindex = int.Parse(_list.Selected.subItems[0]);
+      CAccounts.getInstance().DefAccountIndex = aindex;
+      CAccounts.getInstance().save();
+
+      CCallManager.getInstance().initialize();
+      return true;
     }
 
     bool linkConfigure_Softkey(int keyId)
@@ -277,7 +292,7 @@ namespace Sipek
     bool _radio_Menu()
     {
       CSIPProxySettings page = (CSIPProxySettings)_controller.getPage((int)EPages.P_SIPPROXYSETTINGS);
-      int aindex = int.Parse(_radio.Selected.subItems[0]);
+      int aindex = int.Parse(_list.Selected.subItems[0]);
       page.setAccountIndex(aindex);
       _controller.showPage((int)EPages.P_SIPPROXYSETTINGS);
       return true;
@@ -295,7 +310,7 @@ namespace Sipek
         CCheckBox item = new CCheckBox(CAccounts.getInstance()[i].Name, -1, ischecked);
         if (item.Caption.Length == 0) item.Caption = "empty";
         item.subItems[0] = i.ToString();
-        //item.PosY = _radio.PosY + i*2;
+        //item.Softkey += new BoolIntDelegate(item_Softkey);
         _radio.add(item);
          if (ischecked) cnt++;
       }
@@ -637,6 +652,7 @@ namespace Sipek
   {
     CEditField _editport;
     CSelectList _list;
+    CLink _accountsLink;
 
     public CSIPSettings() 
       : base((int)EPages.P_SIPSETTINGS, "SIP Settings") 
@@ -645,21 +661,16 @@ namespace Sipek
       _list.PosY = 2;
       add(_list);
       
-      _editport = new CEditField("Port>", "", EEditMode.numeric);
+      _editport = new CEditField("Local Port>", "", EEditMode.numeric);
       _editport.PosY = 7;
       _editport.LinkKey = _editport.PosY;
       add(_editport);
 
-      CLink proxyLink = new CLink("Default Account", (int)EPages.P_SIPPROXYSETTINGS);
-      proxyLink.Align = EAlignment.justify_right;
-      proxyLink.PosY = 8;
-      proxyLink.LinkKey = proxyLink.PosY;
-      add(proxyLink);
-
-      CLink addproxyLink = new CLink("Add New Account", 0); // todo!!!
-      addproxyLink.PosY = 9;
-      addproxyLink.LinkKey = addproxyLink.PosY;
-      add(addproxyLink);
+      _accountsLink = new CLink("Accounts", (int)EPages.P_ACCOUNTS);
+      _accountsLink.Align = EAlignment.justify_right;
+      _accountsLink.PosY = 8;
+      _accountsLink.LinkKey = _accountsLink.PosY;
+      add(_accountsLink);
 
       // ok handler
       this.Ok += new VoidDelegate(CSIPSettings_Ok);
@@ -667,15 +678,7 @@ namespace Sipek
 
     public override void onEntry()
     {
-      CAccounts accounts = CAccounts.getInstance();
-
-      _list.removeAll();
-
-      for (int i = 0; i < accounts.getSize(); i++ )
-      {
-        CLink accLink = new CLink(accounts[i].Name, (int)EPages.P_SIPPROXYSETTINGS); // todo
-        _list.add(accLink);
-      }
+      _accountsLink.Caption = CAccounts.getInstance().DefAccount.Name;
 
       _editport.Caption = Properties.Settings.Default.cfgSipPort.ToString();
 
