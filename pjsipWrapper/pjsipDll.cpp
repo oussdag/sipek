@@ -607,7 +607,7 @@ int dll_registerAccount(char* uri, char* reguri, char* domain, char* username, c
   
   pjsua_acc_set_online_status(pjAccId, PJ_TRUE);
 
-	return status;
+  return pjAccId;
 }
 /*
 int dll_registerAccount(char* uri, char* reguri)
@@ -690,4 +690,27 @@ int dll_xferCall(int callid, char* uri)
   pj_str_t tmp = pj_str(uri);
   pj_status_t st = pjsua_call_xfer( callid, &tmp, &msg_data);
   return st;
+}
+
+int dll_xferCallWithReplaces(int callId, int dstSession)
+{
+int call = callId;
+pjsua_msg_data msg_data;
+pjsip_generic_string_hdr refer_sub;
+pj_str_t STR_REFER_SUB = { "Refer-Sub", 9 };
+pj_str_t STR_FALSE = { "false", 5 };
+pjsua_call_id ids[PJSUA_MAX_CALLS];
+pjsua_call_info ci;
+unsigned i, count;
+
+	pjsua_msg_data_init(&msg_data);
+	if (app_config.no_refersub) {
+	    /* Add Refer-Sub: false in outgoing REFER request */
+	    pjsip_generic_string_hdr_init2(&refer_sub, &STR_REFER_SUB, &STR_FALSE);
+	    pj_list_push_back(&msg_data.hdr_list, &refer_sub);
+	}
+
+	pjsua_call_xfer_replaces(call, dstSession, 0, &msg_data);
+
+  return 1;
 }

@@ -46,6 +46,8 @@ namespace Sipek
     private static extern int dll_retrieveCall(int callId);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_xferCall(int callId, string uri);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_xferCallWithReplaces(int callId, int dstSession);
 
     // identify line
     private int _line;
@@ -108,8 +110,7 @@ namespace Sipek
     
     public bool xferCallSession(int session)
     {
-      //string uri = "sip:" + number + "@" + CCallManager.getInstance().SipProxy;
-      //dll_xferCall(_line, uri);
+      dll_xferCallWithReplaces(_line, session);
       return true;
     }
     #endregion Methods
@@ -201,15 +202,23 @@ namespace Sipek
     /////////////////////////////////////////////////////////////////////////////////
     // Call API
     //
-    public static int registerAccount(int accountId)
+    public static int registerAccounts()
     {
-      string uri = "sip:" + CAccounts.getInstance()[accountId].Id + "@" + CAccounts.getInstance()[accountId].Address;
-      string reguri = "sip:" + CAccounts.getInstance()[accountId].Address; // +":" + CCallManager.getInstance().SipProxyPort;
-      //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
-      string domain = CAccounts.getInstance()[accountId].Domain;
-      string username = CAccounts.getInstance()[accountId].Username;
-      string password = CAccounts.getInstance()[accountId].Password;
-      dll_registerAccount(uri, reguri, domain, username, password);
+      for (int i = 0; i < CAccounts.getInstance().getSize(); i++)
+      {
+        CAccount acc = CAccounts.getInstance()[i];
+        if (acc.Id.Length > 0)
+        {
+          string uri = "sip:" + CAccounts.getInstance()[i].Id + "@" + CAccounts.getInstance()[i].Address;
+          string reguri = "sip:" + CAccounts.getInstance()[i].Address; // +":" + CCallManager.getInstance().SipProxyPort;
+          //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
+          string domain = CAccounts.getInstance()[i].Domain;
+          string username = CAccounts.getInstance()[i].Username;
+          string password = CAccounts.getInstance()[i].Password;
+          int accId = dll_registerAccount(uri, reguri, domain, username, password);
+          // todo:::check if accId corresponds to account index!!!
+        }
+      }
       return 1;
     }
 

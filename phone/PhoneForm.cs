@@ -300,7 +300,7 @@ namespace Sipek
       { 
         OKbutton_Click(sender, e);
       }
-      else if ((e.KeyChar >= 'A') && (e.KeyChar <= 'z'))
+      else /*if ((e.KeyChar >= 'A') && (e.KeyChar <= 'z'))*/
       {
         control.getAccessIf().onCharKey(e.KeyChar);
       }

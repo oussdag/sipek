@@ -86,7 +86,6 @@ namespace Sipek
 
     public void initialize()
     {
-     
       ///
       if (!_initialized)
       {
@@ -106,15 +105,13 @@ namespace Sipek
         _calls = new Dictionary<int, CStateMachine>(); 
         
         CPjSipProxy.initialize();
-        CPjSipProxy.registerAccount(0);
       }
       else
       {
         // todo unregister
         CPjSipProxy.restart();
-        // reregister
-        CPjSipProxy.registerAccount(0);
       }
+      CPjSipProxy.registerAccounts(); 
       _initialized = true;
     }
 
