@@ -280,7 +280,10 @@ namespace Sipek
     {
       return _smref.SigProxy.xferCall(number);
     }
-
+    public override bool xferCallSession(int session)
+    {
+      return _smref.SigProxy.xferCallSession(session);
+    }
 
     public override void onHoldConfirm()
     {
@@ -376,6 +379,12 @@ namespace Sipek
       return true;
     }
 
+    public override void onReleased()
+    {
+      _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
+
+      _smref.destroy();
+    }
   }
 
 

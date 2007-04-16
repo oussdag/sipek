@@ -217,5 +217,10 @@ namespace Sipek
       }
     }
 
+
+    public void reload()
+    {
+      Properties.Settings.Default.Reload();
+    }
   }
 }

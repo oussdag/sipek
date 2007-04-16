@@ -94,7 +94,7 @@ namespace Sipek
   /// <summary>
   /// 
   /// </summary>
-  public class IdlePage : CPage
+  public class CIdlePage : CPage
   {
     CText _timedate;
     CLink _linkRinger;
@@ -102,7 +102,7 @@ namespace Sipek
     CLink _linkAccounts;
     CText _displayName;
 
-    public IdlePage()
+    public CIdlePage()
       : base((int)EPages.P_IDLE)
     {
       _timedate = new CText("");
@@ -148,9 +148,18 @@ namespace Sipek
 
       // Initialize handlers
       Digitkey += new BoolIntDelegate(digitkeyHandler);
+      Charkey += new BoolIntDelegate(CIdlePage_Charkey);
       Offhook += new VoidDelegate(IdlePage_Offhook);
       Menu += new VoidDelegate(IdlePage_Menu);
       Ok += new VoidDelegate(IdlePage_Ok);
+    }
+
+    bool CIdlePage_Charkey(int keyId)
+    {
+      CPreDialPage page = (CPreDialPage)_controller.getPage((int)ECallPages.P_PREDIALING);
+      page.setDigits(((char)keyId).ToString());
+      _controller.showPage((int)ECallPages.P_PREDIALING);
+      return true;
     }
 
     bool IdlePage_Ok()
@@ -249,7 +258,6 @@ namespace Sipek
     {
       _radio = new CSelectList(5,1);
       _radio.PosY = 3;
-      _radio.Menu += new VoidDelegate(_radio_Menu);
       add(_radio);
 
       CLink linkConfigure = new CLink("Edit Account");
@@ -257,6 +265,8 @@ namespace Sipek
       linkConfigure.PosY = 10;
       linkConfigure.Softkey += new BoolIntDelegate(linkConfigure_Softkey);
       add(linkConfigure);
+
+      this.Menu += new VoidDelegate(_radio_Menu);
     }
 
     bool linkConfigure_Softkey(int keyId)
@@ -730,10 +740,25 @@ namespace Sipek
       add(linkNext);
 
       this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
+      this.Esc += new VoidDelegate(CSIPProxySettings_Esc);
+    }
+
+    bool CSIPProxySettings_Esc()
+    {
+      CAccounts.getInstance().reload();
+      return false;
     }
 
     bool linkNext_Softkey(int keyId)
     {
+      // store data
+      CAccount account = CAccounts.getInstance()[_accountIndex];
+      account.Address = _editProxyAddress.Caption;
+      account.Port = int.Parse(_editProxyPort.Caption);
+      account.Name = _editDisplayName.Caption;
+      account.Id = _editId.Caption;
+      CAccounts.getInstance()[_accountIndex] = account;
+
       CSIPProxySettings2nd page = (CSIPProxySettings2nd)_controller.getPage((int)EPages.P_SIPPROXYSETTINGS_2nd);
       page.setAccountIndex(_accountIndex);
       _controller.showPage((int)EPages.P_SIPPROXYSETTINGS_2nd);
@@ -770,6 +795,8 @@ namespace Sipek
       return true;
     }
 
+
+
     public void setAccountIndex(int index)
     {
       _accountIndex = index;
@@ -791,6 +818,7 @@ namespace Sipek
     public CSIPProxySettings2nd()
       : base((int)EPages.P_SIPPROXYSETTINGS_2nd, "Settings")
     {
+      this.forgetPage(true);
       ////////////
       // 2nd page
       _editUserName = new CEditField("Username>", "", true);
@@ -808,10 +836,24 @@ namespace Sipek
       linkNext.Align = EAlignment.justify_right;
       linkNext.Softkey += new BoolIntDelegate(linkNext_Softkey);
       add(linkNext);
+
+      this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
+      this.Esc += new VoidDelegate(CSIPProxySettings2nd_Esc);
+    }
+
+    bool CSIPProxySettings2nd_Esc()
+    {
+      CAccounts.getInstance().reload();
+      return false;
     }
 
     bool linkNext_Softkey(int keyId)
     {
+      CAccount account = CAccounts.getInstance()[_accountIndex];
+      account.Username = _editUserName.Caption;
+      account.Password = _editPassword.Caption;
+      CAccounts.getInstance()[_accountIndex] = account;
+
       CSIPProxySettings3rd page = (CSIPProxySettings3rd)_controller.getPage((int)EPages.P_SIPPROXYSETTINGS_3rd);
       page.setAccountIndex(_accountIndex);
       _controller.showPage((int)EPages.P_SIPPROXYSETTINGS_3rd);
@@ -831,10 +873,8 @@ namespace Sipek
     bool CSIPProxySettings_Ok()
     {
       CAccount account = CAccounts.getInstance()[_accountIndex];
-
       account.Username = _editUserName.Caption;
       account.Password = _editPassword.Caption;
-
       CAccounts.getInstance()[_accountIndex] = account;
 
       CAccounts.getInstance().save();
@@ -861,6 +901,8 @@ namespace Sipek
     public CSIPProxySettings3rd()
       : base((int)EPages.P_SIPPROXYSETTINGS_3rd, "Settings")
     {
+      this.forgetPage(true);
+
       _editDomain = new CEditField("Domain>", "", true);
       _editDomain.PosY = 5;
       _editDomain.LinkKey = _editDomain.PosY;
@@ -871,10 +913,33 @@ namespace Sipek
       _editperiod.LinkKey = _editperiod.PosY;
       this.add(_editperiod);
       
-      CLink linkNext = new CLink("More...", (int)EPages.P_SIPPROXYSETTINGS);
+      CLink linkNext = new CLink("More...");
       linkNext.PosY = 10;
       linkNext.Align = EAlignment.justify_right;
+      linkNext.Softkey += new BoolIntDelegate(linkNext_Softkey);
       add(linkNext);
+
+      this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
+      this.Esc += new VoidDelegate(CSIPProxySettings_Esc);
+    }
+
+    bool linkNext_Softkey(int keyId)
+    {
+      CAccount account = CAccounts.getInstance()[_accountIndex];
+      account.Period = int.Parse(_editperiod.Caption);
+      account.Domain = _editDomain.Caption;
+      CAccounts.getInstance()[_accountIndex] = account;
+
+      CSIPProxySettings page = (CSIPProxySettings)_controller.getPage((int)EPages.P_SIPPROXYSETTINGS);
+      page.setAccountIndex(_accountIndex);
+      _controller.showPage((int)EPages.P_SIPPROXYSETTINGS);
+      return true;
+    }
+
+    bool CSIPProxySettings_Esc()
+    {
+      CAccounts.getInstance().reload();
+      return false;
     }
 
     public override void onEntry()
@@ -890,10 +955,8 @@ namespace Sipek
     bool CSIPProxySettings_Ok()
     {
       CAccount account = CAccounts.getInstance()[_accountIndex];
-
       account.Period = int.Parse(_editperiod.Caption);
       account.Domain = _editDomain.Caption;
-
       CAccounts.getInstance()[_accountIndex] = account;
 
       CAccounts.getInstance().save();
