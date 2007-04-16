@@ -200,7 +200,7 @@ namespace Sipek
 
       // Create menu pages...
       new CInitPage();
-      new IdlePage();
+      new CIdlePage();
       new CPhonebookPage();
       new CPhonebookEditPage();
       new CMenuPage();

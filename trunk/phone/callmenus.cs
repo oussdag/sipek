@@ -516,6 +516,7 @@ namespace Sipek
       }
       else if (1 == _callManager.Count)
       {
+        _hold.Caption = "Retrieve";
         // open dial number edit!!!
         _xfer.Link = (int)ECallPages.P_XFERDIAL;
       }
@@ -634,31 +635,35 @@ namespace Sipek
     bool CXferListPage_Ok()
     {
       CLink selection = (CLink)_xfer2List.Selected;
-      // TODO:::implement attended transfer
+      if (selection == null) return false;
+
+      string sesIndStr = selection.subItems[0];
+
+      _currentCall.getState().xferCallSession(int.Parse(sesIndStr));
       return true;
     }
 
     public override void onEntry()
     {
-      base.onEntry();
-
       int callnums = _callManager.getNoCallsInState(EStateId.HOLDING | EStateId.ACTIVE);
 
       _xfer2List.removeAll();
-      /*
+      
       for (int i = 0; i < callnums; i++)
       {
         // Do not add current call!!!
-        CCallStateMachine call = _callManager.getCall(i, ui_holding_state | ui_talk_state);
-        if (muiHandler->getCurrentSID() != automaton->getSession())
+        CStateMachine call = _callManager.getCall(i);
+        if (_callManager.getCurrentCall().Session != call.Session)
         {
-          ItString dn = automaton->getCallingNumber();
-          CLink* link = new CLink(dn, align_left);
-          link->mTag = (void*)automaton->getSession();
-          _xfer2List->add(link);
+          string dn = call.CallingNo;
+          CLink link = new CLink(dn);
+          link.Align = EAlignment.justify_left;
+          link.subItems[0] = call.Session.ToString();
+          _xfer2List.add(link);
         }
       }
-      */
+     
+      base.onEntry();
     }
   }
 
