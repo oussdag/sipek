@@ -419,6 +419,13 @@ namespace Sipek
       _xfer.PosY = 9;
       add(_xfer);
 
+      this.Digitkey += new BoolIntDelegate(CActivePage_Digitkey);
+    }
+
+    bool CActivePage_Digitkey(int keyId)
+    {
+      _callManager.getCurrentCall().getState().dialDtmf((int)EDtmfMode.DM_Inband, keyId.ToString());
+      return true;
     }
 
     bool _hold_Softkey(int keyId)
@@ -777,7 +784,7 @@ namespace Sipek
 
     bool _editField_Ok()
     {
-      _currentCall.getState().serviceRequest(EServiceCodes.Deflect, -1);
+      _currentCall.getState().serviceRequest((int)EServiceCodes.SC_CD, _editField.Caption);
       return true;
     }
   }

@@ -39,3 +39,5 @@ extern "C" PJSIPDLL_DLL_API int dll_holdCall(int callId);
 extern "C" PJSIPDLL_DLL_API int dll_retrieveCall(int callId);
 extern "C" PJSIPDLL_DLL_API int dll_xferCall(int callid, char* uri);
 extern "C" PJSIPDLL_DLL_API int dll_xferCallWithReplaces(int callId, int dstSession);
+extern "C" PJSIPDLL_DLL_API int dll_serviceReq(int callId, int serviceCode, const char* destUri);
+extern "C" PJSIPDLL_DLL_API int dll_dialDtmf(int callId, char* digits, int mode);
