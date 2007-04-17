@@ -31,8 +31,24 @@ namespace Sipek
     RELEASED,
     INCOMING,
     HOLDING
-  }  
+  }
   
+  public enum EServiceCodes : int
+  {
+    SC_CD,
+    SC_CFU,
+    SC_CFNR,
+    SC_DND,
+    SC_3PTY
+  }
+  
+  public enum EDtmfMode : int
+  {
+    DM_Outband,
+    DM_Inband,
+    DM_Transparent
+  }  
+
   /// <summary>
   /// CAbstractState implements two interfaces CTelephonyInterface and CTelephonyCallback. 
   /// The first interface is used for sending requests to call server, where the second is used to 
@@ -84,7 +100,7 @@ namespace Sipek
     public virtual bool endCall()
     {
       _smref.SigProxy.endCall();
-      _smref.destroy();
+      //_smref.destroy();
       return true;
     }
 
@@ -120,11 +136,24 @@ namespace Sipek
     {
       return true;
     }
-    public bool serviceRequest(EServiceCodes code, int session)
+/*    public bool serviceRequest(EServiceCodes code, int session)
     {
       _smref.SigProxy.serviceRequest(code, session);
       return true;
     }
+ */ 
+    public bool serviceRequest(int code, string dest)
+    {
+      _smref.SigProxy.serviceRequest(code, dest);
+      return true;
+    }
+
+    public bool dialDtmf(int mode, string digits)
+    {
+      _smref.SigProxy.dialDtmf(mode, digits);
+      return true;
+    }
+
     #endregion Methods
 
     #region Callbacks
@@ -344,11 +373,11 @@ namespace Sipek
     {
       if (Properties.Settings.Default.cfgCFUFlag == true)
       {
-        _smref.SigProxy.serviceRequest(EServiceCodes.CFU, -1);
+        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CFU, Properties.Settings.Default.cfgCFUNumber);
       }
       else if (Properties.Settings.Default.cfgDNDFlag == true)
       {
-        _smref.SigProxy.serviceRequest(EServiceCodes.DND, -1);
+        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_DND, "");
       }
       else
       {

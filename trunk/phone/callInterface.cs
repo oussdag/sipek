@@ -19,13 +19,6 @@
 
 namespace Sipek
 {
-  public enum EServiceCodes : int
-  {
-    Deflect,
-    CFU,
-    CFNR,
-    DND,
-  }
 
   interface CTelephonyInterface
   {
@@ -47,7 +40,10 @@ namespace Sipek
 
     bool threePtyCall(int session);
 
-    bool serviceRequest(EServiceCodes code, int session);
+    //bool serviceRequest(EServiceCodes code, int session);
+    bool serviceRequest(int code, string dest);
+
+    bool dialDtmf(int mode, string digits);
   }
 
   interface CTelephonyCallback

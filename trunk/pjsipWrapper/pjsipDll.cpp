@@ -36,6 +36,14 @@ static fptr_callretrieveconf* cb_callretrieveconf = 0;
 
 static bool running = true;
 
+enum {
+    SC_Deflect,
+    SC_CFU,
+    SC_CFNR,
+    SC_DND,
+    SC_3Pty
+};
+
 //////////////////////////////////////////////////////////////////////////
 
 /* Call specific data */
@@ -383,59 +391,6 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 			&transport_id);
 		if (status != PJ_SUCCESS)
 			goto on_error;
-
-		/* Add local account */
-/*
-//		pjsua_acc_add_local(transport_id, PJ_TRUE, &aid);
-//		//pjsua_acc_set_transport(aid, transport_id);
-//		pjsua_acc_set_online_status(current_acc, PJ_TRUE);
-
-		pjsua_acc_id pjAccId= -1;
-		string  registrarAddr = cb_getconfigdata(0);
-		string dn = cb_getconfigdata(1);
-
-		//1.) Build URI for the account
-		char uri[PJSIP_MAX_URL_SIZE]={0};
-		pj_ansi_snprintf( uri, 
-			PJSIP_MAX_URL_SIZE,
-			"<sip:%s@%.*s:%d>", 
-			dn.c_str(),
-			(int)registrarAddr.size(),
-			registrarAddr.c_str(),
-			5060);
-
-		//2.) Build Reg URI for the account
-		char reguri[PJSIP_MAX_URL_SIZE]={0};
-		pj_ansi_snprintf( reguri, 
-			PJSIP_MAX_URL_SIZE,
-			"<sip:%.*s:%d>", 
-			(int)registrarAddr.size(),
-			registrarAddr.c_str(),
-			5060);
-
-		//3.) get (and initialize) the cfgStruct for this account from pjSIP
-		pjsua_acc_config thisAccountsCfg; // = mSipConfiguration->getAccountCfg(aAccId);
-		pjsua_acc_config_default(&thisAccountsCfg);
-
-		//4.) set parameters 
-		thisAccountsCfg.id = pj_str(uri);
-		thisAccountsCfg.reg_timeout = 3600;
-		thisAccountsCfg.reg_uri = pj_str(reguri);
-
-		// AUTHENTICATION
-		thisAccountsCfg.cred_count = 1;
-		//		thisAccountsCfg->cred_info[0].username = pj_str((char *) uname.c_str());
-		//		thisAccountsCfg->cred_info[0].realm = pj_str((char *) "iskratel.si");
-		//		thisAccountsCfg->cred_info[0].scheme = pj_str((char *)authType.c_str());
-		//		thisAccountsCfg->cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
-		//		thisAccountsCfg->cred_info[0].data = pj_str((char*)passw.c_str());
-
-		//5.) check if this is the default SIP account and add it to the SIP config.
-		//if (true == isDefault)
-		{//this is the DEFAULT SIP Account
-			status = pjsua_acc_add(&thisAccountsCfg, PJ_TRUE, &pjAccId);
-		} 
-*/
 	}
 
 	/* Add TCP transport unless it's disabled */
@@ -477,22 +432,6 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 		PJ_LOG(3,(THIS_FILE, "Error: no transport is configured"));
 		status = -1;
 		goto on_error;
-	}
-
-
-	/* Add accounts */
-	for (i=0; i<app_config.acc_cnt; ++i) {
-		status = pjsua_acc_add(&app_config.acc_cfg[i], PJ_TRUE, NULL);
-		if (status != PJ_SUCCESS)
-			goto on_error;
-		pjsua_acc_set_online_status(current_acc, PJ_TRUE);
-	}
-
-	/* Add buddies */
-	for (i=0; i<app_config.buddy_cnt; ++i) {
-		status = pjsua_buddy_add(&app_config.buddy_cfg[i], NULL);
-		if (status != PJ_SUCCESS)
-			goto on_error;
 	}
 
 	/* Optionally set codec orders */
@@ -609,30 +548,10 @@ int dll_registerAccount(char* uri, char* reguri, char* domain, char* username, c
 
   return pjAccId;
 }
-/*
-int dll_registerAccount(char* uri, char* reguri)
-{
-	pjsua_acc_config thisAccountsCfg; // = mSipConfiguration->getAccountCfg(aAccId);
-	pjsua_acc_config_default(&thisAccountsCfg);
 
-	//4.) set parameters 
-	thisAccountsCfg.id = pj_str(uri);
-	thisAccountsCfg.reg_timeout = 3600;
-	thisAccountsCfg.reg_uri = pj_str(reguri);
+///////////////////////////////////////////////////////////////////////
+// Call API
 
-	// AUTHENTICATION
-	thisAccountsCfg.cred_count = 1;
-	//		thisAccountsCfg->cred_info[0].username = pj_str((char *) uname.c_str());
-	//		thisAccountsCfg->cred_info[0].realm = pj_str((char *) "iskratel.si");
-	//		thisAccountsCfg->cred_info[0].scheme = pj_str((char *)authType.c_str());
-	//		thisAccountsCfg->cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
-	//		thisAccountsCfg->cred_info[0].data = pj_str((char*)passw.c_str());
-	
-	pjsua_acc_id pjAccId= -1;
-	int status = pjsua_acc_add(&thisAccountsCfg, PJ_TRUE, &pjAccId);
-	return status;
-}
-*/
 int dll_makeCall(int accountId, char* uri)
 {
 int newcallId = -1; 
@@ -701,7 +620,6 @@ pj_str_t STR_REFER_SUB = { "Refer-Sub", 9 };
 pj_str_t STR_FALSE = { "false", 5 };
 pjsua_call_id ids[PJSUA_MAX_CALLS];
 pjsua_call_info ci;
-unsigned i, count;
 
 	pjsua_msg_data_init(&msg_data);
 	if (app_config.no_refersub) {
@@ -713,4 +631,55 @@ unsigned i, count;
 	pjsua_call_xfer_replaces(call, dstSession, 0, &msg_data);
 
   return 1;
+}
+
+int dll_serviceReq(int callId, int serviceCode, const char* destUri)
+{
+  int status = !PJ_SUCCESS; //default status is ERROR!!
+  switch(serviceCode)
+  {
+    case SC_3Pty:
+      {//as this is only local 3PTY that's all we have to do ....
+        status = dll_retrieveCall(callId);
+      }
+  	  break;
+    case SC_CFU:
+    //case SC_CFB:
+    case SC_CFNR:
+    case SC_Deflect:
+      {
+        //1.) build sip target Uri  
+        pj_str_t contact_header_to_call = pj_str((char*)destUri);
+        
+        //2.) Fill pjsua_msg_data with correct Contact header ...
+        pjsua_msg_data aStruct;
+        pjsua_msg_data_init(&aStruct);//Initialize ...
+        
+        pjsip_generic_string_hdr warn;
+        pj_str_t hname = pj_str("Contact");
+        pj_str_t hvalue = contact_header_to_call;
+        pjsip_generic_string_hdr_init2(&warn, &hname, &hvalue);
+        warn.type = PJSIP_H_CONTACT;
+        pj_list_push_back(&aStruct.hdr_list, &warn);
+        
+        //3.) Forward this call...
+        //convert callId from abstract one (UI/CC) into concrete one (PJSIP) !!!
+        status = pjsua_call_hangup(callId, 302, NULL, &(aStruct));
+      }
+      break;
+    case SC_DND:
+      {
+        //this->handleReleaseReq(aAbstrCallId, 486);// sends 486 Busy here and releases this call instance ...
+        status = pjsua_call_hangup(callId, 486, NULL, NULL);
+      }
+      break;
+  }//switch(serviceCode)
+  return status;
+}
+
+int dll_dialDtmf(int callId, char* digits, int mode)
+{
+  pj_str_t dg = pj_str(digits);
+	int status = pjsua_call_dial_dtmf(callId, &dg);
+  return status;
 }

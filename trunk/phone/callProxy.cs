@@ -48,9 +48,14 @@ namespace Sipek
     private static extern int dll_xferCall(int callId, string uri);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_xferCallWithReplaces(int callId, int dstSession);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_serviceReq(int callId, int serviceCode, string destUri);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_dialDtmf(int callId, string digits, int mode);
 
     // identify line
     private int _line;
+    private int _accountId;
 
     #region Constructor
 
@@ -66,7 +71,8 @@ namespace Sipek
 
     public int makeCall(string dialedNo, int accountId)
     {
-      string uri = "sip:" + dialedNo + "@" + CCallManager.getInstance().SipProxy;
+      _accountId = accountId;
+      string uri = "sip:" + dialedNo + "@" + CAccounts.getInstance()[accountId].Address;
       _line = dll_makeCall(accountId, uri);
       return _line;
     }
@@ -103,7 +109,7 @@ namespace Sipek
           
     public bool xferCall(string number)
     {
-      string uri = "sip:" + number + "@" + CCallManager.getInstance().SipProxy;
+      string uri = "sip:" + number + "@" + CAccounts.getInstance()[_accountId].Address;
       dll_xferCall(_line, uri);
       return true;
     }
@@ -116,19 +122,23 @@ namespace Sipek
 
     public bool threePtyCall(int session)
     {
-      //todo:::implement 3pty wrapper function
+      dll_serviceReq(_line, (int)EServiceCodes.SC_3PTY,"");
       return true;
     }
-    public bool serviceRequest(EServiceCodes code, int session)
+    
+    public bool serviceRequest(int code, string dest)
     {
-      //todo:::implement pjsip wrapper function
-      switch (code)
-      { 
-        case EServiceCodes.Deflect:
-          break;
-      }
+      string destUri = "<sip:" + dest + "@" + CAccounts.getInstance().DefAccount.Address + ">";
+      dll_serviceReq(_line, (int)code, destUri);
       return true;
     }
+
+    public bool dialDtmf(int mode, string digits)
+    {
+      dll_dialDtmf(_line, digits, mode);
+      return true;
+    }
+
     #endregion Methods
 
   }

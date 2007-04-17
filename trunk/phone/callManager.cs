@@ -48,22 +48,6 @@ namespace Sipek
       get { return _calls.Count; }
     }
 
-    public string SipProxy
-    {
-      get { return CAccounts.getInstance()[0].Address; }
-    }
-    public int SipProxyPort
-    {
-      get { return CAccounts.getInstance()[0].Port; }
-    }
-    public string SipName
-    {
-      get { return CAccounts.getInstance()[0].Name; }
-    }
-    public int SipPort
-    {
-      get { return Properties.Settings.Default.cfgSipPort; }
-    }
     #endregion Properties
 
 
