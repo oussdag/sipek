@@ -18,6 +18,7 @@
 
 using MenuDesigner;
 using System;
+using System.Collections.Generic;
 
 namespace Sipek
 {
@@ -36,7 +37,12 @@ namespace Sipek
     P_INCOMING = EStateId.INCOMING,
     P_HOLDING = EStateId.HOLDING,
     P_XFERLIST,
-    P_XFERDIAL
+    P_XFERDIAL,
+    P_3PTYLIST,
+    P_DEFLECT,
+    P_CALLOPTIONS,
+    P_SETVOLUME,
+    P_DTMFOPTIONS,
   }
 
   public abstract class CTelephonyPage : CPage
@@ -126,7 +132,8 @@ namespace Sipek
     }
 
     bool menuHandler() 
-    { 
+    {
+      _controller.showPage((int)ECallPages.P_CALLOPTIONS);
       return true; 
     }
 
@@ -383,6 +390,7 @@ namespace Sipek
     CText _duration;
     CLink _hold;
     CLink _xfer;
+    CLink _3pty;
 
     public CActivePage()
       : base(ECallPages.P_ACTIVE, "Connected...")
@@ -401,10 +409,16 @@ namespace Sipek
       _hold.PosY = 7;
       add(_hold);
 
+      _3pty = new CLink("3Pty");
+      _3pty.Align = EAlignment.justify_right;
+      _3pty.PosY = 8;
+      //add(_3pty);
+
       _xfer = new CLink("Transfer");
       //_xfer.Softkey += new BoolIntDelegate(_xfer_Softkey);
       _xfer.PosY = 9;
       add(_xfer);
+
     }
 
     bool _hold_Softkey(int keyId)
@@ -423,7 +437,8 @@ namespace Sipek
 
     public override void  onEntry()
     {
-      base.onEntry();
+      remove(_3pty);
+      _currentCall = _callManager.getCurrentCall();
 
       // check if held
       if (_currentCall.IsHeld)
@@ -438,13 +453,19 @@ namespace Sipek
       // multicall options
       if (_callManager.Count > 1)
       {
-        // check if 3pty == 2 connected calls
+        // check if 3pty => 2 connected calls
         if (_currentCall.Is3Pty)
         {
           _hold.Caption = "3Pty Split";
           this.mText = "3-Party";
         }
-        else if (_callManager.Count == 2)
+        else 
+        {
+          // show 3pty link...
+          add(_3pty);
+        }
+
+        if (_callManager.Count == 2)
         {
           // Hold/swap
           _hold.Caption = "Hold";
@@ -462,6 +483,7 @@ namespace Sipek
         _xfer.Link = (int)ECallPages.P_XFERDIAL;
       }
 
+      base.onEntry();
     }
 
   }
@@ -550,6 +572,11 @@ namespace Sipek
       accept_call.PosY = 7;
       accept_call.LinkKey = accept_call.PosY;
       this.add(accept_call);
+
+      CLink deflectLink = new CLink("Deflect", (int)ECallPages.P_DEFLECT);
+      deflectLink.PosY = 8;
+      deflectLink.Align = EAlignment.justify_right;
+      this.add(deflectLink);
     }
 
     bool accept_call_Softkey(int keyId)
@@ -649,11 +676,12 @@ namespace Sipek
 
       _xfer2List.removeAll();
       
-      for (int i = 0; i < callnums; i++)
+      Dictionary<int, CStateMachine> list = _callManager.getCallList();
+      foreach (KeyValuePair<int, CStateMachine> kvp in list)
       {
-        // Do not add current call!!!
-        CStateMachine call = _callManager.getCall(i);
-        if (_callManager.getCurrentCall().Session != call.Session)
+        CStateMachine call = kvp.Value;
+        if ((call.Session != _callManager.getCurrentCall().Session) && 
+              ((call.getStateId() == EStateId.HOLDING)||(call.getStateId() == EStateId.ACTIVE)))
         {
           string dn = call.CallingNo;
           CLink link = new CLink(dn);
@@ -665,6 +693,153 @@ namespace Sipek
      
       base.onEntry();
     }
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class C3PtyListPage : CTelephonyPage
+  {
+
+    private CSelectList _3pty2List;
+
+    public C3PtyListPage()
+      : base(ECallPages.P_3PTYLIST, "Conference with...")
+    {
+      this.clearHistory(false);
+
+      // remove end call link from CTelephony
+      this.remove(_endCall);
+      this.remove(_sessions);
+      this.remove(_name);
+      this.remove(_digits);
+
+      _3pty2List = new CSelectList(5);
+      _3pty2List.PosY = 1;
+      this.add(_3pty2List);
+
+      // handlers
+      Ok += new VoidDelegate(C3PtyListPage_Ok);
+    }
+
+    bool C3PtyListPage_Ok()
+    {
+      CLink selection = (CLink)_3pty2List.Selected;
+      if (selection == null) return false;
+
+      string sesIndStr = selection.subItems[0];
+
+      _currentCall.getState().threePtyCall(int.Parse(sesIndStr));
+      return true;
+    }
+
+    public override void onEntry()
+    {
+      int callnums = _callManager.getNoCallsInState(EStateId.HOLDING);
+
+      _3pty2List.removeAll();
+
+      Dictionary<int, CStateMachine> list = _callManager.getCallList();
+      foreach (KeyValuePair<int, CStateMachine> kvp in list)
+      {
+        CStateMachine call = kvp.Value;
+        if ((call.Session != _callManager.getCurrentCall().Session) && (call.getStateId() == EStateId.HOLDING))
+        {
+          string dn = call.CallingNo;
+          CLink link = new CLink(dn);
+          link.Align = EAlignment.justify_left;
+          link.subItems[0] = call.Session.ToString();
+          _3pty2List.add(link); 
+        }
+      }
+
+      base.onEntry();
+    }
+  }
+
+  public class CDeflectPage : CTelephonyPage
+  {
+    CEditField _editField;
+
+    public CDeflectPage()
+      : base(ECallPages.P_DEFLECT, "Deflect to...")
+    {
+      clearHistory(false);
+
+      this.remove(_name);
+      this.remove(_digits);
+
+      _editField = new CEditField(">", "", EEditMode.numeric, true);
+      _editField.PosY = 1;
+      _editField.Ok += new VoidDelegate(_editField_Ok);
+      this.add(_editField);
+    }
+
+    bool _editField_Ok()
+    {
+      _currentCall.getState().serviceRequest(EServiceCodes.Deflect, -1);
+      return true;
+    }
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CCallOptionsPage : CTelephonyPage
+  {
+    private CLink _linkDtmf;
+	  private CCheckBox _mute;
+
+    public	CCallOptionsPage() 
+      : base(ECallPages.P_CALLOPTIONS, "Options...")
+    {
+      clearHistory(false);
+
+      forgetPage(false);
+
+      // remove all CTelephony controls.
+      removeAll();
+
+      _mute = new CCheckBox("Mute");
+      _mute.PosY = 5;
+      _mute.Softkey += new BoolIntDelegate(_mute_Softkey);
+      this.add(_mute);
+
+      CLink volume = new CLink("Volume", (int)ECallPages.P_SETVOLUME);
+      volume.PosY = 6;
+      volume.Align = EAlignment.justify_right;
+      this.add(volume);
+
+      _linkDtmf = new CLink("DTMF mode", (int)ECallPages.P_DTMFOPTIONS);
+      _linkDtmf.PosY = 7;
+      this.add(_linkDtmf);
+
+      CLink calls = new CLink("Calls", (int)EPages.P_CALLLOG);
+      calls.PosY = 8;
+      calls.Align = EAlignment.justify_right;
+      this.add(calls);
+
+      CLink phonebook = new CLink("Phonebook", (int)EPages.P_PHONEBOOK);
+      phonebook.PosY = 9;
+      this.add(phonebook);
+
+      CLink menu = new CLink("Menu", (int)EPages.P_MENU);
+      menu.PosY = 10;
+      menu.Align = EAlignment.justify_right;
+      this.add(menu);
+    }
+
+    bool _mute_Softkey(int keyId)
+    {
+      throw new Exception("The method or operation is not implemented.");
+    }
+
+    public override void onEntry()
+    {
+      base.onEntry();
+
+    }
+
   }
 
 } // namespace Sipek

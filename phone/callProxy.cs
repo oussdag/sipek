@@ -35,7 +35,7 @@ namespace Sipek
     private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
 
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_makeCall(int callId, string uri);
+    private static extern int dll_makeCall(int accountId, string uri);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_releaseCall(int callId);
     [DllImport("pjsipDll.dll")]
@@ -64,10 +64,10 @@ namespace Sipek
 
     #region Methods
 
-    public int makeCall(string dialedNo)
+    public int makeCall(string dialedNo, int accountId)
     {
       string uri = "sip:" + dialedNo + "@" + CCallManager.getInstance().SipProxy;
-      _line = dll_makeCall(0, uri);
+      _line = dll_makeCall(accountId, uri);
       return _line;
     }
 
@@ -111,6 +111,22 @@ namespace Sipek
     public bool xferCallSession(int session)
     {
       dll_xferCallWithReplaces(_line, session);
+      return true;
+    }
+
+    public bool threePtyCall(int session)
+    {
+      //todo:::implement 3pty wrapper function
+      return true;
+    }
+    public bool serviceRequest(EServiceCodes code, int session)
+    {
+      //todo:::implement pjsip wrapper function
+      switch (code)
+      { 
+        case EServiceCodes.Deflect:
+          break;
+      }
       return true;
     }
     #endregion Methods
@@ -207,7 +223,7 @@ namespace Sipek
       for (int i = 0; i < CAccounts.getInstance().getSize(); i++)
       {
         CAccount acc = CAccounts.getInstance()[i];
-        if (acc.Id.Length > 0)
+        if (acc.Name.Length > 0)
         {
           string uri = "sip:" + CAccounts.getInstance()[i].Id + "@" + CAccounts.getInstance()[i].Address;
           string reguri = "sip:" + CAccounts.getInstance()[i].Address; // +":" + CCallManager.getInstance().SipProxyPort;
@@ -277,6 +293,15 @@ namespace Sipek
         {
           number = number.Remove(semiPos);
         }
+        else 
+        {
+          int colPos = number.IndexOf(':');
+          if (colPos >= 0)
+          {
+            number = number.Remove(colPos);
+          }
+        }
+
       }
 
       CStateMachine sm = CCallManager.getInstance().createSession(callId, number);

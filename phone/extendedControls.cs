@@ -249,4 +249,50 @@ namespace Sipek
     }
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// 
+  public class CDoubleDecorator : CDecorator
+  {
+    private CText _text;
+
+    public CDoubleDecorator(CEditField decoratee) 
+      : base(null)
+    {
+      // create list that will hold two controls (text and edit)
+	    CComponentList list = new CComponentList();
+	    // set list position 
+	    list.PosY = decoratee.PosY;
+
+	    // take prompt data from decoratee and put it into text control
+	    int pos = decoratee.PosY;
+	    _text = new CText(decoratee.Prompt);
+	    _text.PosY = pos;
+
+	    // put decoratee (edit) under text control and erase prompt
+	    decoratee.PosY = pos + 1;
+	    decoratee.Prompt = "";
+
+	    // add both controls
+	    list.add(_text);
+	    list.add(decoratee);
+	    // set list as decoratee
+	    _component = list;
+    }
+
+	  // overridden 
+	  public override bool  onSoftKey(int id)
+    {
+    	int pos = PosY;
+	    if (pos == id)
+	    {
+		    // handle menu key press as one line lower...
+		    base.onSoftKey(pos+1);
+		    return false;
+	    }
+      return base.onSoftKey(id);
+    }
+  }
+  
 }

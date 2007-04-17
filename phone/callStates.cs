@@ -42,7 +42,6 @@ namespace Sipek
   public abstract class CAbstractState : CTelephonyInterface, CTelephonyCallback
   {
 
-
     #region Properties
     private EStateId _stateId = EStateId.IDLE;
 
@@ -75,9 +74,9 @@ namespace Sipek
     public abstract void onEntry();
     
     public abstract void onExit();
-    
 
-    public virtual int makeCall(string dialedNo)
+
+    public virtual int makeCall(string dialedNo, int accountId)
     {
       return -1;
     }
@@ -115,6 +114,15 @@ namespace Sipek
     }
     public virtual bool xferCallSession(int session)
     {
+      return true;
+    }
+    public bool threePtyCall(int session)
+    {
+      return true;
+    }
+    public bool serviceRequest(EServiceCodes code, int session)
+    {
+      _smref.SigProxy.serviceRequest(code, session);
       return true;
     }
     #endregion Methods
@@ -162,13 +170,13 @@ namespace Sipek
     {
     }
 
-    public override int makeCall(string dialedNo)
+    public override int makeCall(string dialedNo, int accountId)
     {
       _smref.Type = ECallType.EDialed;
 
       _smref.CallingNo = dialedNo;
       _smref.changeState(EStateId.CONNECTING);
-      return _smref.SigProxy.makeCall(dialedNo);
+      return _smref.SigProxy.makeCall(dialedNo, accountId);
     }
 
     public override void incomingCall(string callingNo)
@@ -334,7 +342,18 @@ namespace Sipek
 
     public override void onEntry()
     {
-      _smref.Type = ECallType.EMissed;
+      if (Properties.Settings.Default.cfgCFUFlag == true)
+      {
+        _smref.SigProxy.serviceRequest(EServiceCodes.CFU, -1);
+      }
+      else if (Properties.Settings.Default.cfgDNDFlag == true)
+      {
+        _smref.SigProxy.serviceRequest(EServiceCodes.DND, -1);
+      }
+      else
+      {
+        _smref.Type = ECallType.EMissed;
+      }
     }
 
     public override void onExit()

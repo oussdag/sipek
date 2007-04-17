@@ -212,6 +212,7 @@ namespace Sipek
       new CCalllogPage();
       new CAccountsPage();
       new CServicesPage();
+      new CRedirectPage();
 
       control.initialize();
 

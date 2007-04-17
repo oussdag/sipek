@@ -121,7 +121,7 @@ namespace Sipek
       _displayName.Align = EAlignment.justify_center;
       add(_displayName);
 
-      CLink mlinkPhonebook = new CLink("Phonebook", (int)EPages.P_PHONEBOOK);
+      CLink mlinkPhonebook = new CLink("Buddies", (int)EPages.P_PHONEBOOK);
       mlinkPhonebook.PosY = 9;
       mlinkPhonebook.LinkKey = mlinkPhonebook.PosY;
       this.add(mlinkPhonebook);
@@ -269,8 +269,28 @@ namespace Sipek
       linkConfigure.Softkey += new BoolIntDelegate(linkConfigure_Softkey);
       add(linkConfigure);
 
+      CLink linkSave = new CLink("Save changes");
+      linkSave.PosY = 9;
+      linkSave.Softkey += new BoolIntDelegate(linkSave_Softkey);
+      add(linkSave);
+
       this.Menu += new VoidDelegate(_radio_Menu);
       this.Ok += new VoidDelegate(CAccountsPage_Ok);
+      this.Esc += new VoidDelegate(CAccountsPage_Esc);
+    }
+
+    bool CAccountsPage_Esc()
+    {
+      // discard changes
+      CAccounts.getInstance().reload();
+      _controller.previousPage();
+      return true;
+    }
+
+    bool linkSave_Softkey(int keyId)
+    {
+      CAccounts.getInstance().save();
+      return true;
     }
 
     bool CAccountsPage_Ok()
@@ -308,7 +328,17 @@ namespace Sipek
       {
         bool ischecked = (i == CAccounts.getInstance().DefAccountIndex) ? true : false;
         CCheckBox item = new CCheckBox(CAccounts.getInstance()[i].Name, -1, ischecked);
-        if (item.Caption.Length == 0) item.Caption = "empty";
+        if (item.Caption.Length == 0)
+        {
+          item.Caption = "--- empty ---";
+        }
+        else
+        {
+          if (CAccounts.getInstance()[i].RegState == ERegistrationState.ERegistered)
+            item.Caption += " (Reg)";
+          else
+            item.Caption += " (Not reg)";
+        }
         item.subItems[0] = i.ToString();
         //item.Softkey += new BoolIntDelegate(item_Softkey);
         _radio.add(item);
@@ -338,18 +368,16 @@ namespace Sipek
       add(_criteria);
 
       _list = new CSelectList(7);
-      _list.PosY = 4;
+      _list.PosY = 3;
       add(_list);
 
       CLink addNewLink = new CLink("Add New", (int)EPages.P_PHONEBOOKEDIT);
-      addNewLink.PosY = 3;
-      addNewLink.LinkKey = addNewLink.PosY;
+      addNewLink.PosY = 9;
       //addNewLink.Align = EAlignment.justify_right;
       add(addNewLink);
 
       CLink modifyLink = new CLink("Modify");
-      modifyLink.PosY = 4;
-      modifyLink.LinkKey = modifyLink.PosY;
+      modifyLink.PosY = 10;
       modifyLink.Softkey += new BoolIntDelegate(modifyLink_Softkey);
       modifyLink.Align = EAlignment.justify_right;
       add(modifyLink);
@@ -452,12 +480,12 @@ namespace Sipek
       : base((int)EPages.P_PHONEBOOKEDIT, "Editing")
     {
       _fname = new CEditField("First Name>", "", EEditMode.alphanum_high, true);
-      _fname.PosY = 2;
+      _fname.PosY = 3;
       _fname.LinkKey = _fname.PosY;
       add(_fname);
 
       _lname = new CEditField("Last Name>", "", EEditMode.alphanum_high, false);
-      _lname.PosY = 4;
+      _lname.PosY = 5;
       _lname.LinkKey = _lname.PosY;
       add(_lname);
 
@@ -474,7 +502,8 @@ namespace Sipek
       add(saveLink);
 
       CLink deleteLink = new CLink("Delete!");
-      deleteLink.PosY = 9;
+      deleteLink.PosY = 10;
+      deleteLink.Align = EAlignment.justify_right;
       deleteLink.LinkKey = deleteLink.PosY;
       deleteLink.Softkey += new BoolIntDelegate(deleteLink_Softkey);
       add(deleteLink);
@@ -632,7 +661,7 @@ namespace Sipek
     public CServicesPage()
       : base((int)EPages.P_SERVICES, "Services")
     {
-      CLink linkRedirect = new CLink("Redirect", 0);
+      CLink linkRedirect = new CLink("Redirect", (int)EPages.P_REDIRECT);
       linkRedirect.PosY = 7;
       add(linkRedirect);
 
@@ -648,6 +677,72 @@ namespace Sipek
     }
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  public class CRedirectPage : CPage
+  {
+    CCheckBox _checkCFU;
+    CEditField _editCFUNumber;
+    CCheckBox _checkCFNR;
+    CEditField _editCFNRNumber;
+
+    public CRedirectPage()
+      : base((int)EPages.P_REDIRECT, "Redirections")
+    {
+      _checkCFU = new CCheckBox("Forward (unconditional)");
+      _checkCFU.PosY = 3;
+      add(_checkCFU);
+
+      _editCFUNumber = new CEditField("Number>", "", true);
+      _editCFUNumber.PosY = 5;
+      add(_editCFUNumber);
+
+      _checkCFNR = new CCheckBox("Forward (no reply)");
+      _checkCFNR.PosY = 7;
+      add(_checkCFNR);
+
+      _editCFNRNumber = new CEditField("Number>", "");
+      _editCFNRNumber.PosY = 9;
+      add(_editCFNRNumber);
+
+
+      //_checkCFU = new CCheckBox("Forward (unconditional)", (int)EPages.P_REDIRECT);
+      //_checkCFU.PosY = 9;
+      //add(_checkCFU);
+
+      this.Ok += new VoidDelegate(CRedirectPage_Ok);
+    }
+
+    bool CRedirectPage_Ok()
+    {
+      Properties.Settings.Default.cfgCFUFlag = _checkCFU.Checked;
+      Properties.Settings.Default.cfgCFNRFlag = _checkCFNR.Checked;
+
+      Properties.Settings.Default.cfgCFUNumber = _editCFUNumber.Caption;
+      Properties.Settings.Default.cfgCFNRNumber = _editCFNRNumber.Caption;
+
+      Properties.Settings.Default.Save();
+      return true;
+    }
+
+    public override void onEntry()
+    {
+      base.onEntry();
+
+      _checkCFU.Checked = Properties.Settings.Default.cfgCFUFlag;
+      _checkCFNR.Checked = Properties.Settings.Default.cfgCFNRFlag;
+
+      _editCFUNumber.Caption = Properties.Settings.Default.cfgCFUNumber;
+      _editCFNRNumber.Caption = Properties.Settings.Default.cfgCFNRNumber;
+    }
+
+
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
   public class CSIPSettings : CPage
   {
     CEditField _editport;
@@ -678,7 +773,7 @@ namespace Sipek
 
     public override void onEntry()
     {
-      _accountsLink.Caption = CAccounts.getInstance().DefAccount.Name;
+      //_accountsLink.Caption = CAccounts.getInstance().DefAccount.Name;
 
       _editport.Caption = Properties.Settings.Default.cfgSipPort.ToString();
 
@@ -786,15 +881,8 @@ namespace Sipek
       account.Port = int.Parse(_editProxyPort.Caption);
       account.Name = _editDisplayName.Caption;
       account.Id = _editId.Caption;
-
       CAccounts.getInstance()[_accountIndex] = account;
-
-      CAccounts.getInstance().save();
- 
       _controller.previousPage();
-
-      CCallManager.getInstance().initialize();
-
       return true;
     }
 
@@ -879,13 +967,7 @@ namespace Sipek
       account.Username = _editUserName.Caption;
       account.Password = _editPassword.Caption;
       CAccounts.getInstance()[_accountIndex] = account;
-
-      CAccounts.getInstance().save();
-
       _controller.previousPage();
-
-      CCallManager.getInstance().initialize();
-
       return true;
     }
     public void setAccountIndex(int index)
@@ -961,13 +1043,7 @@ namespace Sipek
       account.Period = int.Parse(_editperiod.Caption);
       account.Domain = _editDomain.Caption;
       CAccounts.getInstance()[_accountIndex] = account;
-
-      CAccounts.getInstance().save();
-
       _controller.previousPage();
-
-      CCallManager.getInstance().initialize();
-
       return true;
     }
     public void setAccountIndex(int index)

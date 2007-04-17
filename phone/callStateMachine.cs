@@ -38,7 +38,7 @@ namespace Sipek
     private CIncomingState _stateIncoming;
     private CHoldingState _stateHolding;
 
-    private ECallType _callType;
+    private ECallType _callType = ECallType.EUndefined;
     private System.DateTime _timestamp;
     private System.TimeSpan _duration;
 
@@ -169,7 +169,7 @@ namespace Sipek
     public void destroy()
     {
       // update call log
-      if ((Type != ECallType.EDialed)||(CallingNo.Length > 0))
+      if (((Type != ECallType.EDialed) || (CallingNo.Length > 0)) && (Type != ECallType.EUndefined))
       {
         CCallLog.getInstance().addCall(Type, CallingNo, Time, Duration);
         CCallLog.getInstance().save();

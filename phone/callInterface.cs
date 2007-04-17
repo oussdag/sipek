@@ -19,10 +19,17 @@
 
 namespace Sipek
 {
+  public enum EServiceCodes : int
+  {
+    Deflect,
+    CFU,
+    CFNR,
+    DND,
+  }
 
   interface CTelephonyInterface
   {
-    int makeCall(string dialedNo);
+    int makeCall(string dialedNo, int accountId);
 
     bool endCall();
 
@@ -37,6 +44,10 @@ namespace Sipek
     bool xferCall(string number);
 
     bool xferCallSession(int session);
+
+    bool threePtyCall(int session);
+
+    bool serviceRequest(EServiceCodes code, int session);
   }
 
   interface CTelephonyCallback
