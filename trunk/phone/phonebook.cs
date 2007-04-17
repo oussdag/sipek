@@ -98,6 +98,9 @@ namespace Sipek
 
       }
       catch (System.Xml.XmlException e) { System.Console.WriteLine(e.Message); }
+
+      // enable IM & Presence
+
     }
 
     public void save()

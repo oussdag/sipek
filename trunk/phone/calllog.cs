@@ -28,7 +28,8 @@ namespace Sipek
   {
     EDialed,
     EReceived,
-    EMissed
+    EMissed,
+    EUndefined
   }  
   
   public class CCallRecord

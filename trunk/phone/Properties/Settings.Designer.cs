@@ -203,5 +203,65 @@ namespace Sipek.Properties {
                 this["cfgSipAccountDomains"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool cfgCFUFlag {
+            get {
+                return ((bool)(this["cfgCFUFlag"]));
+            }
+            set {
+                this["cfgCFUFlag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string cfgCFUNumber {
+            get {
+                return ((string)(this["cfgCFUNumber"]));
+            }
+            set {
+                this["cfgCFUNumber"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string cfgCFNRNumber {
+            get {
+                return ((string)(this["cfgCFNRNumber"]));
+            }
+            set {
+                this["cfgCFNRNumber"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool cfgCFNRFlag {
+            get {
+                return ((bool)(this["cfgCFNRFlag"]));
+            }
+            set {
+                this["cfgCFNRFlag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool cfgDNDFlag {
+            get {
+                return ((bool)(this["cfgDNDFlag"]));
+            }
+            set {
+                this["cfgDNDFlag"] = value;
+            }
+        }
     }
 }

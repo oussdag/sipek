@@ -329,17 +329,25 @@ namespace Sipek
     public void drawCheckBox(int positionId, string caption, EAlignment justify, bool ischecked)
     {
       int alignPos = 0;
-      if (EAlignment.justify_right == justify) alignPos = 23 - 1;
+      if (EAlignment.justify_right == justify)
+      {
+        alignPos = caption.Length;
+      }
 
       if (ischecked)
-        drawText(positionId, caption.Insert(0, "*"), justify);
+        drawText(positionId, caption.Insert(alignPos, "*"), justify);
       else
-        drawText(positionId, caption.Insert(0, " "), justify);
+        drawText(positionId, caption.Insert(alignPos, " "), justify);
     }
 
     public void eraseCheckBox(int positionId, string caption, EAlignment justify)
     {
-      eraseText(positionId, caption.Insert(0, " "), justify);
+      int alignPos = 0;
+      if (EAlignment.justify_right == justify)
+      {
+        alignPos = caption.Length;
+      }
+      eraseText(positionId, caption.Insert(alignPos, " "), justify);
     }
 
   }

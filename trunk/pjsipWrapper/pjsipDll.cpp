@@ -100,7 +100,7 @@ static struct app_config
 
 
 //static pjsua_acc_id	current_acc;
-#define current_acc	pjsua_acc_get_default()
+//#define current_acc	pjsua_acc_get_default()
 static pjsua_call_id	current_call = PJSUA_INVALID_ID;
 
 /* Set default config. */
@@ -291,8 +291,8 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 //		return status;
 
 	/* Copy udp_cfg STUN config to rtp_cfg */
-	app_config.rtp_cfg.use_stun = app_config.udp_cfg.use_stun;
-	app_config.rtp_cfg.stun_config = app_config.udp_cfg.stun_config;
+//	app_config.rtp_cfg.use_stun = app_config.udp_cfg.use_stun;
+//	app_config.rtp_cfg.stun_config = app_config.udp_cfg.stun_config;
 
 
 	/* Initialize application callbacks */
@@ -633,11 +633,11 @@ int dll_registerAccount(char* uri, char* reguri)
 	return status;
 }
 */
-int dll_makeCall(int callId, char* uri)
+int dll_makeCall(int accountId, char* uri)
 {
 int newcallId = -1; 
 	pj_str_t tmp = pj_str(uri);
-	pjsua_call_make_call( current_acc, &tmp, 0, NULL, NULL, &newcallId);
+	pjsua_call_make_call( accountId, &tmp, 0, NULL, NULL, &newcallId);
 
 	return newcallId;
 }

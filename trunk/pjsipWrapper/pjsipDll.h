@@ -32,7 +32,7 @@ extern "C" PJSIPDLL_DLL_API int dll_main(void);
 // pjsip call API
 //extern "C" PJSIPDLL_DLL_API int dll_registerAccount(char* uri, char* reguri); 
 extern "C" PJSIPDLL_DLL_API int dll_registerAccount(char* uri, char* reguri, char* name, char* username, char* password);
-extern "C" PJSIPDLL_DLL_API int dll_makeCall(int callId, char* number); 
+extern "C" PJSIPDLL_DLL_API int dll_makeCall(int accountId, char* uri); 
 extern "C" PJSIPDLL_DLL_API int dll_releaseCall(int callId); 
 extern "C" PJSIPDLL_DLL_API int dll_answerCall(int callId, int code);
 extern "C" PJSIPDLL_DLL_API int dll_holdCall(int callId);

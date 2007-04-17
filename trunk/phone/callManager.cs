@@ -100,6 +100,9 @@ namespace Sipek
         new CHoldingPage();
         new CXferDialingPage();
         new CXferListPage();
+        new C3PtyListPage();
+        new CDeflectPage();
+        new CCallOptionsPage();
 
         // Initialize call table
         _calls = new Dictionary<int, CStateMachine>(); 
@@ -179,11 +182,30 @@ namespace Sipek
       return _calls[session];
     }
 
+    public Dictionary<int, CStateMachine> getCallList()
+    {
+      return _calls;
+    }
 
+    /// <summary>
+    /// Handler for outgoing calls (sessionId is not known yet).
+    /// </summary>
+    /// <param name="number"></param>
     public void createSession(string number)
     {
+      int accId = CAccounts.getInstance().DefAccount.Index;
+      this.createSession(number, accId);
+    }
+
+    /// <summary>
+    /// Handler for outgoing calls (sessionId is not known yet).
+    /// </summary>
+    /// <param name="number"></param>
+    /// <param name="accountId">Specified account Id </param>
+    public void createSession(string number, int accountId)
+    {
       CStateMachine call = createCall(0);
-      int newsession = call.getState().makeCall(number);
+      int newsession = call.getState().makeCall(number, accountId);
       if (newsession != -1)
       {
         call.Session = newsession;
@@ -193,6 +215,13 @@ namespace Sipek
       updateGui();
     }
     
+    /// <summary>
+    /// Handler for incoming calls (sessionId is known).
+    /// Check for forwardings or DND
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <param name="number"></param>
+    /// <returns>call instance</returns>
     public CStateMachine createSession(int sessionId, string number)
     {
       CStateMachine call = createCall(sessionId);
