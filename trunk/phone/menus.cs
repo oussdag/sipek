@@ -39,7 +39,8 @@ namespace Sipek
     P_ACCOUNTS,
     P_SIPPROXYSETTINGSMORE,
     P_SERVICES,
-    P_REDIRECT
+    P_REDIRECT,
+    P_MESSAGEBOX
   }
 
   public enum ERingModes : int
@@ -48,11 +49,26 @@ namespace Sipek
     EMELODY,
     EBEEP
   }
+
+  public enum EStatusFlag : int
+  {
+    ERegStatus = 0x1,
+    EDirectCall = 0x2,
+    ELocked = 0x4,
+    EIncomingCallDisabled = 0x8,
+    ESilent = 0x10,
+    ECallMissed = 0x20,
+    EAlarmMissed = 0x40,
+    EAll = 0xF,
+  }
+
   /// <summary>
   /// 
   /// </summary>
   public class CInitPage : CPage
   {
+    CComponentTimer _timer;
+
     public CInitPage()
       : base((int)EPages.P_INIT)
     {
@@ -77,7 +93,7 @@ namespace Sipek
       this.Ok += new VoidDelegate(okhandler);
     }
 
-    public override void onEntry()
+    public override void  onEntry()
     {
  	    base.onEntry();
       // initialize telephony...
@@ -98,9 +114,9 @@ namespace Sipek
   {
     CText _timedate;
     CLink _linkRinger;
-    CText _statusSymbol;
     CLink _linkAccounts;
     CText _displayName;
+    CStatusBar _statusBar;
 
     public CIdlePage()
       : base((int)EPages.P_IDLE)
@@ -115,6 +131,11 @@ namespace Sipek
       CText title = new CText("SIPek", EAlignment.justify_center);
       title.PosY = 3;
       add(title);
+
+      // status indicator
+      _statusBar = new CStatusBar(EAlignment.justify_right);
+      _statusBar.PosY = 0;
+      add(_statusBar);
 
       _displayName = new CText("");
       _displayName.PosY = 4;
@@ -142,10 +163,6 @@ namespace Sipek
       _linkAccounts.PosY = 7;
       this.add(_linkAccounts);
 
-      _statusSymbol = new CText("", EAlignment.justify_right);
-      _statusSymbol.PosY = 0;
-      this.add(_statusSymbol);
-
       // Initialize handlers
       Digitkey += new BoolIntDelegate(digitkeyHandler);
       Charkey += new BoolIntDelegate(CIdlePage_Charkey);
@@ -170,13 +187,56 @@ namespace Sipek
 
     public override void onEntry()
     {
+      if (!CCallManager.getInstance().isInitialized())
+      {
+        // initialize telephony...
+        CCallManager.getInstance().initialize();
+      }
+
       _displayName.Caption = CAccounts.getInstance().DefAccount.Id;
+
+	    // check forwardings
+	    bool isForwardActive = Properties.Settings.Default.cfgCFUFlag;
+	    if (!isForwardActive)
+	    {
+		    isForwardActive = Properties.Settings.Default.cfgDNDFlag;
+	    }
+      //int isDirectCallActive = ;
+      //int isAlarmActive = ;
+      //int isKeyboardLocked = ;
+      //int isCallMissed = CCallLog::Instance()->getCallsMissed();
+
+      int status = 0;
+      if (isForwardActive)
+      {
+        status = status + (int)EStatusFlag.EIncomingCallDisabled;
+      }
+/*      if (isKeyboardLocked == 1)
+      {
+	      status = status + EStatusFlag.ELocked;
+      }
+      if (isDirectCallActive == 1)
+      {
+	      status = status + EStatusFlag.EDirectCall;
+      }
+      if (isCallMissed == 1)
+      {
+	      status = status + EStatusFlag.ECallMissed;
+      }
+      if (isAlarmActive == 2)
+      {
+        status = status + EStatusFlag.EAlarmMissed;
+      }
+ */ 
+
 
       // get ringer mode
       switch (Properties.Settings.Default.cfgRingMode)
       {
         case (int)ERingModes.ESILENT:
           _linkRinger.Caption = "Silent";
+          // assign to status
+          status = status + (int)EStatusFlag.ESilent;
           break;
         case (int)ERingModes.EMELODY:
           _linkRinger.Caption = "Melody";
@@ -191,13 +251,16 @@ namespace Sipek
       switch (regState)
       {
         case ERegistrationState.ERegistered:
-          _statusSymbol.Caption = "OK";
+          // assign to status
+          status = status + (int)EStatusFlag.ERegStatus;
           break;
         case ERegistrationState.ENotRegistered:
-          _statusSymbol.Caption = "FAIL";
           break;
       }
-      
+
+      // update status bar!!!
+      _statusBar.setStatus(status);
+
       // get default account
       _linkAccounts.Caption = CAccounts.getInstance().DefAccount.Name;
 
@@ -665,15 +728,31 @@ namespace Sipek
       linkRedirect.PosY = 7;
       add(linkRedirect);
 
-      CCheckBox linkDND = new CCheckBox("Do Not Disturb", 0);
-      linkDND.PosY = 8;
-      linkDND.Align = EAlignment.justify_right;
-      add(linkDND);
+      CCheckBox chbDND = new CCheckBox("Do Not Disturb", 0);
+      chbDND.PosY = 8;
+      chbDND.Align = EAlignment.justify_right;
+      chbDND.OnChecked += new VoidDelegate(chbDND_OnChecked);
+      chbDND.OnUnchecked += new VoidDelegate(chbDND_OnUnchecked);
+      add(chbDND);
 
       CCheckBox linkAA = new CCheckBox("Auto Answer", 0);
       linkAA.PosY = 9;
       add(linkAA);
 
+    }
+
+    bool chbDND_OnUnchecked()
+    {
+      Properties.Settings.Default.cfgDNDFlag = false;
+      Properties.Settings.Default.Save();
+      return true;
+    }
+
+    bool chbDND_OnChecked()
+    {
+      Properties.Settings.Default.cfgDNDFlag = true;
+      Properties.Settings.Default.Save();
+      return true;
     }
   }
 
@@ -686,30 +765,36 @@ namespace Sipek
     CEditField _editCFUNumber;
     CCheckBox _checkCFNR;
     CEditField _editCFNRNumber;
+    CCheckBox _checkCFB;
+    CEditField _editCFBNumber;
 
     public CRedirectPage()
       : base((int)EPages.P_REDIRECT, "Redirections")
     {
-      _checkCFU = new CCheckBox("Forward (unconditional)");
-      _checkCFU.PosY = 3;
+      _checkCFU = new CCheckBox("Unconditional");
+      _checkCFU.PosY = 5;
       add(_checkCFU);
 
       _editCFUNumber = new CEditField("Number>", "", true);
-      _editCFUNumber.PosY = 5;
+      _editCFUNumber.PosY = 6;
       add(_editCFUNumber);
 
-      _checkCFNR = new CCheckBox("Forward (no reply)");
+      _checkCFNR = new CCheckBox("On No Reply");
       _checkCFNR.PosY = 7;
       add(_checkCFNR);
 
       _editCFNRNumber = new CEditField("Number>", "");
-      _editCFNRNumber.PosY = 9;
+      _editCFNRNumber.PosY = 8;
       add(_editCFNRNumber);
 
 
-      //_checkCFU = new CCheckBox("Forward (unconditional)", (int)EPages.P_REDIRECT);
-      //_checkCFU.PosY = 9;
-      //add(_checkCFU);
+      _checkCFB = new CCheckBox("On Busy");
+      _checkCFB.PosY = 9;
+      add(_checkCFB);
+
+      _editCFBNumber = new CEditField("Number>", "");
+      _editCFBNumber.PosY = 10;
+      add(_editCFBNumber);
 
       this.Ok += new VoidDelegate(CRedirectPage_Ok);
     }
@@ -718,23 +803,30 @@ namespace Sipek
     {
       Properties.Settings.Default.cfgCFUFlag = _checkCFU.Checked;
       Properties.Settings.Default.cfgCFNRFlag = _checkCFNR.Checked;
+      Properties.Settings.Default.cfgCFBFlag = _checkCFB.Checked;
 
       Properties.Settings.Default.cfgCFUNumber = _editCFUNumber.Caption;
       Properties.Settings.Default.cfgCFNRNumber = _editCFNRNumber.Caption;
+      Properties.Settings.Default.cfgCFBNumber = _editCFBNumber.Caption;
 
       Properties.Settings.Default.Save();
+
+      _controller.previousPage();
+
       return true;
     }
 
     public override void onEntry()
     {
-      base.onEntry();
-
       _checkCFU.Checked = Properties.Settings.Default.cfgCFUFlag;
       _checkCFNR.Checked = Properties.Settings.Default.cfgCFNRFlag;
+      _checkCFB.Checked = Properties.Settings.Default.cfgCFBFlag;
 
       _editCFUNumber.Caption = Properties.Settings.Default.cfgCFUNumber;
       _editCFNRNumber.Caption = Properties.Settings.Default.cfgCFNRNumber;
+      _editCFBNumber.Caption = Properties.Settings.Default.cfgCFBNumber;
+      
+      base.onEntry();
     }
 
 
@@ -1129,6 +1221,77 @@ namespace Sipek
 
     }
   
+  }
+
+  /// <summary>
+  /// Menu page for message text input.
+  /// Buddy data should be set prior to page entry.
+  /// </summary>
+  public class CMessageBoxPage : CPage
+  {
+    private CLink _buddyName;
+    private CTextBox _textBox;
+    private CEditBox _editBox;
+    private int _buddyId = -1; 
+
+    public CMessageBoxPage()
+      : base((int)EPages.P_MESSAGEBOX, "Message Box")
+    {
+      _textBox = new CTextBox("");
+      _textBox.PosY = 2;
+      add(_textBox);
+
+      _editBox = new CEditBox(">","");
+      _editBox.PosY = 5;
+      add(_editBox);
+
+      CLink sendLink = new CLink("Send");
+      sendLink.PosY = 10;
+      sendLink.Align = EAlignment.justify_right;
+      sendLink.Softkey += new BoolIntDelegate(sendLink_Softkey);
+      this.add(sendLink);
+
+      _buddyName = new CLink("");
+      _buddyName.PosY = 3;
+      add(_buddyName);
+
+      this.Ok += new VoidDelegate(CMessageBoxPage_Ok);
+    }
+
+    public int BuddyId
+    {
+      get { return _buddyId; }
+      set { _buddyId = value; }
+    }
+
+    bool sendLink_Softkey(int keyId)
+    {
+      // Invoke SIP stack wrapper function to send message
+
+      throw new System.Exception("The method or operation is not implemented.");
+    }
+
+    bool CMessageBoxPage_Ok()
+    {
+      return sendLink_Softkey(10);
+    }
+
+    public override void onEntry()
+    {
+      // get buddy data form _buddyId
+      CBuddyItem buddy = CBuddyList.getInstance()[_buddyId];
+      if (buddy != null) 
+      {
+
+        //_buddyName.Caption = buddy.Id;
+
+        _textBox.Caption = buddy.LastMessage;
+
+      }
+
+      base.onEntry();
+    }
+
   }
 
 } // namespace Sipek

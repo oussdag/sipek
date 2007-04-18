@@ -263,5 +263,29 @@ namespace Sipek.Properties {
                 this["cfgDNDFlag"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool cfgCFBFlag {
+            get {
+                return ((bool)(this["cfgCFBFlag"]));
+            }
+            set {
+                this["cfgCFBFlag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string cfgCFBNumber {
+            get {
+                return ((string)(this["cfgCFBNumber"]));
+            }
+            set {
+                this["cfgCFBNumber"] = value;
+            }
+        }
     }
 }

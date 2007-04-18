@@ -93,6 +93,7 @@ namespace Sipek
 
     void mtimer_Elapsed(object sender, ElapsedEventArgs e)
     {
+      mtimer.Stop();      
       // check if page is not actual anymore
       if (_pageId != CComponentController.getInstance().Page.Id)
       {
@@ -104,9 +105,9 @@ namespace Sipek
 
     public override void startMillis(int timeout)
     {
+      _pageId = CComponentController.getInstance().Page.Id;
       mtimer.Interval = timeout;
       mtimer.Start();
-      _pageId = CComponentController.getInstance().Page.Id;
     }
 
     public override void abort()

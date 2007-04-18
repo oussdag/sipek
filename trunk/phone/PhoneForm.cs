@@ -58,6 +58,36 @@ namespace Sipek
       string str = new string(' ', 255);
       richTextBox1.Lines = new string[] { str, str, str, str, str, str, str, str, str, str, str };
       //_buttons = new System.Collections.Generic.List<Button>();
+
+      control = CComponentController.getInstance();
+
+      Renderer renderer = new Renderer(this);
+      CFactoryImpl factory = new CFactoryImpl();
+
+      control.attach(renderer);
+      control.Factory = factory;
+      control.Language = _langEN;
+
+      // Create menu pages...
+      new CInitPage();
+      new CIdlePage();
+      new CPhonebookPage();
+      new CPhonebookEditPage();
+      new CMenuPage();
+      new CSIPSettings();
+      new CSIPProxySettings();
+      new CSIPProxySettings2nd();
+      new CSIPProxySettings3rd();
+      new CRingModePage();
+      new CCalllogPage();
+      new CAccountsPage();
+      new CServicesPage();
+      new CRedirectPage();
+      
+      control.initialize();
+
+      // set active page...
+      control.showPage((int)EPages.P_INIT);
     }
 
     public void clearScreen()
@@ -189,37 +219,9 @@ namespace Sipek
 
     private void PhoneForm_Shown(object sender, EventArgs e)
     {
-      control = CComponentController.getInstance();
-
-      Renderer renderer = new Renderer(this);
-      CFactoryImpl factory = new CFactoryImpl();
-
-      control.attach(renderer);
-      control.Factory = factory;
-      control.Language = _langEN;
-
-      // Create menu pages...
-      new CInitPage();
-      new CIdlePage();
-      new CPhonebookPage();
-      new CPhonebookEditPage();
-      new CMenuPage();
-      new CSIPSettings();
-      new CSIPProxySettings();
-      new CSIPProxySettings2nd();
-      new CSIPProxySettings3rd();
-      new CRingModePage();
-      new CCalllogPage();
-      new CAccountsPage();
-      new CServicesPage();
-      new CRedirectPage();
-
-      control.initialize();
-
-      // set active page...
-      control.setActivePage((int)EPages.P_INIT);
-
-      control.HomePageId = (int)EPages.P_IDLE;
+      CComponentController.getInstance().HomePageId = (int)EPages.P_IDLE;
+      // set home page...
+      CComponentController.getInstance().showPage((int)EPages.P_IDLE);
     }
 
     private void rightNav_Click(object sender, EventArgs e)

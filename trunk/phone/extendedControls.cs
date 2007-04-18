@@ -294,5 +294,273 @@ namespace Sipek
       return base.onSoftKey(id);
     }
   }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  class CStatusBar : CText
+  {
+    private int _status = 0;
+
+    public CStatusBar() 
+      : this(EAlignment.justify_right)
+    {
+    }
+
+    public CStatusBar(EAlignment alignmode)
+      : base("    ",alignmode)
+    {
+    }
+
+    public void resetStatus()
+    {
+	    _status = 0;
+	    renderStatus();
+    }
+
+    public void addStatus(EStatusFlag status, bool value)
+    {
+	    if (value == true) 
+		    _status = _status | (int)status;
+	    else
+		    _status = _status & ((int)status ^ 0xF);
+
+	    renderStatus();
+    }
+
+    public void setStatus(int value)
+    {
+	    _status = value;
+	    renderStatus();
+    }
+
+    protected void renderStatus()
+    {
+	    if (_caption.Length < 4) return;
+
+      if ((_status & (int)EStatusFlag.ERegStatus) > 0)
+	    {
+		    //_caption[0] = 'R';
+        _caption = _caption.Remove(0, 1);
+        _caption = _caption.Insert(0, "R");
+	    }
+	    else
+	    {
+		    //_caption[0] = 'F';
+        _caption = _caption.Remove(0, 1);
+        _caption = _caption.Insert(0, "R");
+      }
+	    // check direct call flag
+      if ((_status & (int)EStatusFlag.EDirectCall) > 0)
+	    {
+		    //_caption[1] = 'D';
+        _caption = _caption.Remove(1, 1);
+        _caption = _caption.Insert(1, "D");
+	    }
+	    else
+	    {
+		    // check keyboard locked flag
+        if ((_status & (int)EStatusFlag.ELocked) > 0)
+		    {
+			    //_caption[1] = 'L';
+          _caption = _caption.Remove(1, 1);
+          _caption = _caption.Insert(1, "L");
+		    }
+		    else
+		    {
+			    //_caption[1] = ' ';
+          _caption = _caption.Remove(1, 1);
+          _caption = _caption.Insert(1, " ");
+		    }
+	    }
+
+	    // check direct call flag
+      if ((_status & (int)EStatusFlag.EAlarmMissed) > 0)
+	    {
+		    //_caption[2] = 'A';
+        _caption = _caption.Remove(2, 1);
+        _caption = _caption.Insert(2, "A");
+	    }
+	    else
+	    {
+		    // check keyboard locked flag
+        if ((_status & (int)EStatusFlag.ECallMissed) > 0)
+		    {
+			    //_caption[2] = 'C';
+          _caption = _caption.Remove(2, 1);
+          _caption = _caption.Insert(2, "C");
+		    }
+		    else
+		    {
+			    //_caption[2] = ' ';
+          _caption = _caption.Remove(2, 1);
+          _caption = _caption.Insert(2, " ");
+		    }
+	    }
+
+	    // check incoming call status
+      if ((_status & (int)EStatusFlag.EIncomingCallDisabled) > 0)
+	    {
+		    //_caption[3] = 'I';
+        _caption = _caption.Remove(3, 1);
+        _caption = _caption.Insert(3, "I");
+	    }
+	    else
+	    {
+		    // check for silent call status (lower priority than EIncomingCallDisabled)
+        if ((_status & (int)EStatusFlag.ESilent) > 0)
+		    {
+			    //_caption[3] = 'S';
+          _caption = _caption.Remove(3, 1);
+          _caption = _caption.Insert(3, "S");
+		    }
+		    else
+		    {
+			    //_caption[3] = ' ';
+          _caption = _caption.Remove(3, 1);
+          _caption = _caption.Insert(3, " ");
+		    }
+	    }
+    }
+  }
+
+  public class CEditBox : CEditField
+  {
+    public CEditBox(string prompt, string caption)
+      : base(prompt, caption)
+    { }
+  }
+
+  public class CTextBox : CText
+  {
+    public CTextBox(string text)
+      : base(text)
+    { }
+  }
+
+
+  ////////////////////////////////////////////
+  // Buddy list
   
+  class CBuddyMessage
+  {
+    private DateTime _datetime;
+    private string _text;
+
+    public string Content
+    {
+      get { return _text; }
+    }
+
+    public CBuddyMessage(DateTime datetime, string text)
+    {
+      _text = text;
+      _datetime = datetime;
+    }
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  class CBuddyItem
+  {
+    private int _id;
+    private string _uri;
+    private List<CBuddyMessage> _messageList;
+
+    public int Id
+    {
+      get { return _id; }
+      set {_id = value; }
+    }
+
+    public string Uri
+    {
+      get { return _uri; }
+      set { _uri = value; }
+    }
+
+    public string LastMessage
+    {
+      get { return _messageList[_messageList.Count - 1].Content; }
+    }
+
+    public CBuddyMessage this [int index]
+    {
+      get { return _messageList[index]; }
+    }
+
+
+    public CBuddyItem(int id, string uri)
+    {
+      _id = id;
+      _uri = uri;
+      _messageList = new List<CBuddyMessage>();
+    }
+
+    public void addMessage(DateTime datetime, string text)
+    {
+      CBuddyMessage msg = new CBuddyMessage(datetime, text);
+      _messageList.Add(msg);
+    }
+
+    public void clearAllMessages()
+    {
+      _messageList.Clear();
+    }
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  class CBuddyList
+  {
+    private Dictionary<int, CBuddyItem> _buddyList;
+
+    // Singleton 
+    private static CBuddyList _instance = null;
+    public static CBuddyList getInstance()
+    { 
+      if (_instance == null)
+      {
+        _instance = new CBuddyList();
+      }
+      return _instance;
+    }
+
+    protected CBuddyList()
+    {
+      _buddyList = new Dictionary<int, CBuddyItem>();
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    public CBuddyItem this[int index]
+    {
+      get { return _buddyList[index]; }
+    }
+
+    public int Count
+    {
+      get { return _buddyList.Count; }
+    }
+    /////////////////////////////////////////////////////////////////////////
+
+    public void addBuddy(int id, string uri)
+    { 
+      CBuddyItem buddy = new CBuddyItem(id, uri);
+      _buddyList.Add(id, buddy);
+    }
+
+    public void removeBuddy(int id)
+    {
+      _buddyList.Remove(id);
+    }
+
+    public void removeAll()
+    {
+      _buddyList.Clear();
+    }
+  
+  }
 }
