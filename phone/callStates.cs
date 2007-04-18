@@ -399,6 +399,11 @@ namespace Sipek
       return true;
     }
 
+    public override void onReleased()
+    {
+      _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
+      _smref.destroy();
+    }
   }
 
     /// <summary>

@@ -67,6 +67,10 @@ namespace Sipek
 
     #region Methods
 
+    public bool isInitialized()
+    {
+      return _initialized;
+    }
 
     public void initialize()
     {
@@ -113,7 +117,7 @@ namespace Sipek
       if (_currentSession < 0)
       {
         // todo::: showHomePage
-        CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
+          CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
         return;
       }
 
