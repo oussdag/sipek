@@ -19,6 +19,7 @@
 using MenuDesigner;
 using Sipek;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace Sipek
 {
@@ -67,8 +68,6 @@ namespace Sipek
   /// </summary>
   public class CInitPage : CPage
   {
-    CComponentTimer _timer;
-
     public CInitPage()
       : base((int)EPages.P_INIT)
     {
@@ -452,14 +451,14 @@ namespace Sipek
     {
       _list.removeAll();
 
-      Collection<CPhonebookRecord> results = CPhonebook.getInstance().getList();
+      Dictionary<int, CBuddyRecord> results = CBuddyList.getInstance().getList();
 
-      foreach (CPhonebookRecord item in results)
+      foreach (KeyValuePair<int, CBuddyRecord> kvp in results)
       {
-        CLink recordLink = new CLink(item.FirstName + " " + item.LastName);
-        recordLink.subItems[0] = item.LastName;
-        recordLink.subItems[1] = item.FirstName;
-        recordLink.subItems[2] = item.Number;
+        CLink recordLink = new CLink(kvp.Value.FirstName + " " + kvp.Value.LastName);
+        recordLink.subItems[0] = kvp.Value.Id.ToString();
+        //recordLink.subItems[1] = kvp.Value.FirstName;
+        //recordLink.subItems[2] = kvp.Value.Number;
         recordLink.Ok += new VoidDelegate(recordLink_Ok);
         recordLink.Softkey += new BoolIntDelegate(recordLink_Softkey);
         _list.add(recordLink);
@@ -484,14 +483,13 @@ namespace Sipek
 
     bool modifyLink_Softkey(int keyId)
     {
-      CPhonebookEditPage page = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
-
       CLink selitem = (CLink)_list.Selected;
-      if (selitem == null) return true;
-
-      page.LastName = selitem.subItems[0];
-      page.FirstName = selitem.subItems[1];
-      page.Number = selitem.subItems[2];
+      if (selitem == null) return true;      
+      
+      CPhonebookEditPage page = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
+      // get record
+      string indstr = selitem.subItems[0];
+      page.BuddyId = int.Parse(indstr);
 
       _controller.showPage(page.Id);
       
@@ -506,10 +504,11 @@ namespace Sipek
 
     bool CPhonebookPage_Menu()
     {
+      string indstr = _list.Selected.subItems[0];
+
       CPhonebookEditPage editPage = (CPhonebookEditPage)_controller.getPage((int)EPages.P_PHONEBOOKEDIT);
-      editPage.FirstName = ((CLink)_list.Selected).Caption;
-      editPage.LastName = ((CLink)_list.Selected).subItems[0];
-      editPage.Number = ((CLink)_list.Selected).subItems[1];
+      editPage.BuddyId = int.Parse(indstr);
+
       _controller.showPage(editPage.Id);
       return true;
     }
@@ -525,18 +524,12 @@ namespace Sipek
     private CEditField _fname;
     private CEditField _lname;
     private CEditField _number;
+    private int _id = -1;
 
-    public string FirstName
+    public int BuddyId
     {
-      set { _fname.Caption = value; }
-    }
-    public string LastName
-    {
-      set { _lname.Caption = value; }
-    }
-    public string Number
-    {
-      set { _number.Caption = value; }
+      get { return _id;  }
+      set { _id = value; }
     }
 
     public CPhonebookEditPage()
@@ -572,6 +565,25 @@ namespace Sipek
       add(deleteLink);
     }
 
+    public override void onEntry()
+    {
+      base.onEntry();
+
+      CBuddyRecord record = CBuddyList.getInstance().getRecord(BuddyId);
+
+      if (record == null) return;
+ 
+      _fname.Caption = record.FirstName;
+      _lname.Caption = record.LastName;
+      _number.Caption = record.Number;
+    }
+
+    public override void onExit()
+    {
+      base.onExit();
+      BuddyId = -1;
+    }
+
     bool saveLink_Ok()
     {
       return saveLink_Softkey(0);
@@ -579,13 +591,13 @@ namespace Sipek
 
     bool saveLink_Softkey(int keyId)
     {
-      CPhonebookRecord record = new CPhonebookRecord();
+      CBuddyRecord record = new CBuddyRecord();
       record.FirstName = _fname.Caption;
       record.LastName = _lname.Caption;
       record.Number = _number.Caption;
 
-      CPhonebook.getInstance().addRecord(record);
-      CPhonebook.getInstance().save();
+      CBuddyList.getInstance().addRecord(record);
+      CBuddyList.getInstance().save();
 
       _controller.previousPage();
       return true;
@@ -593,8 +605,8 @@ namespace Sipek
 
     bool deleteLink_Softkey(int keyId)
     {
-      CPhonebook.getInstance().deleteRecord(_lname.Caption);
-      CPhonebook.getInstance().save();
+      CBuddyList.getInstance().deleteRecord(BuddyId);
+      CBuddyList.getInstance().save();
 
       _controller.previousPage();
       return true;
@@ -974,6 +986,9 @@ namespace Sipek
       account.Name = _editDisplayName.Caption;
       account.Id = _editId.Caption;
       CAccounts.getInstance()[_accountIndex] = account;
+
+      CAccounts.getInstance().save();
+
       _controller.previousPage();
       return true;
     }
@@ -1021,13 +1036,6 @@ namespace Sipek
       add(linkNext);
 
       this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
-      this.Esc += new VoidDelegate(CSIPProxySettings2nd_Esc);
-    }
-
-    bool CSIPProxySettings2nd_Esc()
-    {
-      CAccounts.getInstance().reload();
-      return false;
     }
 
     bool linkNext_Softkey(int keyId)
@@ -1059,6 +1067,9 @@ namespace Sipek
       account.Username = _editUserName.Caption;
       account.Password = _editPassword.Caption;
       CAccounts.getInstance()[_accountIndex] = account;
+      
+      CAccounts.getInstance().save();
+      
       _controller.previousPage();
       return true;
     }
@@ -1097,7 +1108,6 @@ namespace Sipek
       add(linkNext);
 
       this.Ok += new VoidDelegate(CSIPProxySettings_Ok);
-      this.Esc += new VoidDelegate(CSIPProxySettings_Esc);
     }
 
     bool linkNext_Softkey(int keyId)
@@ -1111,12 +1121,6 @@ namespace Sipek
       page.setAccountIndex(_accountIndex);
       _controller.showPage((int)EPages.P_SIPPROXYSETTINGS);
       return true;
-    }
-
-    bool CSIPProxySettings_Esc()
-    {
-      CAccounts.getInstance().reload();
-      return false;
     }
 
     public override void onEntry()
@@ -1135,6 +1139,8 @@ namespace Sipek
       account.Period = int.Parse(_editperiod.Caption);
       account.Domain = _editDomain.Caption;
       CAccounts.getInstance()[_accountIndex] = account;
+
+      CAccounts.getInstance().save();
       _controller.previousPage();
       return true;
     }
@@ -1279,7 +1285,7 @@ namespace Sipek
     public override void onEntry()
     {
       // get buddy data form _buddyId
-      CBuddyItem buddy = CBuddyList.getInstance()[_buddyId];
+      CBuddyRecord buddy = CBuddyList.getInstance()[_buddyId];
       if (buddy != null) 
       {
 

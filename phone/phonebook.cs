@@ -19,17 +19,69 @@
 using System.Xml;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System;
 
 namespace Sipek
 {
-
-  public class CPhonebookRecord
+  ////////////////////////////////////////////
+  // 
+  /// <summary>
+  /// CBuddyMessage
+  /// </summary>
+  public class CBuddyMessage
   {
+    private DateTime _datetime;
+    private string _text;
+
+    public string Content
+    {
+      get { return _text; }
+    }
+
+    public CBuddyMessage(DateTime datetime, string text)
+    {
+      _text = text;
+      _datetime = datetime;
+    }
+  }
+
+  /// <summary>
+  /// CBuddyRecord
+  /// </summary>
+  public class CBuddyRecord
+  {
+    private int _id;
     private string _firstName;
     private string _lastName;
     private string _number;
     private string _email;
     private int _accountId;
+    private string _uri;
+    private List<CBuddyMessage> _messageList;
+
+    public int Id
+    {
+      get { return _id; }
+      set { _id = value; }
+    }
+
+    public string Uri
+    {
+      get { return _uri; }
+      set { _uri = value; }
+    }
+
+    public string LastMessage
+    {
+      get { return _messageList[_messageList.Count - 1].Content; }
+    }
+
+    public CBuddyMessage this[int index]
+    {
+      get { return _messageList[index]; }
+    }
+
+    /////////////////////////////////////////////////////
 
     public string FirstName
     {
@@ -54,124 +106,213 @@ namespace Sipek
       get { return _accountId; }
       set { _accountId = value; }
     }
+
+    #region Constructor
+
+    /*public CBuddyRecord(int id, string uri)
+    {
+      _id = id;
+      _uri = uri;
+      _messageList = new List<CBuddyMessage>();
+    }*/
+
+    #endregion
+
+    #region public methods
+
+    public void addMessage(DateTime datetime, string text)
+    {
+      CBuddyMessage msg = new CBuddyMessage(datetime, text);
+      _messageList.Add(msg);
+    }
+
+    public void clearAllMessages()
+    {
+      _messageList.Clear();
+    }
+
+    #endregion
+
   }
 
   /// <summary>
-  /// CPhonebook
+  /// CBuddyList
   /// </summary>
-  public class CPhonebook
+  public class CBuddyList
   {
-    private static CPhonebook _instance = null;
-    
-    private XmlDocument _xmlDocument;
+    private static CBuddyList _instance = null;
+
+    private Dictionary<int, CBuddyRecord> _buddyList;
 
     private string XMLPhonebookFile = "phonebook.xml";
 
+    private const string FIRSTNAME = "FirstName";
+    private const string LASTNAME = "LastName";
+    private const string NUMBER = "phonenumber";
+    private const string URI = "uri";
+    private const string PHONE_URI = "Phone/uri";
+    private const string PHONE_NUMBER = "Phone/phonenumber";
 
-    public static CPhonebook getInstance()
+    #region Properties
+    public CBuddyRecord this[int index]
+    {
+      get { return _buddyList[index]; }
+    }
+
+    public int BuddyCount
+    {
+      get { return _buddyList.Count; }
+    }
+    #endregion
+
+    /////////////////////////////////////////////////////////////////////////
+    #region Constructor
+    public static CBuddyList getInstance()
     {
       if (_instance == null)
       {
-        _instance = new CPhonebook();
+        _instance = new CBuddyList();
       }
       return _instance;
     }
 
-    public CPhonebook()
+    public CBuddyList()
     {
-      _xmlDocument = new XmlDocument();
-      load();
+      initialize();
     }
 
-    public void load()
+    #endregion
+
+    #region Private Methods
+
+    private void initialize()
     {
+      XmlDocument xmlDocument = new XmlDocument();
       try
       {
-        _xmlDocument.Load(XMLPhonebookFile);
+        xmlDocument.Load(XMLPhonebookFile);
       }
       catch (System.IO.FileNotFoundException ee) 
       { 
         System.Console.WriteLine(ee.Message);
 
-        XmlNode root = _xmlDocument.CreateNode("element","Phonebook","");
-        _xmlDocument.AppendChild(root);
+        XmlNode root = xmlDocument.CreateNode("element", "Phonebook", "");
+        xmlDocument.AppendChild(root);
 
       }
       catch (System.Xml.XmlException e) { System.Console.WriteLine(e.Message); }
 
-      // enable IM & Presence
 
+      // initialize internal list
+      _buddyList = new Dictionary<int, CBuddyRecord>();
+
+      XmlNodeList list = xmlDocument.SelectNodes("/Phonebook/Record");
+
+      foreach (XmlNode item in list)
+      {
+        CBuddyRecord record = new CBuddyRecord();
+
+        XmlNode snode = item.SelectSingleNode(FIRSTNAME);
+        if ((snode != null) && (snode.FirstChild.Value != null)) record.FirstName = snode.FirstChild.Value;
+
+        snode = item.SelectSingleNode(LASTNAME);
+        if ((snode != null) && (snode.FirstChild.Value != null)) record.LastName = snode.FirstChild.Value;
+
+        snode = item.SelectSingleNode(PHONE_NUMBER);
+        if ((snode != null) && (snode.FirstChild.Value != null)) record.Number = snode.FirstChild.Value;
+
+        snode = item.SelectSingleNode(PHONE_URI);
+        if ((snode != null) && (snode.FirstChild != null)) record.Uri = snode.FirstChild.Value;
+ 
+        //_buddyList.Add(record.Id, record);
+        this.addRecord(record);
+      }
+    }
+
+    #endregion
+
+  
+    #region Public methods
+
+    public Dictionary<int, CBuddyRecord> getList()
+    {
+      return _buddyList;
+    }
+
+    public CBuddyRecord getRecord(int id)
+    {
+      if (_buddyList.ContainsKey(id)) return _buddyList[id];
+      return null;
     }
 
     public void save()
     {
       try
       {
-        _xmlDocument.Save(XMLPhonebookFile);
+        // serialize data
+        XmlDocument xmldoc = new XmlDocument();
+
+        XmlNode nodeRoot = xmldoc.CreateNode("element", "Phonebook", "");
+
+        foreach (KeyValuePair<int, CBuddyRecord> kvp in _buddyList)
+        {
+          XmlNode nodeRecord = xmldoc.CreateNode("element", "Record", "");
+
+          XmlElement ellastname = xmldoc.CreateElement(LASTNAME);
+          ellastname.InnerText = kvp.Value.LastName;
+          nodeRecord.AppendChild(ellastname);
+
+          XmlElement elname = xmldoc.CreateElement(FIRSTNAME);
+          elname.InnerText = kvp.Value.FirstName;
+          nodeRecord.AppendChild(elname);
+
+          XmlElement phelem = xmldoc.CreateElement("Phone");
+          {
+            XmlElement elNumber = xmldoc.CreateElement(NUMBER);
+            elNumber.InnerText = kvp.Value.Number;
+            phelem.AppendChild(elNumber);
+
+            XmlElement elUri = xmldoc.CreateElement(URI);
+            elUri.InnerText = kvp.Value.Uri;
+            phelem.AppendChild(elUri);
+          }
+          nodeRecord.AppendChild(phelem);
+
+          nodeRoot.AppendChild(nodeRecord);
+        }
+        xmldoc.AppendChild(nodeRoot);
+
+        xmldoc.Save(XMLPhonebookFile);
       }
       catch (System.IO.FileNotFoundException ee) { System.Console.WriteLine(ee.Message); }
       catch (System.Xml.XmlException e) { System.Console.WriteLine(e.Message); }
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    public CPhonebookRecord getRecord(string field, string criteria)
-    { 
-      //string groupXpath = "[attribute::name=\"" + group + "\"]";
-      //string paramXpath = "[attribute::name=\"" + param + "\"]";
-      //XmlNode foundNode = xmlSettings.SelectSingleNode("/settings/group" + groupXpath);
-      return null;
-    }
-
-    public Collection<CPhonebookRecord> getList()
+    public void addRecord(CBuddyRecord record)
     {
-      Collection<CPhonebookRecord> result = new Collection<CPhonebookRecord>();
+      // Call stack to add buddy and get buddy id
+      // TODO
+      Random rnd = new System.Random(DateTime.Now.Millisecond);
+      int buddyindex = rnd.Next(10000);
+      record.Id = buddyindex;
 
-      XmlNodeList list = _xmlDocument.SelectNodes("/Phonebook/Record");
-
-      foreach (XmlNode item in list)
+      for (int i = 0; i < 30000; i++)
       {
-        CPhonebookRecord record = new CPhonebookRecord();
-        record.FirstName = item.ChildNodes[0].InnerText;
-        record.LastName = item.ChildNodes[1].InnerText;
-
-        XmlNode node = item.ChildNodes[2];
-        record.Number = node.ChildNodes[0].InnerText; 
-
-        result.Add(record);
+        buddyindex = rnd.Next(10000);
       }
-
-      return result;
+      // add record to buddylist
+      _buddyList.Add(record.Id, record);
     }
 
-    public void addRecord(CPhonebookRecord record)
+    public void deleteRecord(int id)
     {
-      XmlNode nodeRecord = _xmlDocument.CreateNode("element","Record","");
-
-      XmlElement ellastname = _xmlDocument.CreateElement("LastName");
-      ellastname.InnerText = record.LastName;
-      nodeRecord.AppendChild(ellastname);
-
-      XmlElement elname = _xmlDocument.CreateElement("FirstName");
-      elname.InnerText = record.FirstName;
-      nodeRecord.AppendChild(elname);
-
-      XmlElement phelem = _xmlDocument.CreateElement("Phone");
-
-        XmlElement elNumber = _xmlDocument.CreateElement("phonenumber");
-        elNumber.InnerText = record.Number;
-        phelem.AppendChild(elNumber);
-      nodeRecord.AppendChild(phelem);
-
-      _xmlDocument.DocumentElement.AppendChild(nodeRecord);
+      if (_buddyList.ContainsKey(id))
+      {
+        _buddyList.Remove(id);
+      }
     }
 
-    public void deleteRecord(string name)
-    {
-      string path = "/phonebook/record" + "[name='" + name + "']";
-      XmlNode node = _xmlDocument.SelectSingleNode(path);
-      _xmlDocument.DocumentElement.RemoveChild(node);
-    }
-
+    #endregion
   }
 
 } // namespace Sipek
