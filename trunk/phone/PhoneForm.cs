@@ -107,7 +107,7 @@ namespace Sipek
       if (_caretPos >= 0) richTextBox1.Select(_caretPos, 1);
       if (_selection >= 0) richTextBox1.Select(_selection, 23);
 
-      this.richTextBox1.Focus();
+      //this.richTextBox1.Focus();
     }
 
     public void setCursor(int xaxis, int yaxis)
@@ -121,94 +121,114 @@ namespace Sipek
       _selection = startX + startY * 256;
       richTextBox1.Select(_selection, length);
     }
+
+    ////////////////////////////////////////////////////////////////////////
     private void digitKey1_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_1);
+      richTextBox1.Focus();
     }
 
     private void digitKey2_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_2);
+      richTextBox1.Focus();
     }
 
     private void digitKey3_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_3);
+      richTextBox1.Focus();
     }
 
     private void digitKey4_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_4);
+      richTextBox1.Focus();
     }
 
     private void digitKey5_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_5);
+      richTextBox1.Focus();
     }
 
     private void digitKey6_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_6);
+      richTextBox1.Focus();
     }
 
     private void digitKey7_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_7);
+      richTextBox1.Focus();
     }
 
     private void digitKey8_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_8);
+      richTextBox1.Focus();
     }
 
     private void digitKey9_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_9);
+      richTextBox1.Focus();
     }
 
     private void digitKey0_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_0);
+      richTextBox1.Focus();
     }
 
     private void digitKeyS_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_star);
+      richTextBox1.Focus();
     }
 
     private void digitKeyH_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDigitKey((int)ENumKeyTags.NumKey_hash);
+      richTextBox1.Focus();
     }
 
     private void OKbutton_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onOkKey();
+      richTextBox1.Focus();
     }
 
     private void onhookButton_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onOnHookKey();
+      richTextBox1.Focus();
     }
 
     private void offhookButton_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onOffHookKey();
+      richTextBox1.Focus();
     }
 
     private void Cancel_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onEscKey();
+      richTextBox1.Focus();
     }
 
     private void clearButton_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onClearKey();
+      richTextBox1.Focus();
     }
 
     private void buttonSettings_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onMenuKey();
+      richTextBox1.Focus();
     }    
     
     private void PhoneForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -227,66 +247,79 @@ namespace Sipek
     private void rightNav_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onRightKey();
+      richTextBox1.Focus();
     }
 
     private void leftNav_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onLeftKey();
+      richTextBox1.Focus();
     }
 
     private void downNav_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onDownKey();
+      richTextBox1.Focus();
     }
 
     private void upNav_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onUpKey();
+      richTextBox1.Focus();
     }
 
     private void button0_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(0);
+      richTextBox1.Focus();
     }
 
     private void button3_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(3);
+      richTextBox1.Focus();
     }
 
     private void button4_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(4);
+      richTextBox1.Focus();
     }
     
     private void button5_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(5);
+      richTextBox1.Focus();
     }
 
     private void button6_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(6);
+      richTextBox1.Focus();
     }
 
     private void button7_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(7);
+      richTextBox1.Focus();
     }
 
     private void button8_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(8);
+      richTextBox1.Focus();
     }
 
     private void button9_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(9);
+      richTextBox1.Focus();
     }
 
     private void button10_Click(object sender, EventArgs e)
     {
       control.getAccessIf().onSoftKey(10);
+      richTextBox1.Focus();
     }
 
     private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
