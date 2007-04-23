@@ -156,7 +156,8 @@ namespace Sipek
     delegate int OnCallStateChanged(int callId, int stateId);
     delegate int OnCallIncoming(int callId, string number);
     delegate int OnCallHoldConfirm(int callId);
-
+    delegate int OnMessageReceivedCallback(string from, string message);
+    delegate int OnBuddyStatusChangedCallback(int buddyId, int status);
 
     [DllImport("pjsipDll.dll")]
     private static extern int dll_init(int listenPort);
@@ -164,8 +165,16 @@ namespace Sipek
     private static extern int dll_main();
     [DllImport("pjsipDll.dll")]
     private static extern int dll_shutdown();
-    
-    // callbacks
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_addBuddy(string uri, bool subscribe);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_removeBuddy(int buddyId);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_sendMessage(int accId, string uri, string message);
+
+    // call API callbacks
     [DllImport("pjsipDll.dll")]
     private static extern int onCallStateCallback(OnCallStateChanged cb);
     [DllImport("pjsipDll.dll")]
@@ -176,11 +185,11 @@ namespace Sipek
     private static extern int getConfigDataCallback(GetConfigData cb);
     [DllImport("pjsipDll.dll")]
     private static extern int onCallHoldConfirmCallback(OnCallHoldConfirm cb);
-    
-    // call API
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
-    
+    private static extern int onMessageReceivedCallback(OnMessageReceivedCallback cb);
+    [DllImport("pjsipDll.dll")]
+    private static extern int onBuddyStatusChangedCallback(OnBuddyStatusChangedCallback cb);
+
     #endregion Wrapper functions
 
     #region Variables
@@ -190,6 +199,8 @@ namespace Sipek
     static OnCallIncoming ciDel = new OnCallIncoming(onCallIncoming);
     static GetConfigData gdDel = new GetConfigData(getConfigData);
     static OnCallHoldConfirm chDel = new OnCallHoldConfirm(onCallHoldConfirm);
+    static OnMessageReceivedCallback mrdel = new OnMessageReceivedCallback(onMessageReceived);
+    static OnBuddyStatusChangedCallback bscdel = new OnBuddyStatusChangedCallback(onBuddyStatusChanged);
 
     #endregion Variables
 
@@ -202,6 +213,8 @@ namespace Sipek
       onCallStateCallback( csDel );
       onRegStateCallback( rsDel );
       onCallHoldConfirmCallback(chDel);
+      onBuddyStatusChangedCallback(bscdel);
+      onMessageReceivedCallback(mrdel);
 
       // Initialize pjsip...
       int port = Properties.Settings.Default.cfgSipPort;
@@ -248,6 +261,22 @@ namespace Sipek
       return 1;
     }
 
+    public static int addBuddy(string ident)
+    {
+      string uri = "sip:" + ident + "@" + CAccounts.getInstance().DefAccount.Address;
+      return dll_addBuddy(uri, true);
+    }
+
+    public static int delBuddy(int buddyId)
+    {
+      return dll_removeBuddy(buddyId);
+    }
+
+    public static int sendMessage(string dest, string message)
+    {
+      string uri = "sip:" + dest + "@" + CAccounts.getInstance().DefAccount.Address;
+      return dll_sendMessage(CAccounts.getInstance().DefAccountIndex, uri, message);
+    }
     #endregion Methods
 
     #region Callbacks
@@ -346,6 +375,18 @@ namespace Sipek
     {
       CStateMachine sm = CCallManager.getInstance().getCall(callId);
       if (sm != null) sm.getState().onHoldConfirm();
+      return 1;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    private static int onMessageReceived(string from, string message)
+    {
+      return 1;
+    }
+
+    private static int onBuddyStatusChanged(int buddyId, int status)
+    {
       return 1;
     }
 

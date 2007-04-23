@@ -15,6 +15,8 @@ typedef int __stdcall fptr_callincoming(int, char*);	// on call incoming
 typedef int __stdcall fptr_getconfigdata(int);	// get config data
 typedef int __stdcall fptr_callholdconf(int);
 typedef int __stdcall fptr_callretrieveconf(int);
+typedef int __stdcall fptr_msgrec (char*, char*);
+typedef int __stdcall fptr_buddystatus(int, int);
 
 // Callback registration 
 extern "C" PJSIPDLL_DLL_API int onRegStateCallback(fptr_regstate cb);	  // register registration notifier
@@ -23,7 +25,8 @@ extern "C" PJSIPDLL_DLL_API int onCallIncoming(fptr_callincoming cb); // registe
 extern "C" PJSIPDLL_DLL_API int getConfigDataCallback(fptr_getconfigdata cb); // get config data
 extern "C" PJSIPDLL_DLL_API int onCallHoldConfirmCallback(fptr_callholdconf cb); // register call notifier
 //extern "C" PJSIPDLL_DLL_API int onCallRetrieveConfirm(fptr_callretrieveconf cb); // register call notifier
-
+extern "C" PJSIPDLL_DLL_API int onMessageReceivedCallback(fptr_msgrec cb); // register call notifier
+extern "C" PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb); // register call notifier
 
 // pjsip common API
 extern "C" PJSIPDLL_DLL_API int dll_init(int listenPort);
@@ -41,3 +44,7 @@ extern "C" PJSIPDLL_DLL_API int dll_xferCall(int callid, char* uri);
 extern "C" PJSIPDLL_DLL_API int dll_xferCallWithReplaces(int callId, int dstSession);
 extern "C" PJSIPDLL_DLL_API int dll_serviceReq(int callId, int serviceCode, const char* destUri);
 extern "C" PJSIPDLL_DLL_API int dll_dialDtmf(int callId, char* digits, int mode);
+// IM & Presence api
+extern "C" PJSIPDLL_DLL_API int dll_addBuddy(char* uri, bool subscribe);
+extern "C" PJSIPDLL_DLL_API int dll_removeBuddy(int buddyId);
+extern "C" PJSIPDLL_DLL_API int dll_sendMessage(int accId, char* uri, char* message);

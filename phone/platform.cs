@@ -351,6 +351,57 @@ namespace Sipek
       eraseText(positionId, caption.Insert(alignPos, " "), justify);
     }
 
+
+    public void drawTextBox(int posY, int lines, string caption, EAlignment alignmode)
+    {
+      // max lines
+      int linesCnt = caption.Length / maxColumns;
+      for (int i = 0; i < linesCnt; i++)
+      {
+        drawText(i + posY, caption.Substring(i*maxColumns, maxColumns), alignmode);
+      }
+      drawText(posY + linesCnt, caption.Substring(linesCnt * maxColumns, caption.Length % maxColumns), alignmode);
+    }
+
+    public void eraseTextBox(int posY, int lines, string caption, EAlignment alignmode)
+    {
+      int linesCnt = caption.Length / maxColumns;
+      for (int i = 0; i < linesCnt; i++)
+      {
+        eraseText(i + posY, caption.Substring(i * maxColumns, maxColumns), alignmode);
+      }
+      eraseText(posY + linesCnt + posY, caption.Substring(linesCnt * maxColumns, caption.Length % maxColumns), alignmode);
+    }
+
+    public void drawEditBox(int posY, int lines, string prompt, string captionOrg, int cursor_position, bool selected, EEditMode mode)
+    {
+      string caption = prompt + captionOrg;
+      drawTextBox(posY, lines, caption, EAlignment.justify_left);
+      if (selected)
+      {
+        switch (mode)
+        {
+          case EEditMode.alphanum_high:
+            drawText(maxColumns - 3, 0, "ABC");
+            break;
+          case EEditMode.alphanum_low:
+            drawText(maxColumns - 3, 0, "abc");
+            break;
+          case EEditMode.numeric:
+            drawText(maxColumns - 3, 0, "123");
+            break;
+        }
+      }
+      if (selected) formSetCursor(prompt.Length + cursor_position % maxColumns, posY + (cursor_position/maxColumns));
+    }
+
+    public void eraseEditBox(int posY, int lines, string prompt, string captionOrg, int cursor_position)
+    {
+      string caption = prompt + captionOrg;
+      eraseTextBox(posY, lines, caption, EAlignment.justify_left);
+      eraseText(maxColumns - 3, 0, "   ");
+    }
+
   }
   #endregion Rendering
 

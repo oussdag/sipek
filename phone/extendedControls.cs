@@ -348,7 +348,7 @@ namespace Sipek
 	    {
 		    //_caption[0] = 'F';
         _caption = _caption.Remove(0, 1);
-        _caption = _caption.Insert(0, "R");
+        _caption = _caption.Insert(0, "?");
       }
 	    // check direct call flag
       if ((_status & (int)EStatusFlag.EDirectCall) > 0)
@@ -427,8 +427,17 @@ namespace Sipek
   public class CEditBox : CEditField
   {
     public CEditBox(string prompt, string caption)
-      : base(prompt, caption)
+      : base(prompt, caption,true)
     { }
+
+    public override void onDraw(CObserver renderer)
+    {
+      renderer.drawEditBox(PosY, 4, Prompt, Caption, _cursorPosition, Focused, _currentMode);
+    }
+    public override void onErase(CObserver renderer)
+    {
+      renderer.eraseEditBox(PosY, 4, Prompt, Caption, _cursorPosition);
+    }
   }
 
   public class CTextBox : CText
@@ -436,6 +445,16 @@ namespace Sipek
     public CTextBox(string text)
       : base(text)
     { }
+
+    public override void onDraw(CObserver renderer)
+    {
+      renderer.drawTextBox(PosY, 0, Caption, Align);
+    }
+    public override void onErase(CObserver renderer)
+    {
+      renderer.eraseTextBox(PosY, 0, Caption, Align);
+    }
+
   }
 
 
