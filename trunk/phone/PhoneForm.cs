@@ -83,6 +83,7 @@ namespace Sipek
       new CAccountsPage();
       new CServicesPage();
       new CRedirectPage();
+      new CMessageBoxPage();
       
       control.initialize();
 
@@ -324,11 +325,7 @@ namespace Sipek
 
     private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
     {
-      if ((e.KeyChar >= 0x30) && (e.KeyChar <= 0x39))
-      {
-        control.getAccessIf().onDigitKey(e.KeyChar - 0x30);
-      }
-      else if (e.KeyChar == 0x08)
+      if (e.KeyChar == 0x08)
       {
         clearButton_Click(sender, e);
       }

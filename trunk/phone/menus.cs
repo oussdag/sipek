@@ -444,7 +444,24 @@ namespace Sipek
       modifyLink.Align = EAlignment.justify_right;
       add(modifyLink);
 
+      CLink messageLink = new CLink("Message");
+      messageLink.Align = EAlignment.justify_right;
+      messageLink.PosY = 8;
+      messageLink.Softkey += new BoolIntDelegate(messageLink_Softkey);
+      add(messageLink);
+
       Menu += new VoidDelegate(CPhonebookPage_Menu);
+    }
+
+    bool messageLink_Softkey(int keyId)
+    {
+      CLink item = (CLink)_list.Selected;
+      if (item == null) return false;
+
+      CMessageBoxPage page = (CMessageBoxPage)_controller.getPage((int)EPages.P_MESSAGEBOX);
+      page.BuddyId = int.Parse(item.subItems[0]);
+      _controller.showPage(page.Id);
+      return true;
     }
 
     public override void onEntry()
@@ -457,8 +474,7 @@ namespace Sipek
       {
         CLink recordLink = new CLink(kvp.Value.FirstName + " " + kvp.Value.LastName);
         recordLink.subItems[0] = kvp.Value.Id.ToString();
-        //recordLink.subItems[1] = kvp.Value.FirstName;
-        //recordLink.subItems[2] = kvp.Value.Number;
+
         recordLink.Ok += new VoidDelegate(recordLink_Ok);
         recordLink.Softkey += new BoolIntDelegate(recordLink_Softkey);
         _list.add(recordLink);
@@ -591,11 +607,21 @@ namespace Sipek
 
     bool saveLink_Softkey(int keyId)
     {
-      CBuddyRecord record = new CBuddyRecord();
+      CBuddyRecord record;
+
+      if (BuddyId >= 0)
+      {
+        record = CBuddyList.getInstance().getRecord(BuddyId);
+        CBuddyList.getInstance().deleteRecord(BuddyId);
+      }
+      else 
+      {
+        record = new CBuddyRecord();
+      }
       record.FirstName = _fname.Caption;
       record.LastName = _lname.Caption;
       record.Number = _number.Caption;
-
+      
       CBuddyList.getInstance().addRecord(record);
       CBuddyList.getInstance().save();
 
@@ -1238,7 +1264,13 @@ namespace Sipek
     private CLink _buddyName;
     private CTextBox _textBox;
     private CEditBox _editBox;
-    private int _buddyId = -1; 
+    private int _buddyId = -1;
+    
+    public int BuddyId
+    {
+      get { return _buddyId; }
+      set { _buddyId = value; }
+    }
 
     public CMessageBoxPage()
       : base((int)EPages.P_MESSAGEBOX, "Message Box")
@@ -1264,17 +1296,18 @@ namespace Sipek
       this.Ok += new VoidDelegate(CMessageBoxPage_Ok);
     }
 
-    public int BuddyId
-    {
-      get { return _buddyId; }
-      set { _buddyId = value; }
-    }
-
     bool sendLink_Softkey(int keyId)
     {
-      // Invoke SIP stack wrapper function to send message
-
-      throw new System.Exception("The method or operation is not implemented.");
+      if (_buddyId == -1) return true;
+      // get buddy data form _buddyId
+      CBuddyRecord buddy = CBuddyList.getInstance()[_buddyId];
+      if (buddy != null)
+      {
+        // Invoke SIP stack wrapper function to send message
+        CPjSipProxy.sendMessage(buddy.Number, _editBox.Caption);
+      }
+      _controller.previousPage();
+      return true;
     }
 
     bool CMessageBoxPage_Ok()
@@ -1284,15 +1317,18 @@ namespace Sipek
 
     public override void onEntry()
     {
-      // get buddy data form _buddyId
-      CBuddyRecord buddy = CBuddyList.getInstance()[_buddyId];
-      if (buddy != null) 
+      if (_buddyId != -1)
       {
+        // get buddy data form _buddyId
+        CBuddyRecord buddy = CBuddyList.getInstance()[_buddyId];
+        if (buddy != null)
+        {
 
-        //_buddyName.Caption = buddy.Id;
+          //_buddyName.Caption = buddy.Id;
 
-        _textBox.Caption = buddy.LastMessage;
+          _textBox.Caption = buddy.LastMessage;
 
+        }
       }
 
       base.onEntry();

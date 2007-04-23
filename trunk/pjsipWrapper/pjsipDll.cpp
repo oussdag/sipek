@@ -32,7 +32,8 @@ static fptr_callincoming* cb_callincoming = 0;
 static fptr_getconfigdata* cb_getconfigdata = 0;
 static fptr_callholdconf* cb_callholdconf = 0;
 static fptr_callretrieveconf* cb_callretrieveconf = 0;
-
+static fptr_buddystatus* cb_buddystatus = 0;
+static fptr_msgrec* cb_messagereceived = 0;
 
 static bool running = true;
 
@@ -136,7 +137,7 @@ static void default_config(struct app_config *cfg)
 }
 
 //////////////////////////////////////////////////////////////////////////
-
+// Callbacks
 //////////////////////////////////////////////////////////////////////////
 
 static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
@@ -269,7 +270,61 @@ static void on_reg_state(pjsua_acc_id acc_id)
 	if (cb_regstate != 0) cb_regstate(acc_id, accinfo.status);
 }
 
+/*
+ * Handler on buddy state changed.
+ */
+static void on_buddy_state(pjsua_buddy_id buddy_id)
+{
+    pjsua_buddy_info info;
+    pjsua_buddy_get_info(buddy_id, &info);
 
+    PJ_LOG(3,(THIS_FILE, "%.*s status is %.*s",
+	      (int)info.uri.slen,
+	      info.uri.ptr,
+	      (int)info.status_text.slen,
+	      info.status_text.ptr));
+
+	// callback
+  if (cb_buddystatus != 0) cb_buddystatus(buddy_id, info.status);
+}
+
+
+/**
+ * Incoming IM message (i.e. MESSAGE request)!
+ */
+static void on_pager(pjsua_call_id call_id, const pj_str_t *from, 
+		     const pj_str_t *to, const pj_str_t *contact,
+		     const pj_str_t *mime_type, const pj_str_t *text)
+{
+    /* Note: call index may be -1 */
+    PJ_UNUSED_ARG(call_id);
+    PJ_UNUSED_ARG(to);
+    PJ_UNUSED_ARG(contact);
+    PJ_UNUSED_ARG(mime_type);
+
+    PJ_LOG(3,(THIS_FILE,"MESSAGE from %.*s: %.*s",
+	      (int)from->slen, from->ptr,
+	      (int)text->slen, text->ptr));
+
+    if (cb_messagereceived != 0) (*cb_messagereceived)(from->ptr, text->ptr);
+}
+
+
+/**
+ * Received typing indication
+ */
+static void on_typing(pjsua_call_id call_id, const pj_str_t *from,
+		      const pj_str_t *to, const pj_str_t *contact,
+		      pj_bool_t is_typing)
+{
+    PJ_UNUSED_ARG(call_id);
+    PJ_UNUSED_ARG(to);
+    PJ_UNUSED_ARG(contact);
+
+    PJ_LOG(3,(THIS_FILE, "IM indication: %.*s %s",
+	      (int)from->slen, from->ptr,
+	      (is_typing?"is typing..":"has stopped typing")));
+}
 
 //////////////////////////////////////////////////////////////////////////
 // DLL functions...
@@ -309,9 +364,9 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 	app_config.cfg.cb.on_incoming_call = &on_incoming_call;
 //	app_config.cfg.cb.on_dtmf_digit = &call_on_dtmf_callback;
 	app_config.cfg.cb.on_reg_state = &on_reg_state;
-//	app_config.cfg.cb.on_buddy_state = &on_buddy_state;
-//	app_config.cfg.cb.on_pager = &on_pager;
-//	app_config.cfg.cb.on_typing = &on_typing;
+	app_config.cfg.cb.on_buddy_state = &on_buddy_state;
+	app_config.cfg.cb.on_pager = &on_pager;
+	app_config.cfg.cb.on_typing = &on_typing;
 //	app_config.cfg.cb.on_call_transfer_status = &on_call_transfer_status;
 //	app_config.cfg.cb.on_call_replaced = &on_call_replaced;
 
@@ -510,6 +565,18 @@ PJSIPDLL_DLL_API int onCallHoldConfirmCallback(fptr_callholdconf cb)
 	return 1;
 }
 
+PJSIPDLL_DLL_API int onMessageReceivedCallback(fptr_msgrec cb)
+{
+  cb_messagereceived = cb;
+  return 1;
+}
+
+PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb)
+{
+  cb_buddystatus = cb;
+  return 1;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -682,4 +749,30 @@ int dll_dialDtmf(int callId, char* digits, int mode)
   pj_str_t dg = pj_str(digits);
 	int status = pjsua_call_dial_dtmf(callId, &dg);
   return status;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+int dll_addBuddy(char* uri, bool subscribe)
+{
+pj_status_t status;
+pjsua_buddy_config buddy_cfg;
+
+  buddy_cfg.uri = pj_str(uri);
+  buddy_cfg.subscribe = (subscribe == true) ? 1 : 0;
+  // Add buddy
+  int buddyId = -1;
+	status = pjsua_buddy_add(&buddy_cfg, &buddyId);
+  return buddyId;
+}
+
+int dll_removeBuddy(int buddyId)
+{
+  return pjsua_buddy_del(buddyId);
+}
+
+int dll_sendMessage(int accId, char* uri, char* message)
+{
+  pj_str_t tmp_uri = pj_str(uri);
+  pj_str_t tmp = pj_str(message);
+	return pjsua_im_send(accId, &tmp_uri, NULL, &tmp, NULL, NULL);
 }

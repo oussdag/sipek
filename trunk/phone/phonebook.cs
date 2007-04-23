@@ -57,7 +57,7 @@ namespace Sipek
     private string _email;
     private int _accountId;
     private string _uri;
-    private List<CBuddyMessage> _messageList;
+    private Stack<CBuddyMessage> _messageList;
 
     public int Id
     {
@@ -73,14 +73,17 @@ namespace Sipek
 
     public string LastMessage
     {
-      get { return _messageList[_messageList.Count - 1].Content; }
+      get {
+        if (_messageList.Count == 0) return "";
+        return _messageList.Peek().Content; 
+      }
     }
-
+/*
     public CBuddyMessage this[int index]
     {
       get { return _messageList[index]; }
     }
-
+    */
     /////////////////////////////////////////////////////
 
     public string FirstName
@@ -109,12 +112,10 @@ namespace Sipek
 
     #region Constructor
 
-    /*public CBuddyRecord(int id, string uri)
+    public CBuddyRecord()
     {
-      _id = id;
-      _uri = uri;
-      _messageList = new List<CBuddyMessage>();
-    }*/
+      _messageList = new Stack<CBuddyMessage>();
+    }
 
     #endregion
 
@@ -123,7 +124,7 @@ namespace Sipek
     public void addMessage(DateTime datetime, string text)
     {
       CBuddyMessage msg = new CBuddyMessage(datetime, text);
-      _messageList.Add(msg);
+      _messageList.Push(msg);
     }
 
     public void clearAllMessages()
@@ -292,14 +293,17 @@ namespace Sipek
     {
       // Call stack to add buddy and get buddy id
       // TODO
-      Random rnd = new System.Random(DateTime.Now.Millisecond);
-      int buddyindex = rnd.Next(10000);
-      record.Id = buddyindex;
-
-      for (int i = 0; i < 30000; i++)
+      int buddyindex = CPjSipProxy.addBuddy(record.Number);
+      if (buddyindex == -1)
       {
+        Random rnd = new System.Random(DateTime.Now.Millisecond);
         buddyindex = rnd.Next(10000);
+        for (int i = 0; i < 30000; i++)
+        {
+          buddyindex = rnd.Next(10000);
+        }
       }
+      record.Id = buddyindex;
       // add record to buddylist
       _buddyList.Add(record.Id, record);
     }
