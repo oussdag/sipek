@@ -117,7 +117,7 @@ namespace Sipek
       if (_currentSession < 0)
       {
         // todo::: showHomePage
-          CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
+        CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
         return;
       }
 

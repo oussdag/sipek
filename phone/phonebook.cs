@@ -245,6 +245,21 @@ namespace Sipek
       if (_buddyList.ContainsKey(id)) return _buddyList[id];
       return null;
     }
+    
+    public int getBuddy(string buddy)
+    {
+      int buddyId = -1;
+      Dictionary<int,CBuddyRecord>.ValueCollection col = _buddyList.Values;
+      foreach (CBuddyRecord item in col)
+      {
+        if ((item.FirstName.Contains(buddy) == true) || (item.LastName.Contains(buddy) == true) 
+            || (item.Number.Contains(buddy) == true))
+        {
+          return item.Id;
+        }
+      }
+      return buddyId;
+    }
 
     public void save()
     {
@@ -317,6 +332,7 @@ namespace Sipek
     }
 
     #endregion
+
   }
 
 } // namespace Sipek
