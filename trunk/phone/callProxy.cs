@@ -21,7 +21,7 @@ using System.Threading;
 using System;
 using System.Net;
 using System.Net.Sockets;
-
+using MenuDesigner;
 
 namespace Sipek
 {
@@ -382,6 +382,10 @@ namespace Sipek
 
     private static int onMessageReceived(string from, string message)
     {
+      CMessageReceivedPage page = (CMessageReceivedPage)CComponentController.getInstance().getPage((int)EPages.P_MESSAGERECEIVEDBOX);
+      page.Message = message;
+      page.From = from;
+      CComponentController.getInstance().showPage(page.Id);
       return 1;
     }
 

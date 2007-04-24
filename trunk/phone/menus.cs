@@ -41,7 +41,8 @@ namespace Sipek
     P_SIPPROXYSETTINGSMORE,
     P_SERVICES,
     P_REDIRECT,
-    P_MESSAGEBOX
+    P_MESSAGEBOX,
+    P_MESSAGERECEIVEDBOX,
   }
 
   public enum ERingModes : int
@@ -562,7 +563,7 @@ namespace Sipek
       add(_lname);
 
       _number = new CEditField("Number>", "", EEditMode.numeric);
-      _number.PosY = 6;
+      _number.PosY = 7;
       _number.LinkKey = _number.PosY;
       add(_number);
 
@@ -1261,11 +1262,12 @@ namespace Sipek
   /// </summary>
   public class CMessageBoxPage : CPage
   {
+    private CText _titleText;
     private CLink _buddyName;
     private CTextBox _textBox;
     private CEditBox _editBox;
     private int _buddyId = -1;
-    
+
     public int BuddyId
     {
       get { return _buddyId; }
@@ -1273,13 +1275,17 @@ namespace Sipek
     }
 
     public CMessageBoxPage()
-      : base((int)EPages.P_MESSAGEBOX, "Message Box")
+      : base((int)EPages.P_MESSAGEBOX, "Send Message To...")
     {
+      _titleText = new CText("Buddy");
+      _titleText.PosY = 1;
+      add(_titleText);
+
       _textBox = new CTextBox("");
       _textBox.PosY = 2;
       add(_textBox);
 
-      _editBox = new CEditBox(">","");
+      _editBox = new CEditBox(">", "");
       _editBox.PosY = 5;
       add(_editBox);
 
@@ -1294,6 +1300,26 @@ namespace Sipek
       add(_buddyName);
 
       this.Ok += new VoidDelegate(CMessageBoxPage_Ok);
+    }
+
+    public override void onEntry()
+    {
+      if (_buddyId != -1)
+      {
+        // get buddy data form _buddyId
+        CBuddyRecord buddy = CBuddyList.getInstance()[_buddyId];
+        if (buddy != null)
+        {
+          _titleText.Caption = buddy.FirstName + ", " + buddy.LastName;
+
+          //_buddyName.Caption = buddy.Id;
+
+          _textBox.Caption = buddy.LastMessage;
+
+        }
+      }
+
+      base.onEntry();
     }
 
     bool sendLink_Softkey(int keyId)
@@ -1314,24 +1340,107 @@ namespace Sipek
     {
       return sendLink_Softkey(10);
     }
+  }
+
+    
+  /// <summary>
+  /// Menu page for message text input.
+  /// Buddy data should be set prior to page entry.
+  /// </summary>
+  public class CMessageReceivedPage : CPage
+  {
+    private CText _titleText;
+    private CLink _replyLink;
+    private CTextBox _textBox;
+
+    private string _textString;
+    private string _fromString;
+    private int _buddyId = -1;
+
+    public string Message
+    {
+      set { _textString = value; }
+    }
+    public string From
+    {
+      set { _fromString = value; }
+    }
+
+    public CMessageReceivedPage()
+      : base((int)EPages.P_MESSAGERECEIVEDBOX, "Message Received")
+    {
+      _titleText = new CText("");
+      _titleText.PosY = 1;
+      add(_titleText);
+
+      _textBox = new CTextBox("");
+      _textBox.PosY = 3;
+      add(_textBox);
+
+      _replyLink = new CLink("Reply");
+      _replyLink.PosY = 9;
+      _replyLink.Softkey += new BoolIntDelegate(_replyLink_Softkey);
+      add(_replyLink);
+    }
 
     public override void onEntry()
     {
-      if (_buddyId != -1)
+      _buddyId = -1;
+
+      // parse from string
+      string buddykey = parseFrom(_fromString);
+      int id = CBuddyList.getInstance().getBuddy(buddykey);
+      if (id >= 0)
       {
-        // get buddy data form _buddyId
+        _buddyId = id;
+        
         CBuddyRecord buddy = CBuddyList.getInstance()[_buddyId];
-        if (buddy != null)
-        {
-
-          //_buddyName.Caption = buddy.Id;
-
-          _textBox.Caption = buddy.LastMessage;
-
-        }
+        _titleText.Caption = buddy.FirstName + ", " + buddy.LastName;
       }
 
+      _textBox.Caption = _textString;
+
       base.onEntry();
+    }
+
+    bool _replyLink_Softkey(int keyId)
+    {
+      CMessageBoxPage page = (CMessageBoxPage)_controller.getPage((int)EPages.P_MESSAGEBOX);
+
+      if (_buddyId >= 0)
+      {
+        page.BuddyId = _buddyId;
+        _controller.showPage((int)EPages.P_MESSAGEBOX);
+      }
+      return true;
+    }
+
+    private string parseFrom(string from)
+    {
+      string number = from.Replace("<sip:", "");
+
+      int atPos = number.IndexOf('@');
+      if (atPos >= 0)
+      {
+        number = number.Remove(atPos);
+      }
+      else
+      {
+        int semiPos = number.IndexOf(';');
+        if (semiPos >= 0)
+        {
+          number = number.Remove(semiPos);
+        }
+        else
+        {
+          int colPos = number.IndexOf(':');
+          if (colPos >= 0)
+          {
+            number = number.Remove(colPos);
+          }
+        }
+      }
+      return number;
     }
 
   }

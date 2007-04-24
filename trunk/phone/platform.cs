@@ -368,9 +368,10 @@ namespace Sipek
       int linesCnt = caption.Length / maxColumns;
       for (int i = 0; i < linesCnt; i++)
       {
-        eraseText(i + posY, caption.Substring(i * maxColumns, maxColumns), alignmode);
+        string subniz = caption.Substring(i * maxColumns, maxColumns);
+        eraseText(i + posY, subniz, alignmode);
       }
-      eraseText(posY + linesCnt + posY, caption.Substring(linesCnt * maxColumns, caption.Length % maxColumns), alignmode);
+      eraseText(posY + linesCnt, caption.Substring(linesCnt * maxColumns, caption.Length % maxColumns), alignmode);
     }
 
     public void drawEditBox(int posY, int lines, string prompt, string captionOrg, int cursor_position, bool selected, EEditMode mode)

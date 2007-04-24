@@ -84,6 +84,7 @@ namespace Sipek
       new CServicesPage();
       new CRedirectPage();
       new CMessageBoxPage();
+      new CMessageReceivedPage();
       
       control.initialize();
 
