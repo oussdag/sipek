@@ -48,3 +48,7 @@ extern "C" PJSIPDLL_DLL_API int dll_dialDtmf(int callId, char* digits, int mode)
 extern "C" PJSIPDLL_DLL_API int dll_addBuddy(char* uri, bool subscribe);
 extern "C" PJSIPDLL_DLL_API int dll_removeBuddy(int buddyId);
 extern "C" PJSIPDLL_DLL_API int dll_sendMessage(int accId, char* uri, char* message);
+
+// Tones api
+extern "C" PJSIPDLL_DLL_API int dll_playTone(int toneId);
+extern "C" PJSIPDLL_DLL_API int dll_stopTone();

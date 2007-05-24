@@ -47,9 +47,10 @@
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -67,8 +68,8 @@
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
-				AssemblyDebug="1"
 				ProgramDatabaseFile="$(OutDir)/pjsipDll.pdb"
+				GenerateMapFile="true"
 				SubSystem="2"
 				ImportLibrary="$(OutDir)/pjsipDll.lib"
 				TargetMachine="1"

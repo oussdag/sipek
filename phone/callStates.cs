@@ -262,10 +262,12 @@ namespace Sipek
 
     public override void onEntry()
     {
+      CPjSipProxy.playTone(ETones.EToneRingback);
     }
 
     public override void onExit()
     {
+      CPjSipProxy.stopTone();
     }
 
     public override void onConnect()
@@ -349,10 +351,12 @@ namespace Sipek
 
     public override void onEntry()
     {
+      CPjSipProxy.playTone(ETones.EToneCongestion);
     }
 
     public override void onExit()
     {
+      CPjSipProxy.stopTone();
     }
 
   }
@@ -383,11 +387,14 @@ namespace Sipek
       {
         _smref.Type = ECallType.EMissed;
       }
+
+      CPjSipProxy.playTone(ETones.EToneRing);
     }
 
     public override void onExit()
     {
-    }
+      CPjSipProxy.stopTone();
+    }    
 
     public override bool acceptCall()
     {

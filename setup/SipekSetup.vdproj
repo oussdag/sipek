@@ -21,14 +21,38 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1E9C227F5A854E1D8FCECEC6F3318E67"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_35D0308FE7C64EB78941EE4275F83B76"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4E71028215E449ADAED4503DACBD9868"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_DF47F18F254D48EAF82228CB361D87EF"
+        "MsmKey" = "8:_6C8EF72A40F09A7D192A5E795B9E0C4C"
         "OwnerKey" = "8:_4E71028215E449ADAED4503DACBD9868"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6F5262C3B5D547ECA82F0F6414747D27"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9C246F5F8E2B4AB39FF6EF4A6F1FB60B"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -46,7 +70,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_DF47F18F254D48EAF82228CB361D87EF"
+        "OwnerKey" = "8:_6C8EF72A40F09A7D192A5E795B9E0C4C"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -170,14 +194,54 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DF47F18F254D48EAF82228CB361D87EF"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E9C227F5A854E1D8FCECEC6F3318E67"
+            {
+            "SourcePath" = "8:..\\phone\\bin\\ringback.wav"
+            "TargetName" = "8:ringback.wav"
+            "Tag" = "8:"
+            "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_35D0308FE7C64EB78941EE4275F83B76"
+            {
+            "SourcePath" = "8:..\\phone\\bin\\dial.wav"
+            "TargetName" = "8:dial.wav"
+            "Tag" = "8:"
+            "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6C8EF72A40F09A7D192A5E795B9E0C4C"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:pjsipDll, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_DF47F18F254D48EAF82228CB361D87EF"
+                    "_6C8EF72A40F09A7D192A5E795B9E0C4C"
                     {
                     "Name" = "8:pjsipDll.dll"
                     "Attributes" = "3:512"
@@ -199,6 +263,46 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6F5262C3B5D547ECA82F0F6414747D27"
+            {
+            "SourcePath" = "8:..\\phone\\bin\\ring.wav"
+            "TargetName" = "8:ring.wav"
+            "Tag" = "8:"
+            "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9C246F5F8E2B4AB39FF6EF4A6F1FB60B"
+            {
+            "SourcePath" = "8:..\\phone\\bin\\congestion.wav"
+            "TargetName" = "8:congestion.wav"
+            "Tag" = "8:"
+            "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
@@ -241,7 +345,7 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_53FEFCC8E99C4D6E829E8A7AB91229FA"
                     {
-                    "Name" = "8:sasacoh"
+                    "Name" = "8:SasaCoh"
                     "AlwaysCreate" = "11:TRUE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -268,7 +372,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SIPek"
         "ProductCode" = "8:{206AFE21-564D-4AA4-8C7C-2CF19329D173}"
-        "PackageCode" = "8:{ADF5EF64-792B-4329-BAFF-B615A218811A}"
+        "PackageCode" = "8:{5A547316-8614-4569-97F2-5E9EC0D6574A}"
         "UpgradeCode" = "8:{29CE83EC-8ACB-4E49-85BA-73D22ECEA660}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
