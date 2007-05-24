@@ -25,6 +25,15 @@ using MenuDesigner;
 
 namespace Sipek
 {
+  public enum ETones : int
+  {
+    EToneDial = 0,
+    EToneCongestion,
+    EToneRingback,
+    EToneRing,
+  }
+
+
   /// <summary>
   /// 
   /// </summary>
@@ -189,6 +198,12 @@ namespace Sipek
     private static extern int onMessageReceivedCallback(OnMessageReceivedCallback cb);
     [DllImport("pjsipDll.dll")]
     private static extern int onBuddyStatusChangedCallback(OnBuddyStatusChangedCallback cb);
+
+    // tones api
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_playTone(int toneId);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_stopTone();
 
     #endregion Wrapper functions
 
@@ -395,6 +410,18 @@ namespace Sipek
     }
 
     #endregion Callbacks
+
+
+    ////
+    public static int playTone(ETones toneId)
+    {
+      return dll_playTone((int)toneId);
+    }
+
+    public static int stopTone()
+    {
+      return dll_stopTone();
+    }
 
   }
 
