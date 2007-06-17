@@ -64,7 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Iphlpapi.lib  dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib pjlib-i386-win32-vc8-debug.lib pjlib-util-i386-win32-vc8-debug.lib pjmedia-i386-win32-vc8-debug.lib pjmedia-codec-i386-win32-vc8-debug.lib pjsip-core-i386-win32-vc8-debug.lib pjsip-simple-i386-win32-vc8-debug.lib pjsip-ua-i386-win32-vc8-debug.lib pjsua-lib-i386-win32-vc8-debug.lib libgsmcodec-i386-win32-vc8-debug.lib libilbccodec-i386-win32-vc8-debug.lib libportaudio-i386-win32-vc8-debug.lib libresample-i386-win32-vc8-debug.lib libspeex-i386-win32-vc8-debug.lib pjnath-i386-win32-vc8-debug.lib"
-				OutputFile="$(SolutionDir)/lib/pjsipDll.dll"
+				OutputFile="$(SolutionDir)/lib/pjsipDlld.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
