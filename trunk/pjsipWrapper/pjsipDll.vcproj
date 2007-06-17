@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib pjlib-i386-win32-vc8-debug.lib pjlib-util-i386-win32-vc8-debug.lib pjmedia-i386-win32-vc8-debug.lib pjmedia-codec-i386-win32-vc8-debug.lib pjsip-core-i386-win32-vc8-debug.lib pjsip-simple-i386-win32-vc8-debug.lib pjsip-ua-i386-win32-vc8-debug.lib pjsua-lib-i386-win32-vc8-debug.lib"
+				AdditionalDependencies="Iphlpapi.lib  dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib pjlib-i386-win32-vc8-debug.lib pjlib-util-i386-win32-vc8-debug.lib pjmedia-i386-win32-vc8-debug.lib pjmedia-codec-i386-win32-vc8-debug.lib pjsip-core-i386-win32-vc8-debug.lib pjsip-simple-i386-win32-vc8-debug.lib pjsip-ua-i386-win32-vc8-debug.lib pjsua-lib-i386-win32-vc8-debug.lib libgsmcodec-i386-win32-vc8-debug.lib libilbccodec-i386-win32-vc8-debug.lib libportaudio-i386-win32-vc8-debug.lib libresample-i386-win32-vc8-debug.lib libspeex-i386-win32-vc8-debug.lib pjnath-i386-win32-vc8-debug.lib"
 				OutputFile="$(SolutionDir)/lib/pjsipDll.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -107,6 +107,7 @@
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -126,8 +127,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PJSIPDLL_EXPORTS"
-				RuntimeLibrary="0"
-				UsePrecompiledHeader="2"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -143,7 +144,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/pjsipDll.dll"
+				AdditionalDependencies="Iphlpapi.lib dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib pjlib-i386-win32-vc8-release.lib pjlib-util-i386-win32-vc8-release.lib pjmedia-i386-win32-vc8-release.lib pjmedia-codec-i386-win32-vc8-release.lib pjsip-core-i386-win32-vc8-release.lib pjsip-simple-i386-win32-vc8-release.lib pjsip-ua-i386-win32-vc8-release.lib pjsua-lib-i386-win32-vc8-release.lib libgsmcodec-i386-win32-vc8-debug.lib libilbccodec-i386-win32-vc8-debug.lib libportaudio-i386-win32-vc8-debug.lib libresample-i386-win32-vc8-debug.lib libspeex-i386-win32-vc8-debug.lib pjnath-i386-win32-vc8-debug.lib"
+				OutputFile="$(SolutionDir)/lib/pjsipDll.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
