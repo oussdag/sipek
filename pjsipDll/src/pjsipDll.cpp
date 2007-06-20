@@ -35,13 +35,8 @@ static fptr_callretrieveconf* cb_callretrieveconf = 0;
 static fptr_buddystatus* cb_buddystatus = 0;
 static fptr_msgrec* cb_messagereceived = 0;
 
-static bool running = true;
-
-#define SAMPLES_PER_FRAME   64
-
-static pjmedia_port* gmediaport;
+// for playing files (tones)
 static pjmedia_snd_port* snd_port;
-static pjmedia_port *file_port;
 
 enum {
     SC_Deflect,
@@ -107,7 +102,7 @@ static struct app_config
 	unsigned		    duration;
 
 #ifdef STEREO_DEMO
-	pjmedia_snd_port	   *snd;
+	pjmedia_snd_port* snd_port;
 #endif
 
 	float		    mic_level,
@@ -347,7 +342,7 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 	pjsua_transport_id transport_id = -1;
 	unsigned i;
 	pj_status_t status;
- 
+
 	/* Create pjsua */
 	status = pjsua_create();
 	if (status != PJ_SUCCESS)
@@ -399,57 +394,13 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 //		app_config.call_data[i].timer.cb = &call_timeout_callback;
 	}
 
-	/* Optionally registers WAV file */
-	for (i=0; i<app_config.wav_count; ++i) {
-		pjsua_player_id wav_id;
+	//////////////////////////////////////////////////////////////////////////////
+	// Initialiye Wav file player
+	//pj_str_t label = pj_str("label");
+	//pjsua_playlist_create( app_config.wav_files, app_config.wav_count, &label, 0, &wav_id);
 
-		status = pjsua_player_create(&app_config.wav_files[i], 0, &wav_id);
-		if (status != PJ_SUCCESS)
-			goto on_error;
-	
-		if (app_config.wav_id == PJSUA_INVALID_ID) {
-			app_config.wav_id = wav_id;
-			app_config.wav_port = pjsua_player_get_conf_port(app_config.wav_id);
-		}
-	}
-
-	/* Optionally registers tone players */
-	for (i=0; i<app_config.tone_count; ++i) {
-		pjmedia_port *tport;
-		char name[80];
-		pj_str_t label;
-		pj_status_t status;
-
-		pj_ansi_snprintf(name, sizeof(name), "tone-%d,%d",
-			app_config.tones[i].freq1, 
-			app_config.tones[i].freq2);
-		label = pj_str(name);
-		status = pjmedia_tonegen_create2(app_config.pool, &label,
-			8000, 1, 160, 16, 
-			PJMEDIA_TONEGEN_LOOP,  &tport);
-		if (status != PJ_SUCCESS) {
-			pjsua_perror(THIS_FILE, "Unable to create tone generator", status);
-			goto on_error;
-		}
-
-		status = pjsua_conf_add_port(app_config.pool, tport, 
-			&app_config.tone_slots[i]);
-		pj_assert(status == PJ_SUCCESS);
-
-		status = pjmedia_tonegen_play(tport, 1, &app_config.tones[i], 0);
-		pj_assert(status == PJ_SUCCESS);
-	}
-
-	/* Optionally create recorder file, if any. */
-	if (app_config.rec_file.slen) {
-		status = pjsua_recorder_create(&app_config.rec_file, 0, NULL, 0, 0,
-			&app_config.rec_id);
-		if (status != PJ_SUCCESS)
-			goto on_error;
-
-		app_config.rec_port = pjsua_recorder_get_conf_port(app_config.rec_id);
-	}
-
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
 	/* Add UDP transport unless it's disabled. */
 	if (!app_config.no_udp) {
 		pjsua_acc_id aid;
@@ -595,12 +546,9 @@ PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb)
 
 PJSIPDLL_DLL_API int dll_shutdown()
 {
-	//running = false;
 	pjsua_destroy();
 	return 0;
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////
 int dll_registerAccount(char* uri, char* reguri, char* domain, char* username, char* password)
@@ -790,65 +738,56 @@ int dll_sendMessage(int accId, char* uri, char* message)
 	return pjsua_im_send(accId, &tmp_uri, NULL, &tmp, NULL, NULL);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 int dll_playTone(int toneId)
 {
-	int status;
+int status = -1;
+pjmedia_port *file_port;
+
 /*
-	if (toneId > app_config.tone_count - 1) return -1;
+     pjsua_player_id player_id;
+     
+     status = pjsua_player_create(&app_config.wav_files[toneId], 0, &player_id);
+     if (status != PJ_SUCCESS)
+        return status;
+*/
 
-	status = pjmedia_tonegen_play(gmediaport, 1, &app_config.tones[toneId], 1); 
+    /* Create file media port from the WAV file */
+    status = pjmedia_wav_player_port_create( app_config.pool,	/* memory pool	    */
+					      app_config.wav_files[toneId].ptr,	/* file to play	    */
+					      20,	/* ptime.	    */
+					      0,	/* flags	    */
+					      0,	/* default buffer   */
+					      &file_port/* returned port    */
+					      );
 
-	switch (toneId)
-	{
-		case 0:	status = pjmedia_tonegen_play(gmediaport, 1, app_config.tones, 0); break;
-		case 1:	status = pjmedia_tonegen_play(gmediaport, 1, galertingtone, 0); break;
-		case 2:	status = pjmedia_tonegen_play(gmediaport, 1, gbusytone, 0); break;
-		case 3:	status = pjmedia_tonegen_play(gmediaport, 1, gcongestiontone, 0); break;
-		case 4:	status = pjmedia_tonegen_play(gmediaport, 1, gbeeptone, 0); break;
-	}
-	*/
+    if (status != PJ_SUCCESS) {
+		//app_perror(THIS_FILE, "Unable to use WAV file", status);
+		return 1;
+    }
 
-	 pj_caching_pool cp;
-     pjmedia_endpt *med_endpt;     
-     //pjmedia_port *file_port;
-     //pjmedia_snd_port *snd_port;
-     char tmp[10];
-     //pj_status_t status;
+	     /* Create sound player port. */
+    status = pjmedia_snd_port_create_player( 
+		 app_config.pool,				    /* pool		    */
+		 -1,				    /* use default dev.	    */
+		 file_port->info.clock_rate,	    /* clock rate.	    */
+		 file_port->info.channel_count,	    /* # of channels.	    */
+		 file_port->info.samples_per_frame, /* samples per frame.   */
+		 file_port->info.bits_per_sample,   /* bits per sample.	    */
+		 0,				    /* options		    */
+		 &snd_port			    /* returned port	    */
+		 );
 
-     /* Create file media port from the WAV file */
-     status = pjmedia_wav_player_port_create(  app_config.pool,     /* memory pool      */
-                                               app_config.wav_files[toneId].ptr,  /* file to play     */
-                                               20,       /* ptime.           */
-                                               0,        /* flags            */
-                                               0,        /* default buffer   */
-                                               &file_port/* returned port    */
-                                               );
-     if (status != PJ_SUCCESS) {
-         //app_perror(THIS_FILE, "Unable to use WAV file", status);
-         return 1;
-     }
- 
-     /* Create sound player port. */
-     status = pjmedia_snd_port_create_player( 
-                  app_config.pool,                              /* pool                 */
-                  -1,                                /* use default dev.     */
-                  file_port->info.clock_rate,        /* clock rate.          */
-                  file_port->info.channel_count,     /* # of channels.       */
-                  file_port->info.samples_per_frame, /* samples per frame.   */
-                  file_port->info.bits_per_sample,   /* bits per sample.     */
-                  0,                                 /* options              */
-                  &snd_port                          /* returned port        */
-                  );
-     if (status != PJ_SUCCESS) {
-         //app_perror(THIS_FILE, "Unable to open sound device", status);
-         return 1;
-     }
- 
-     /* Connect file port to the sound player.
-      * Stream playing will commence immediately.
-      */
-     status = pjmedia_snd_port_connect( snd_port, file_port);
-     PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
+    if (status != PJ_SUCCESS) {
+		//app_perror(THIS_FILE, "Unable to open sound device", status);
+		return 1;
+    }
+
+    /* Connect file port to the sound player.
+     * Stream playing will commence immediately.
+     */
+    status = pjmedia_snd_port_connect( snd_port, file_port);
 
 	return status;
 }
@@ -856,29 +795,13 @@ int dll_playTone(int toneId)
 int dll_stopTone()
 {
 	pj_status_t status;
-//	return pjmedia_tonegen_stop(gmediaport);
-	/* Disconnect sound port from file port */
-     status = pjmedia_snd_port_disconnect(snd_port);
-     PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
- 
-     /* Without this sleep, Windows/DirectSound will repeteadly
-      * play the last frame during destroy.
-      */
- 
-     /* Destroy sound device */
-     status = pjmedia_snd_port_destroy( snd_port );
-     PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
- 
- 
-     /* Destroy file port */
-     status = pjmedia_port_destroy( file_port );
-     PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
- 
- 
-     /* Release application pool */
-     //pj_pool_release( pool );
+    /* Start deinitialization: */
 
-	 return status;
+    /* Disconnect sound port from file port */
+    status = pjmedia_snd_port_disconnect(snd_port);
+    PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
+	
+	return status;
 }
 
 
