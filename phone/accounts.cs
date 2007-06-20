@@ -145,6 +145,9 @@ namespace Sipek
     {
       _accounts = new Dictionary<int, CAccount>();
       int count = Properties.Settings.Default.cfgSipAccountAddresses.Count;
+
+      this.DefAccountIndex = Properties.Settings.Default.cfgSipAccountDefault;
+
       for (int i = 0; i < count; i++)
       {
         CAccount account = new CAccount();
@@ -203,6 +206,9 @@ namespace Sipek
     public void save()
     {
       int count = Properties.Settings.Default.cfgSipAccountAddresses.Count;
+
+      Properties.Settings.Default.cfgSipAccountDefault = this.DefAccountIndex;
+
       for (int index = 0; index < count; index++)
       {
         Properties.Settings.Default.cfgSipAccountAddresses[index] = this[index].Address;
