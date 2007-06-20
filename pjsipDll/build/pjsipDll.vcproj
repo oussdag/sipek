@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="../../pjsip/include,../../pjlib/include,../../pjlib-util/include,../../pjmedia/include,../../pjnath/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PJSIPDLL_EXPORTS"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -63,8 +63,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib  dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib pjlib-i386-win32-vc8-debug.lib pjlib-util-i386-win32-vc8-debug.lib pjmedia-i386-win32-vc8-debug.lib pjmedia-codec-i386-win32-vc8-debug.lib pjsip-core-i386-win32-vc8-debug.lib pjsip-simple-i386-win32-vc8-debug.lib pjsip-ua-i386-win32-vc8-debug.lib pjsua-lib-i386-win32-vc8-debug.lib libgsmcodec-i386-win32-vc8-debug.lib libilbccodec-i386-win32-vc8-debug.lib libportaudio-i386-win32-vc8-debug.lib libresample-i386-win32-vc8-debug.lib libspeex-i386-win32-vc8-debug.lib pjnath-i386-win32-vc8-debug.lib"
-				OutputFile="$(SolutionDir)/lib/pjsipDlld.dll"
+				IgnoreImportLibrary="false"
+				AdditionalDependencies="Iphlpapi.lib dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib"
+				OutputFile="../bin/pjsipdll.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -126,6 +127,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="../../pjsip/include,../../pjlib/include,../../pjlib-util/include,../../pjmedia/include,../../pjnath/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PJSIPDLL_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -144,8 +146,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib pjlib-i386-win32-vc8-release.lib pjlib-util-i386-win32-vc8-release.lib pjmedia-i386-win32-vc8-release.lib pjmedia-codec-i386-win32-vc8-release.lib pjsip-core-i386-win32-vc8-release.lib pjsip-simple-i386-win32-vc8-release.lib pjsip-ua-i386-win32-vc8-release.lib pjsua-lib-i386-win32-vc8-release.lib libgsmcodec-i386-win32-vc8-debug.lib libilbccodec-i386-win32-vc8-debug.lib libportaudio-i386-win32-vc8-debug.lib libresample-i386-win32-vc8-debug.lib libspeex-i386-win32-vc8-debug.lib pjnath-i386-win32-vc8-debug.lib"
-				OutputFile="$(SolutionDir)/lib/pjsipDll.dll"
+				IgnoreImportLibrary="false"
+				AdditionalDependencies="Iphlpapi.lib dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib"
+				OutputFile="../bin/pjsipdll.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -189,7 +192,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\pjsipDll.cpp"
+				RelativePath="..\src\pjsipDll.cpp"
 				>
 			</File>
 		</Filter>
@@ -199,7 +202,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\pjsipDll.h"
+				RelativePath="..\src\pjsipDll.h"
 				>
 			</File>
 		</Filter>
