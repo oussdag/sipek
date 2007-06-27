@@ -21,6 +21,8 @@ using System.Windows.Forms;
 
 using MenuDesigner;
 using Sipek;
+using Telephony;
+using System.Collections.Generic;
 
 namespace Sipek
 {
@@ -88,9 +90,60 @@ namespace Sipek
       
       control.initialize();
 
+      // register callback
+      Telephony.CCallManager.getInstance().registerOnRefreshCallback(onTelephonyRefresh);
+
       // set active page...
       control.showPage((int)EPages.P_INIT);
     }
+
+    delegate void RefreshDelegate();
+
+    public void onTelephonyRefresh()
+    {
+      if (this.Created)
+        this.Invoke(new RefreshDelegate(this.RefreshForm));
+    }
+
+    public void RefreshForm()
+    {
+      int currentSession = CCallManager.getInstance().getCurrentCallIndex();
+
+      // get current session
+      if (currentSession < 0)
+      {
+        // todo::: showHomePage
+        CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
+        return;
+      }
+
+      Dictionary<int, CStateMachine> calls = CCallManager.getInstance().getCallList();
+      CStateMachine call = CCallManager.getInstance().getCurrentCall();
+      if (call != null)
+      {
+        int stateId = (int)call.getStateId();
+        if (stateId == (int)EStateId.IDLE)
+        {
+          if (CCallManager.getInstance().Count == 0)
+          {
+            CComponentController.getInstance().showPage(stateId);
+          }
+          else
+          {
+            calls.GetEnumerator().MoveNext();
+            currentSession = calls.GetEnumerator().Current.Key;
+
+            CStateMachine nextcall = CCallManager.getInstance().getCall(currentSession);
+            if (nextcall != null) CComponentController.getInstance().showPage((int)nextcall.getStateId());
+          }
+        }
+        else
+        {
+          CComponentController.getInstance().showPage(stateId);
+        }
+      }    
+    }
+
 
     public void clearScreen()
     {

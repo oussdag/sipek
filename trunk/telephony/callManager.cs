@@ -18,10 +18,8 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using MenuDesigner;
 
-
-namespace Sipek
+namespace Telephony
 {
   /// <summary>
   /// 
@@ -48,6 +46,69 @@ namespace Sipek
       get { return _calls.Count; }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Configuration settings
+    public bool CFUFlag
+    {
+      get { return false;  }
+    }
+
+    public string CFUNumber
+    {
+      get { return "";  }
+    }
+
+    public bool DNDFlag
+    {
+      get { return false;  }
+    }
+
+    public int SipPort
+    {
+      get { return 5060; }
+    }   
+
+    /////////////////////////////////////////////////////////////////////
+    // Accounts
+    public int DefaultAccountIndex
+    {
+      get { return CAccounts.getInstance().DefAccount.Index; }
+    }
+
+    public string getAddress()
+    {
+      return getAddress(this.DefaultAccountIndex);
+    }
+
+    public string getAddress(int accId)
+    {
+      return CAccounts.getInstance()[accId].Address;
+    }
+
+    public string getId(int accId)
+    {
+      return CAccounts.getInstance()[accId].Id;
+    }
+    public string getUsername(int accId)
+    {
+      return CAccounts.getInstance()[accId].Username;
+    }
+    public string getPassword(int accId)
+    {
+      return CAccounts.getInstance()[accId].Password;
+    }
+    public string getDomain(int accId)
+    {
+      return CAccounts.getInstance()[accId].Domain;
+    }
+
+    public int NumAccounts
+    {
+      get { return CAccounts.getInstance().getSize(); }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+
     #endregion Properties
 
 
@@ -64,6 +125,27 @@ namespace Sipek
 
     #endregion Constructor
 
+    #region Callback
+
+    CallbackDelegate onRefreshCallback; // function pointer variable
+    public delegate void CallbackDelegate();  // define callback type 
+
+    // dummy callback method in case no other registered
+    private void dummy()
+    {
+    }
+
+    /// <summary>
+    /// Register callback function
+    /// </summary>
+    /// <param name="method"></param>
+    public void registerOnRefreshCallback(CallbackDelegate method)
+    {
+      onRefreshCallback = new CallbackDelegate(method);
+    }
+
+    #endregion
+
 
     #region Methods
 
@@ -77,20 +159,7 @@ namespace Sipek
       ///
       if (!_initialized)
       {
-        // Create menu pages...
-        new CConnectingPage();
-        new CRingingPage();
-        new CReleasedPage();
-        new CActivePage();
-        new CDialPage();
-        new CIncomingPage();
-        new CPreDialPage();
-        new CHoldingPage();
-        new CXferDialingPage();
-        new CXferListPage();
-        new C3PtyListPage();
-        new CDeflectPage();
-        new CCallOptionsPage();
+        if (onRefreshCallback == null) onRefreshCallback = new CallbackDelegate(dummy);
 
         // Initialize call table
         _calls = new Dictionary<int, CStateMachine>(); 
@@ -117,7 +186,8 @@ namespace Sipek
       if (_currentSession < 0)
       {
         // todo::: showHomePage
-        CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
+        //CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
+        onRefreshCallback();
         return;
       }
 
@@ -129,7 +199,8 @@ namespace Sipek
         {
           if (Count == 0)
           {
-            CComponentController.getInstance().showPage(stateId);
+            //CComponentController.getInstance().showPage(stateId);
+            onRefreshCallback();
           }
           else
           {
@@ -138,11 +209,13 @@ namespace Sipek
 
             CStateMachine nextcall = getCall(_currentSession);
             //if (nextcall != null) CComponentController.getInstance().showPage((int)nextcall.getStateId());
+            onRefreshCallback();
           }
         }
         else
         {
-          CComponentController.getInstance().showPage(stateId);
+          //CComponentController.getInstance().showPage(stateId);
+          onRefreshCallback();
         }
       }
     }
@@ -237,13 +310,22 @@ namespace Sipek
 
     public void onUserRelease()
     {
+      onUserRelease(_currentSession);
+    }
+    
+    public void onUserRelease(int session)
+    {
       CStateMachine call = getCall(_currentSession);
       if (call != null) call.getState().endCall();
     }
 
     public void onUserAnswer()
     {
-      CStateMachine call = getCall(_currentSession);
+      onUserAnswer(_currentSession);
+    }
+    public void onUserAnswer(int session)
+    {
+      CStateMachine call = getCall(session);
       call.getState().acceptCall();
     }
 
@@ -307,9 +389,23 @@ namespace Sipek
       return cnt;
     }
 
+    /////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="accId"></param>
+    /// <param name="regState"></param>
+    public void setAccountState(int accId, int regState)
+    {
+      CAccounts.getInstance()[accId].RegState = regState;
+      updateGui();
+    }
+
     #endregion Methods
 
-
   }
+
+
+
 
 } // namespace Sipek

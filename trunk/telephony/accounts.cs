@@ -20,18 +20,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sipek
+namespace Telephony
 {
-  public enum ERegistrationState
-  {
-    ERegistered,
-    ENotRegistered
-  }
 
   public class CAccount
   {
     // runtime data
-    ERegistrationState _registrationState = ERegistrationState.ENotRegistered;
+    int _registrationState = 0;
     int _index = 0;
 
     // configuration data 
@@ -98,7 +93,7 @@ namespace Sipek
       set { _index = value; }
     }
 
-    public ERegistrationState RegState 
+    public int RegState 
     {
       get { return _registrationState; }
       set 
@@ -113,6 +108,8 @@ namespace Sipek
   /// </summary>
   public class CAccounts
   {
+    private Properties.Settings _settings = Properties.Settings.Default;
+
     private static CAccounts _instance = null;
     private Dictionary<int, CAccount> _accounts;
     private int _defaccountId = 0;
@@ -144,21 +141,22 @@ namespace Sipek
     protected CAccounts()
     {
       _accounts = new Dictionary<int, CAccount>();
-      int count = Properties.Settings.Default.cfgSipAccountAddresses.Count;
 
-      this.DefAccountIndex = Properties.Settings.Default.cfgSipAccountDefault;
+      int count = _settings.cfgSipAccountAddresses.Count;
+
+      this.DefAccountIndex = _settings.cfgSipAccountDefault;
 
       for (int i = 0; i < count; i++)
       {
         CAccount account = new CAccount();
-        account.Id = Properties.Settings.Default.cfgSipAccountIds[i];
-        account.Name = Properties.Settings.Default.cfgSipAccountNames[i];
-        account.Address = Properties.Settings.Default.cfgSipAccountAddresses[i];
-        account.Port = Int16.Parse(Properties.Settings.Default.cfgSipAccountPorts[i]);
-        account.Username = Properties.Settings.Default.cfgSipAccountUsername[i];
-        account.Password = Properties.Settings.Default.cfgSipAccountPassword[i];
-        account.Domain = Properties.Settings.Default.cfgSipAccountDomains[i];
-        account.Period = Int16.Parse(Properties.Settings.Default.cfgSipAccountRegPeriod[i]);
+        account.Id = _settings.cfgSipAccountIds[i];
+        account.Name = _settings.cfgSipAccountNames[i];
+        account.Address = _settings.cfgSipAccountAddresses[i];
+        account.Port = Int16.Parse(_settings.cfgSipAccountPorts[i]);
+        account.Username = _settings.cfgSipAccountUsername[i];
+        account.Password = _settings.cfgSipAccountPassword[i];
+        account.Domain = _settings.cfgSipAccountDomains[i];
+        account.Period = Int16.Parse(_settings.cfgSipAccountRegPeriod[i]);
         account.Index = i;
 
         _accounts.Add(i, account);
@@ -170,14 +168,14 @@ namespace Sipek
       get
       {
         CAccount account = _accounts[index];
-        account.Name = Properties.Settings.Default.cfgSipAccountNames[index];
-        account.Id = Properties.Settings.Default.cfgSipAccountIds[index];
-        account.Address = Properties.Settings.Default.cfgSipAccountAddresses[index];
-        account.Port = Int16.Parse(Properties.Settings.Default.cfgSipAccountPorts[index]);
-        account.Username = Properties.Settings.Default.cfgSipAccountUsername[index];
-        account.Password = Properties.Settings.Default.cfgSipAccountPassword[index];
-        account.Domain = Properties.Settings.Default.cfgSipAccountDomains[index];
-        account.Period = Int16.Parse(Properties.Settings.Default.cfgSipAccountRegPeriod[index]);
+        account.Name = _settings.cfgSipAccountNames[index];
+        account.Id = _settings.cfgSipAccountIds[index];
+        account.Address = _settings.cfgSipAccountAddresses[index];
+        account.Port = Int16.Parse(_settings.cfgSipAccountPorts[index]);
+        account.Username = _settings.cfgSipAccountUsername[index];
+        account.Password = _settings.cfgSipAccountPassword[index];
+        account.Domain = _settings.cfgSipAccountDomains[index];
+        account.Period = Int16.Parse(_settings.cfgSipAccountRegPeriod[index]);
 
         return account;
       }
@@ -185,48 +183,48 @@ namespace Sipek
       {
         CAccount account = _accounts[index];
 
-        Properties.Settings.Default.cfgSipAccountNames[index] = account.Name = value.Name;
-        Properties.Settings.Default.cfgSipAccountIds[index] = account.Id = value.Id;
-        Properties.Settings.Default.cfgSipAccountAddresses[index] = account.Address = value.Address;
+        _settings.cfgSipAccountNames[index] = account.Name = value.Name;
+        _settings.cfgSipAccountIds[index] = account.Id = value.Id;
+        _settings.cfgSipAccountAddresses[index] = account.Address = value.Address;
         account.Port = value.Port;
-        Properties.Settings.Default.cfgSipAccountPorts[index] = value.Port.ToString();
-        Properties.Settings.Default.cfgSipAccountUsername[index] = account.Username = value.Username;
-        Properties.Settings.Default.cfgSipAccountPassword[index] = account.Password = value.Password;
-        Properties.Settings.Default.cfgSipAccountDomains[index] = account.Domain = value.Domain;
+        _settings.cfgSipAccountPorts[index] = value.Port.ToString();
+        _settings.cfgSipAccountUsername[index] = account.Username = value.Username;
+        _settings.cfgSipAccountPassword[index] = account.Password = value.Password;
+        _settings.cfgSipAccountDomains[index] = account.Domain = value.Domain;
         account.Period = value.Period;
-        Properties.Settings.Default.cfgSipAccountRegPeriod[index] = value.Period.ToString();
+        _settings.cfgSipAccountRegPeriod[index] = value.Period.ToString();
       }
     }
 
     public int getSize()
     {
-      return Properties.Settings.Default.cfgSipAccountNames.Count;
+      return _settings.cfgSipAccountNames.Count;
     }
 
     public void save()
     {
-      int count = Properties.Settings.Default.cfgSipAccountAddresses.Count;
+      int count = _settings.cfgSipAccountAddresses.Count;
 
-      Properties.Settings.Default.cfgSipAccountDefault = this.DefAccountIndex;
+      _settings.cfgSipAccountDefault = this.DefAccountIndex;
 
       for (int index = 0; index < count; index++)
       {
-        Properties.Settings.Default.cfgSipAccountAddresses[index] = this[index].Address;
-        Properties.Settings.Default.cfgSipAccountPorts[index] = this[index].Port.ToString();
-        Properties.Settings.Default.cfgSipAccountNames[index] = this[index].Name;
-        Properties.Settings.Default.cfgSipAccountRegPeriod[index] = this[index].Period.ToString();
-        Properties.Settings.Default.cfgSipAccountIds[index] = this[index].Id;
-        Properties.Settings.Default.cfgSipAccountUsername[index] = this[index].Username;
-        Properties.Settings.Default.cfgSipAccountPassword[index] = this[index].Password;
-        Properties.Settings.Default.cfgSipAccountDomains[index] = this[index].Domain;
-        Properties.Settings.Default.Save();
+        _settings.cfgSipAccountAddresses[index] = this[index].Address;
+        _settings.cfgSipAccountPorts[index] = this[index].Port.ToString();
+        _settings.cfgSipAccountNames[index] = this[index].Name;
+        _settings.cfgSipAccountRegPeriod[index] = this[index].Period.ToString();
+        _settings.cfgSipAccountIds[index] = this[index].Id;
+        _settings.cfgSipAccountUsername[index] = this[index].Username;
+        _settings.cfgSipAccountPassword[index] = this[index].Password;
+        _settings.cfgSipAccountDomains[index] = this[index].Domain;
+        _settings.Save();
       }
     }
 
 
     public void reload()
     {
-      Properties.Settings.Default.Reload();
+      _settings.Reload();
     }
   }
 }

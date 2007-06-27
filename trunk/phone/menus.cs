@@ -20,6 +20,7 @@ using MenuDesigner;
 using Sipek;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using Telephony;
 
 namespace Sipek
 {
@@ -63,7 +64,7 @@ namespace Sipek
     EAlarmMissed = 0x40,
     EAll = 0xF,
   }
-
+  
   /// <summary>
   /// 
   /// </summary>
@@ -96,6 +97,22 @@ namespace Sipek
     public override void  onEntry()
     {
  	    base.onEntry();
+
+      // Create call menu pages...
+      new CConnectingPage();
+      new CRingingPage();
+      new CReleasedPage();
+      new CActivePage();
+      new CDialPage();
+      new CIncomingPage();
+      new CPreDialPage();
+      new CHoldingPage();
+      new CXferDialingPage();
+      new CXferListPage();
+      new C3PtyListPage();
+      new CDeflectPage();
+      new CCallOptionsPage();
+
       // initialize telephony...
       CCallManager.getInstance().initialize();
     }
@@ -196,10 +213,10 @@ namespace Sipek
       _displayName.Caption = CAccounts.getInstance().DefAccount.Id;
 
 	    // check forwardings
-	    bool isForwardActive = Properties.Settings.Default.cfgCFUFlag;
+      bool isForwardActive = CCallManager.getInstance().CFUFlag; //Properties.Settings.Default.cfgCFUFlag;
 	    if (!isForwardActive)
 	    {
-		    isForwardActive = Properties.Settings.Default.cfgDNDFlag;
+        isForwardActive = CCallManager.getInstance().DNDFlag; //Properties.Settings.Default.cfgDNDFlag;
 	    }
       //int isDirectCallActive = ;
       //int isAlarmActive = ;
@@ -229,7 +246,6 @@ namespace Sipek
       }
  */ 
 
-
       // get ringer mode
       switch (Properties.Settings.Default.cfgRingMode)
       {
@@ -247,14 +263,14 @@ namespace Sipek
       }      
       
       // get registration status
-      ERegistrationState regState = CAccounts.getInstance().DefAccount.RegState;
+      int regState = CAccounts.getInstance().DefAccount.RegState;
       switch (regState)
       {
-        case ERegistrationState.ERegistered:
+        case 200:
           // assign to status
           status = status + (int)EStatusFlag.ERegStatus;
           break;
-        case ERegistrationState.ENotRegistered:
+        default:
           break;
       }
 
@@ -397,7 +413,7 @@ namespace Sipek
         }
         else
         {
-          if (CAccounts.getInstance()[i].RegState == ERegistrationState.ERegistered)
+          if (CAccounts.getInstance()[i].RegState == 200)
             item.Caption += " (Reg)";
           else
             item.Caption += " (Not reg)";
@@ -782,15 +798,15 @@ namespace Sipek
 
     bool chbDND_OnUnchecked()
     {
-      Properties.Settings.Default.cfgDNDFlag = false;
-      Properties.Settings.Default.Save();
+      //Properties.Settings.Default.cfgDNDFlag = false;
+      //Properties.Settings.Default.Save();
       return true;
     }
 
     bool chbDND_OnChecked()
     {
-      Properties.Settings.Default.cfgDNDFlag = true;
-      Properties.Settings.Default.Save();
+      //Properties.Settings.Default.cfgDNDFlag = true;
+      //Properties.Settings.Default.Save();
       return true;
     }
   }
@@ -840,6 +856,7 @@ namespace Sipek
 
     bool CRedirectPage_Ok()
     {
+/*
       Properties.Settings.Default.cfgCFUFlag = _checkCFU.Checked;
       Properties.Settings.Default.cfgCFNRFlag = _checkCFNR.Checked;
       Properties.Settings.Default.cfgCFBFlag = _checkCFB.Checked;
@@ -849,7 +866,7 @@ namespace Sipek
       Properties.Settings.Default.cfgCFBNumber = _editCFBNumber.Caption;
 
       Properties.Settings.Default.Save();
-
+*/
       _controller.previousPage();
 
       return true;
@@ -857,13 +874,13 @@ namespace Sipek
 
     public override void onEntry()
     {
-      _checkCFU.Checked = Properties.Settings.Default.cfgCFUFlag;
-      _checkCFNR.Checked = Properties.Settings.Default.cfgCFNRFlag;
-      _checkCFB.Checked = Properties.Settings.Default.cfgCFBFlag;
+      _checkCFU.Checked = CCallManager.getInstance().CFUFlag; //Properties.Settings.Default.cfgCFUFlag;
+      //_checkCFNR.Checked = CCallManager.getInstance()//Properties.Settings.Default.cfgCFNRFlag;
+      //_checkCFB.Checked = Properties.Settings.Default.cfgCFBFlag;
 
-      _editCFUNumber.Caption = Properties.Settings.Default.cfgCFUNumber;
-      _editCFNRNumber.Caption = Properties.Settings.Default.cfgCFNRNumber;
-      _editCFBNumber.Caption = Properties.Settings.Default.cfgCFBNumber;
+      _editCFUNumber.Caption = CCallManager.getInstance().CFUNumber; //Properties.Settings.Default.cfgCFUNumber;
+      //_editCFNRNumber.Caption = //Properties.Settings.Default.cfgCFNRNumber;
+      //_editCFBNumber.Caption = //Properties.Settings.Default.cfgCFBNumber;
       
       base.onEntry();
     }

@@ -17,7 +17,7 @@
  */
 
 
-namespace Sipek
+namespace Telephony
 {
   /// <summary>
   /// 
@@ -67,12 +67,28 @@ namespace Sipek
       set { _stateId = value; }
     }
 
+    protected CCallManager _manager;
+    protected CCallManager Manager
+    {
+      get { return _manager; }
+    }
+
+    public string Name
+    {
+      get {
+        switch (this.StateId)
+        {
+          //case EStateId.IDLE: name = "IDLE";
+        }
+        return StateId.ToString(); 
+      }
+    }
+
     #endregion
 
     #region Variables
 
     protected CStateMachine _smref;
-
 
     #endregion Variables
 
@@ -81,6 +97,7 @@ namespace Sipek
     public CAbstractState(CStateMachine sm)
     {
       _smref = sm;
+      _manager = CCallManager.getInstance();
     }
 
     #endregion Constructor
@@ -179,6 +196,7 @@ namespace Sipek
     }
     #endregion Callbacks
   }
+
 
   /// <summary>
   /// CIdleState
@@ -375,11 +393,11 @@ namespace Sipek
 
     public override void onEntry()
     {
-      if (Properties.Settings.Default.cfgCFUFlag == true)
+      if (Manager.CFUFlag == true)
       {
-        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CFU, Properties.Settings.Default.cfgCFUNumber);
+        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CFU, Manager.CFUNumber);
       }
-      else if (Properties.Settings.Default.cfgDNDFlag == true)
+      else if (Manager.DNDFlag == true)
       {
         _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_DND, "");
       }

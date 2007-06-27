@@ -17,7 +17,7 @@
  */
 
 
-namespace Sipek
+namespace Telephony
 {
   /// <summary>
   /// CStateMachine class is a telephony data container for one call. It maintains call state, 
@@ -141,6 +141,11 @@ namespace Sipek
     public EStateId getStateId()
     {
       return _state.StateId;
+    }
+
+    public string getStateName()
+    {
+      return _state.Name;
     }
 
     public void changeState(CAbstractState state)
