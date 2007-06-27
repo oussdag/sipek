@@ -284,7 +284,18 @@ namespace Telephony
       }
       return 1;
     }
+    ////
+    public static int playTone(ETones toneId)
+    {
+      return dll_playTone((int)toneId);
+    }
 
+    public static int stopTone()
+    {
+      return dll_stopTone();
+    }
+
+    // Buddy list handling
     public static int addBuddy(string ident)
     {
       string uri = "sip:" + ident + "@" + Manager.getAddress();
@@ -301,6 +312,7 @@ namespace Telephony
       string uri = "sip:" + dest + "@" + Manager.getAddress();
       return dll_sendMessage(Manager.DefaultAccountIndex, uri, message);
     }
+
     #endregion Methods
 
     #region Callbacks
@@ -397,12 +409,7 @@ namespace Telephony
 
     private static int onMessageReceived(string from, string message)
     {
-/* TODO:::
-      CMessageReceivedPage page = (CMessageReceivedPage)CComponentController.getInstance().getPage((int)EPages.P_MESSAGERECEIVEDBOX);
-      page.Message = message;
-      page.From = from;
-      CComponentController.getInstance().showPage(page.Id);
- */
+      Manager.SetMessageReceived(from, message);
       return 1;
     }
 
@@ -412,18 +419,6 @@ namespace Telephony
     }
 
     #endregion Callbacks
-
-
-    ////
-    public static int playTone(ETones toneId)
-    {
-      return dll_playTone((int)toneId);
-    }
-
-    public static int stopTone()
-    {
-      return dll_stopTone();
-    }
 
   }
 

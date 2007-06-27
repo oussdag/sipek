@@ -125,23 +125,17 @@ namespace Telephony
 
     #endregion Constructor
 
-    #region Callback
+    #region Events
 
-    CallbackDelegate onRefreshCallback; // function pointer variable
-    public delegate void CallbackDelegate();  // define callback type 
+    public delegate void CallStateChangedDelegate();  // define callback type 
+    public delegate void MessageReceivedCallbackDelegate(string from, string message);  // define callback type 
+
+    public event CallStateChangedDelegate CallStateChanged;
+    public event MessageReceivedCallbackDelegate MessageReceived;
 
     // dummy callback method in case no other registered
     private void dummy()
     {
-    }
-
-    /// <summary>
-    /// Register callback function
-    /// </summary>
-    /// <param name="method"></param>
-    public void registerOnRefreshCallback(CallbackDelegate method)
-    {
-      onRefreshCallback = new CallbackDelegate(method);
     }
 
     #endregion
@@ -159,7 +153,7 @@ namespace Telephony
       ///
       if (!_initialized)
       {
-        if (onRefreshCallback == null) onRefreshCallback = new CallbackDelegate(dummy);
+        CallStateChanged += dummy;
 
         // Initialize call table
         _calls = new Dictionary<int, CStateMachine>(); 
@@ -182,42 +176,7 @@ namespace Telephony
 
     public void updateGui()
     {
-      // get current session
-      if (_currentSession < 0)
-      {
-        // todo::: showHomePage
-        //CComponentController.getInstance().showPage(CComponentController.getInstance().HomePageId);
-        onRefreshCallback();
-        return;
-      }
-
-      CStateMachine call = getCall(_currentSession);
-      if (call != null)
-      {
-        int stateId = (int)call.getStateId();
-        if (stateId == (int)EStateId.IDLE)
-        {
-          if (Count == 0)
-          {
-            //CComponentController.getInstance().showPage(stateId);
-            onRefreshCallback();
-          }
-          else
-          {
-            _calls.GetEnumerator().MoveNext();
-            _currentSession = _calls.GetEnumerator().Current.Key;
-
-            CStateMachine nextcall = getCall(_currentSession);
-            //if (nextcall != null) CComponentController.getInstance().showPage((int)nextcall.getStateId());
-            onRefreshCallback();
-          }
-        }
-        else
-        {
-          //CComponentController.getInstance().showPage(stateId);
-          onRefreshCallback();
-        }
-      }
+       CallStateChanged();
     }
 
     public CStateMachine getCurrentCall()
@@ -400,9 +359,13 @@ namespace Telephony
       CAccounts.getInstance()[accId].RegState = regState;
       updateGui();
     }
+    
+    public void SetMessageReceived(string from, string message)
+    {
+      MessageReceived(from, message);
+    }
 
     #endregion Methods
-
   }
 
 
