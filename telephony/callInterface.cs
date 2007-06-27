@@ -17,7 +17,7 @@
  */
 
 
-namespace Sipek
+namespace Telephony
 {
 
   interface CTelephonyInterface

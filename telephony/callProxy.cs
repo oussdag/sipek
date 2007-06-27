@@ -21,9 +21,8 @@ using System.Threading;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using MenuDesigner;
 
-namespace Sipek
+namespace Telephony
 {
   public enum ETones : int
   {
@@ -66,6 +65,11 @@ namespace Sipek
     private int _line;
     private int _accountId;
 
+    private CCallManager Manager
+    {
+      get { return CCallManager.getInstance(); }
+    }
+
     #region Constructor
 
     public CCallProxy(int line)
@@ -81,7 +85,7 @@ namespace Sipek
     public int makeCall(string dialedNo, int accountId)
     {
       _accountId = accountId;
-      string uri = "sip:" + dialedNo + "@" + CAccounts.getInstance()[accountId].Address;
+      string uri = "sip:" + dialedNo + "@" + Manager.getAddress(accountId);
       _line = dll_makeCall(accountId, uri);
       return _line;
     }
@@ -118,7 +122,7 @@ namespace Sipek
           
     public bool xferCall(string number)
     {
-      string uri = "sip:" + number + "@" + CAccounts.getInstance()[_accountId].Address;
+      string uri = "sip:" + number + "@" + Manager.getAddress(_accountId);
       dll_xferCall(_line, uri);
       return true;
     }
@@ -137,7 +141,7 @@ namespace Sipek
     
     public bool serviceRequest(int code, string dest)
     {
-      string destUri = "<sip:" + dest + "@" + CAccounts.getInstance().DefAccount.Address + ">";
+      string destUri = "<sip:" + dest + "@" + Manager.getAddress() + ">";
       dll_serviceReq(_line, (int)code, destUri);
       return true;
     }
@@ -217,6 +221,11 @@ namespace Sipek
     static OnMessageReceivedCallback mrdel = new OnMessageReceivedCallback(onMessageReceived);
     static OnBuddyStatusChangedCallback bscdel = new OnBuddyStatusChangedCallback(onBuddyStatusChanged);
 
+    private static CCallManager Manager
+    {
+      get { return CCallManager.getInstance(); }
+    }
+
     #endregion Variables
 
     #region Methods
@@ -232,7 +241,7 @@ namespace Sipek
       onMessageReceivedCallback(mrdel);
 
       // Initialize pjsip...
-      int port = Properties.Settings.Default.cfgSipPort;
+      int port = CCallManager.getInstance().SipPort;
       dll_init(port);
       dll_main();
     }
@@ -246,7 +255,7 @@ namespace Sipek
     {
       shutdown();
 
-      int port = Properties.Settings.Default.cfgSipPort;
+      int port = CCallManager.getInstance().SipPort;
 
       dll_init(port);
       dll_main();
@@ -258,17 +267,17 @@ namespace Sipek
     //
     public static int registerAccounts()
     {
-      for (int i = 0; i < CAccounts.getInstance().getSize(); i++)
+      for (int i = 0; i < Manager.NumAccounts; i++)
       {
-        CAccount acc = CAccounts.getInstance()[i];
-        if (acc.Name.Length > 0)
+        //CAccount acc = CAccounts.getInstance()[i];
+        if (Manager.getId(i).Length > 0)
         {
-          string uri = "sip:" + CAccounts.getInstance()[i].Id + "@" + CAccounts.getInstance()[i].Address;
-          string reguri = "sip:" + CAccounts.getInstance()[i].Address; // +":" + CCallManager.getInstance().SipProxyPort;
+          string uri = "sip:" + Manager.getId(i) + "@" + Manager.getAddress(i);
+          string reguri = "sip:" + Manager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
           //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
-          string domain = CAccounts.getInstance()[i].Domain;
-          string username = CAccounts.getInstance()[i].Username;
-          string password = CAccounts.getInstance()[i].Password;
+          string domain = Manager.getDomain(i);
+          string username = Manager.getUsername(i);
+          string password = Manager.getPassword(i);
           int accId = dll_registerAccount(uri, reguri, domain, username, password);
           // todo:::check if accId corresponds to account index!!!
         }
@@ -278,7 +287,7 @@ namespace Sipek
 
     public static int addBuddy(string ident)
     {
-      string uri = "sip:" + ident + "@" + CAccounts.getInstance().DefAccount.Address;
+      string uri = "sip:" + ident + "@" + Manager.getAddress();
       return dll_addBuddy(uri, true);
     }
 
@@ -289,8 +298,8 @@ namespace Sipek
 
     public static int sendMessage(string dest, string message)
     {
-      string uri = "sip:" + dest + "@" + CAccounts.getInstance().DefAccount.Address;
-      return dll_sendMessage(CAccounts.getInstance().DefAccountIndex, uri, message);
+      string uri = "sip:" + dest + "@" + Manager.getAddress();
+      return dll_sendMessage(Manager.DefaultAccountIndex, uri, message);
     }
     #endregion Methods
 
@@ -366,16 +375,7 @@ namespace Sipek
 
     private static int onRegStateChanged(int accId, int regState)
     {
-      switch (regState)
-      {
-        case 200: 
-            CAccounts.getInstance()[accId].RegState = ERegistrationState.ERegistered;
-          break;
-        default:
-          CAccounts.getInstance()[accId].RegState = ERegistrationState.ENotRegistered;
-          break;
-      }
-      CCallManager.getInstance().updateGui();
+      Manager.setAccountState(accId, regState);
       return 1;
     }
 
@@ -397,10 +397,12 @@ namespace Sipek
 
     private static int onMessageReceived(string from, string message)
     {
+/* TODO:::
       CMessageReceivedPage page = (CMessageReceivedPage)CComponentController.getInstance().getPage((int)EPages.P_MESSAGERECEIVEDBOX);
       page.Message = message;
       page.From = from;
       CComponentController.getInstance().showPage(page.Id);
+ */
       return 1;
     }
 

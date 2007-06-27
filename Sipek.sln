@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+# Visual C# Express 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sipek", "phone\Sipek.csproj", "{A7BC13EB-0EC3-432A-94BE-1B59EF5DBD2F}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "setup\SipekSetup.vdproj", "{61648C39-C8C0-49C5-9018-90F02D982FD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telephony", "..\sipek2\telephony\Telephony.csproj", "{7C60E672-0016-457E-9D23-445F88FB1640}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,16 @@ Global
 		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Mixed Platforms.ActiveCfg = Debug
 		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Win32.ActiveCfg = Release
 		{61648C39-C8C0-49C5-9018-90F02D982FD1}.Release|Win32.Build.0 = Release
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7C60E672-0016-457E-9D23-445F88FB1640}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

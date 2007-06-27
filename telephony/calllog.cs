@@ -22,7 +22,7 @@ using System.Text;
 using System.Xml;
 using System.Collections.ObjectModel;
 
-namespace Sipek
+namespace Telephony
 {
   public enum ECallType : int
   {
