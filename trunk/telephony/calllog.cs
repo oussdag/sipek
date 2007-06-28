@@ -126,6 +126,31 @@ namespace Telephony
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////
+    public Collection<CCallRecord> getList(ECallType type)
+    {
+      Collection<CCallRecord> result = new Collection<CCallRecord>();
+
+      XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
+
+      foreach (XmlNode item in list)
+      {
+        ECallType ctype = (ECallType)int.Parse(item.ChildNodes[0].InnerText);
+        if (ctype == type)
+        {
+          CCallRecord record = new CCallRecord();
+          record.Type = ctype;
+          record.Name = item.ChildNodes[1].InnerText;
+          record.Number = item.ChildNodes[2].InnerText;
+          record.Time = DateTime.Parse(item.ChildNodes[3].InnerText);
+          record.Duration = TimeSpan.Parse(item.ChildNodes[4].InnerText);
+          record.Count = int.Parse(item.ChildNodes[5].InnerText);
+
+          result.Add(record);
+        }
+      }
+
+      return result;
+    }
 
     public Collection<CCallRecord> getList()
     {
