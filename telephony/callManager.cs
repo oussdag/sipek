@@ -129,9 +129,11 @@ namespace Telephony
 
     public delegate void CallStateChangedDelegate();  // define callback type 
     public delegate void MessageReceivedCallbackDelegate(string from, string message);  // define callback type 
+    public delegate void BuddyStatusCallbackDelegate(int buddyId, int status);  // define callback type 
 
     public event CallStateChangedDelegate CallStateChanged;
     public event MessageReceivedCallbackDelegate MessageReceived;
+    public event BuddyStatusCallbackDelegate BuddyStatusChanged;
 
     // dummy callback method in case no other registered
     private void dummy()
@@ -252,7 +254,7 @@ namespace Telephony
       return call;
     }
 
-     public void destroySession(int session)
+    public void destroySession(int session)
     {
       _calls.Remove(session);
       if (_calls.Count == 0)
@@ -264,7 +266,7 @@ namespace Telephony
         // select other session
         _currentSession = _calls.GetEnumerator().Current.Key;
       }
-      updateGui();
+      //updateGui();
     }
 
     public void onUserRelease()
@@ -362,10 +364,17 @@ namespace Telephony
     
     public void SetMessageReceived(string from, string message)
     {
-      MessageReceived(from, message);
+      if (MessageReceived!= null) MessageReceived(from, message);
+    }
+
+    public void setBuddyState(int buddyId, int status)
+    {
+      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status);
     }
 
     #endregion Methods
+
+
   }
 
 

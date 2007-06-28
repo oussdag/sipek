@@ -415,6 +415,7 @@ namespace Telephony
 
     private static int onBuddyStatusChanged(int buddyId, int status)
     {
+      Manager.setBuddyState(buddyId, status);
       return 1;
     }
 
