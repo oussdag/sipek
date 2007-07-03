@@ -57,9 +57,9 @@ namespace Telephony.Properties {
   <string>0</string>
   <string>0</string>
 </ArrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountAddresses {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountAddresses {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountAddresses"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountAddresses"]));
             }
             set {
                 this["cfgSipAccountAddresses"] = value;
@@ -76,9 +76,9 @@ namespace Telephony.Properties {
   <string>0</string>
   <string>0</string>
 </ArrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountPorts {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountPorts {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountPorts"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountPorts"]));
             }
             set {
                 this["cfgSipAccountPorts"] = value;
@@ -95,9 +95,9 @@ namespace Telephony.Properties {
   <string>1237</string>
   <string>1238</string>
 </ArrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountPassword {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountPassword {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountPassword"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountPassword"]));
             }
             set {
                 this["cfgSipAccountPassword"] = value;
@@ -114,9 +114,9 @@ namespace Telephony.Properties {
   <string />
   <string />
 </ArrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountNames {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountNames {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountNames"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountNames"]));
             }
             set {
                 this["cfgSipAccountNames"] = value;
@@ -133,9 +133,9 @@ namespace Telephony.Properties {
   <string>3600</string>
   <string>3600</string>
 </ArrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountRegPeriod {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountRegPeriod {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountRegPeriod"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountRegPeriod"]));
             }
             set {
                 this["cfgSipAccountRegPeriod"] = value;
@@ -164,9 +164,9 @@ namespace Telephony.Properties {
   <string>0</string>
   <string>0</string>
 </ArrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountIds {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountIds {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountIds"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountIds"]));
             }
             set {
                 this["cfgSipAccountIds"] = value;
@@ -179,9 +179,9 @@ namespace Telephony.Properties {
             "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
             "tring>1341</string>\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</A" +
             "rrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountUsername {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountUsername {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountUsername"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountUsername"]));
             }
             set {
                 this["cfgSipAccountUsername"] = value;
@@ -200,9 +200,9 @@ namespace Telephony.Properties {
   <string />
   <string />
 </ArrayOfString>")]
-        public System.Collections.Specialized.StringCollection cfgSipAccountDomains {
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountDomains {
             get {
-                return ((System.Collections.Specialized.StringCollection)(this["cfgSipAccountDomains"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountDomains"]));
             }
             set {
                 this["cfgSipAccountDomains"] = value;
@@ -223,6 +223,7 @@ namespace Telephony.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string cfgCFUNumber {
             get {
                 return ((string)(this["cfgCFUNumber"]));
@@ -234,6 +235,7 @@ namespace Telephony.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string cfgCFNRNumber {
             get {
                 return ((string)(this["cfgCFNRNumber"]));
@@ -281,12 +283,37 @@ namespace Telephony.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string cfgCFBNumber {
             get {
                 return ((string)(this["cfgCFBNumber"]));
             }
             set {
                 this["cfgCFBNumber"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool cfgAAFlag {
+            get {
+                return ((bool)(this["cfgAAFlag"]));
+            }
+            set {
+                this["cfgAAFlag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int cfgAATimeout {
+            get {
+                return ((int)(this["cfgAATimeout"]));
+            }
+            set {
+                this["cfgAATimeout"] = value;
             }
         }
     }

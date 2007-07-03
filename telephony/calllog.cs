@@ -152,6 +152,10 @@ namespace Telephony
 
     public void save()
     {
+      CCallRecord[] tmplist = _callList.ToArray();
+      List<CCallRecord> list = new List<CCallRecord>(tmplist);
+      list.Reverse();
+
       try
       {
         // serialize data
@@ -159,7 +163,7 @@ namespace Telephony
 
         XmlNode nodeRoot = xmldoc.CreateNode("element", "Calllog", "");
 
-        foreach (CCallRecord item in _callList)
+        foreach (CCallRecord item in list)
         {
           XmlNode nodeRecord = xmldoc.CreateNode("element", "Record", "");
 
@@ -182,7 +186,11 @@ namespace Telephony
           XmlElement elcount = xmldoc.CreateElement(COUNT);
           elcount.InnerText = item.Count.ToString();
           nodeRecord.AppendChild(elcount);
-          
+
+          XmlElement eltype = xmldoc.CreateElement(TYPE);
+          eltype.InnerText = ((int)item.Type).ToString();
+          nodeRecord.AppendChild(eltype);
+
           // add to xml
           nodeRoot.AppendChild(nodeRecord);
         }
@@ -207,11 +215,11 @@ namespace Telephony
       return _callList;
     }
 
-    private CCallRecord findRecord(string number)
+    private CCallRecord findRecord(string number, ECallType type)
     {
       foreach (CCallRecord item in _callList)
       {
-        if ((item.Number == number))
+        if ((item.Number == number)&&(item.Type == type))
         {
           return item;
         }
@@ -221,20 +229,25 @@ namespace Telephony
 
     protected void addRecord(CCallRecord record)
     {
-      CCallRecord calllogItem = findRecord(record.Number);
-      if (null == calllogItem)
+      CCallRecord calllogItem = findRecord(record.Number, record.Type);
+      if ((null == calllogItem)||(record.Type != calllogItem.Type))
       {
         _callList.Push(record);
       }
-      else
+      else 
       {
-        deleteRecord(record.Number);
+        deleteRecord(record);
         record.Count = calllogItem.Count + 1;
         _callList.Push(record);
       }
     }
 
-    public void deleteRecord(string name)
+    public void deleteRecord(CCallRecord record)
+    {
+      this.deleteRecord(record.Number, record.Type);
+    }
+
+    public void deleteRecord(string number, ECallType type)
     {
       CCallRecord[] tmplist = _callList.ToArray();
       List<CCallRecord> list = new List<CCallRecord>(tmplist);
@@ -243,14 +256,12 @@ namespace Telephony
 
       foreach (CCallRecord item in list)
       {
-        if ((item.Number == name)||(item.Name == name))
+        if ((item.Number == number) && (item.Type == type))
         {
-          //list.Remove(item);
           continue;
         }
         _callList.Push(item);
       }
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////

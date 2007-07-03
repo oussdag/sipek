@@ -227,4 +227,47 @@ namespace Telephony
       _settings.Reload();
     }
   }
+
+  ////////////////////////////////////////////////////////////////////////////////////
+
+  public static class CSettings
+  {
+    public static bool DND
+    {
+      get { return Properties.Settings.Default.cfgDNDFlag; }
+      set { Properties.Settings.Default.cfgDNDFlag = value; }
+    }
+    public static bool AA
+    {
+      get { return Properties.Settings.Default.cfgAAFlag; }
+      set { Properties.Settings.Default.cfgAAFlag = value; }
+    }
+    public static bool CFU
+    {
+      get { return Properties.Settings.Default.cfgCFUFlag; }
+      set { Properties.Settings.Default.cfgCFUFlag = value; }
+    }
+    public static string CFUNumber
+    {
+      get { return Properties.Settings.Default.cfgCFUNumber; }
+      set { Properties.Settings.Default.cfgCFNRNumber = value; }
+    }
+    public static bool CFNR
+    {
+      get { return Properties.Settings.Default.cfgCFNRFlag; }
+      set { Properties.Settings.Default.cfgCFNRFlag = value; }
+    }
+    public static string CFNRNumber
+    {
+      get { return Properties.Settings.Default.cfgCFNRNumber; }
+      set { Properties.Settings.Default.cfgCFNRNumber = value; }
+    }
+    public static bool CFB
+    {
+      get { return Properties.Settings.Default.cfgCFBFlag; }
+      set { Properties.Settings.Default.cfgCFBFlag = value; }
+    }
+  
+  }
+
 }
