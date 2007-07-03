@@ -50,17 +50,17 @@ namespace Telephony
     // Configuration settings
     public bool CFUFlag
     {
-      get { return false;  }
+      get { return CSettings.CFU;  }
     }
 
     public string CFUNumber
     {
-      get { return "";  }
+      get { return CSettings.CFUNumber;  }
     }
 
     public bool DNDFlag
     {
-      get { return false;  }
+      get { return CSettings.DND;  }
     }
 
     public int SipPort
@@ -391,8 +391,12 @@ namespace Telephony
       }
     }    
 
-    #endregion Methods
+    public void onUserTransfer(int session, string number)
+    {
+      this.getCall(session).getState().xferCall(number);
+    }
 
+    #endregion Methods
 
   }
 
