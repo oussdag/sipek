@@ -284,6 +284,7 @@ namespace Telephony
     {
       onUserAnswer(_currentSession);
     }
+
     public void onUserAnswer(int session)
     {
       CStateMachine call = getCall(session);
@@ -371,6 +372,24 @@ namespace Telephony
     {
       if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status);
     }
+
+    public void HoldRetrieve(int session)
+    {
+      // check Hold or Retrieve
+      CAbstractState state = this.getCall(session).getState();
+      if (state.StateId == EStateId.ACTIVE)
+      {
+        this.getCall(session).getState().holdCall();
+      }
+      else if (state.StateId == EStateId.HOLDING)
+      {
+        this.getCall(session).getState().retrieveCall();
+      }
+      else
+      { 
+        // illegal
+      }
+    }    
 
     #endregion Methods
 

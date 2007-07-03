@@ -75,12 +75,18 @@ namespace Telephony
 
   public class CCallLog
   {
+    private const string NAME = "Name";
+    private const string NUMBER = "Number";
+    private const string DATETIME = "Time";
+    private const string TYPE = "Type";
+    private const string DURATION = "Duration";
+    private const string COUNT = "Count";
+
     private static CCallLog _instance = null;
     
-    private XmlDocument _xmlDocument;
-
     private string XMLCallLogFile = "calllog.xml";
 
+    private Stack<CCallRecord> _callList;
 
     public static CCallLog getInstance()
     {
@@ -93,32 +99,96 @@ namespace Telephony
 
     public CCallLog()
     {
-      _xmlDocument = new XmlDocument();
       load();
     }
 
-    public void load()
+    private void load()
     {
+      XmlDocument xmlDocument = new XmlDocument();
       try
       {
-        _xmlDocument.Load(XMLCallLogFile);
+        xmlDocument.Load(XMLCallLogFile);
       }
       catch (System.IO.FileNotFoundException ee)
       {
         System.Console.WriteLine(ee.Message);
 
-        XmlNode root = _xmlDocument.CreateNode("element", "Calllog", "");
-        _xmlDocument.AppendChild(root);
+        XmlNode root = xmlDocument.CreateNode("element", "Calllog", "");
+        xmlDocument.AppendChild(root);
 
       }
       catch (System.Xml.XmlException e) { System.Console.WriteLine(e.Message); }
+
+      XmlNodeList list = xmlDocument.SelectNodes("/Calllog/Record");
+
+      // create list 
+      _callList = new Stack<CCallRecord>();
+      foreach (XmlNode item in list)
+      {
+        CCallRecord record = new CCallRecord();
+
+        XmlNode snode = item.SelectSingleNode(NAME);
+        if ((snode != null) && (null != snode.FirstChild) &&(snode.FirstChild.Value != null)) record.Name = snode.FirstChild.Value;
+
+        snode = item.SelectSingleNode(NUMBER);
+        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Number = snode.FirstChild.Value;
+
+        snode = item.SelectSingleNode(DATETIME);
+        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Time = DateTime.Parse(snode.FirstChild.Value);
+
+        snode = item.SelectSingleNode(DURATION);
+        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Duration = TimeSpan.Parse(snode.FirstChild.Value);
+
+        snode = item.SelectSingleNode(COUNT);
+        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Count = int.Parse(snode.FirstChild.Value);
+
+        snode = item.SelectSingleNode(TYPE);
+        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Type = (ECallType)int.Parse(snode.FirstChild.Value);
+
+        _callList.Push(record);
+      }
+
     }
 
     public void save()
     {
       try
       {
-        _xmlDocument.Save(XMLCallLogFile);
+        // serialize data
+        XmlDocument xmldoc = new XmlDocument();
+
+        XmlNode nodeRoot = xmldoc.CreateNode("element", "Calllog", "");
+
+        foreach (CCallRecord item in _callList)
+        {
+          XmlNode nodeRecord = xmldoc.CreateNode("element", "Record", "");
+
+          XmlElement elname = xmldoc.CreateElement(NAME);
+          elname.InnerText = item.Name;
+          nodeRecord.AppendChild(elname);
+
+          XmlElement elnumber = xmldoc.CreateElement(NUMBER);
+          elnumber.InnerText = item.Number;
+          nodeRecord.AppendChild(elnumber);
+
+          XmlElement eldur = xmldoc.CreateElement(DURATION);
+          eldur.InnerText = item.Duration.ToString();
+          nodeRecord.AppendChild(eldur);
+        
+          XmlElement eltime = xmldoc.CreateElement(DATETIME);
+          eltime.InnerText = item.Time.ToString();
+          nodeRecord.AppendChild(eltime);
+
+          XmlElement elcount = xmldoc.CreateElement(COUNT);
+          elcount.InnerText = item.Count.ToString();
+          nodeRecord.AppendChild(elcount);
+          
+          // add to xml
+          nodeRoot.AppendChild(nodeRecord);
+        }
+        xmldoc.AppendChild(nodeRoot);
+
+        xmldoc.Save(XMLCallLogFile);
       }
       catch (System.IO.FileNotFoundException ee) { System.Console.WriteLine(ee.Message); }
       catch (System.Xml.XmlException e) { System.Console.WriteLine(e.Message); }
@@ -126,61 +196,22 @@ namespace Telephony
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////
-    public Collection<CCallRecord> getList(ECallType type)
+    public Stack<CCallRecord> getList(ECallType type)
     {
-      Collection<CCallRecord> result = new Collection<CCallRecord>();
-
-      XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
-
-      foreach (XmlNode item in list)
-      {
-        ECallType ctype = (ECallType)int.Parse(item.ChildNodes[0].InnerText);
-        if (ctype == type)
-        {
-          CCallRecord record = new CCallRecord();
-          record.Type = ctype;
-          record.Name = item.ChildNodes[1].InnerText;
-          record.Number = item.ChildNodes[2].InnerText;
-          record.Time = DateTime.Parse(item.ChildNodes[3].InnerText);
-          record.Duration = TimeSpan.Parse(item.ChildNodes[4].InnerText);
-          record.Count = int.Parse(item.ChildNodes[5].InnerText);
-
-          result.Add(record);
-        }
-      }
-
-      return result;
+      // todo!!!
+      return _callList;
     }
 
-    public Collection<CCallRecord> getList()
+    public Stack<CCallRecord> getList()
     {
-      Collection<CCallRecord> result = new Collection<CCallRecord>();
-
-      XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
-      
-      foreach (XmlNode item in list)
-      {
-        CCallRecord record = new CCallRecord();
-        record.Type = (ECallType)int.Parse(item.ChildNodes[0].InnerText);
-        record.Name = item.ChildNodes[1].InnerText;
-        record.Number = item.ChildNodes[2].InnerText;
-        record.Time = DateTime.Parse(item.ChildNodes[3].InnerText);
-        record.Duration = TimeSpan.Parse(item.ChildNodes[4].InnerText);
-        record.Count = int.Parse(item.ChildNodes[5].InnerText);
-
-        result.Add(record);
-      }
-      
-      return result;
+      return _callList;
     }
 
-    public XmlNode findRecord(string number)
-    { 
-      XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
-
-      foreach (XmlNode item in list)
+    private CCallRecord findRecord(string number)
+    {
+      foreach (CCallRecord item in _callList)
       {
-        if (item.ChildNodes[2].InnerText == number)
+        if ((item.Number == number))
         {
           return item;
         }
@@ -190,71 +221,36 @@ namespace Telephony
 
     protected void addRecord(CCallRecord record)
     {
-      int count = 1;
-
-      XmlNode searchRes = findRecord(record.Number);
-
-      if (searchRes != null)
+      CCallRecord calllogItem = findRecord(record.Number);
+      if (null == calllogItem)
       {
-        try
-        {
-          count = int.Parse(searchRes.ChildNodes[5].InnerText);
-          count++;
-        }
-        catch (Exception e)
-        {
-          count = 1;
-          XmlElement xmlcount = _xmlDocument.CreateElement("Count");
-          searchRes.AppendChild(xmlcount);
-        }
-        searchRes.ChildNodes[5].InnerText = count.ToString();
-        return;
+        _callList.Push(record);
       }
-
-      XmlNode nodeRecord = _xmlDocument.CreateNode("element", "Record", "");
-
-      XmlElement eltype = _xmlDocument.CreateElement("Type");
-      eltype.InnerText = ((int)record.Type).ToString();
-      nodeRecord.AppendChild(eltype);
-
-      XmlElement ellastname = _xmlDocument.CreateElement("Name");
-      ellastname.InnerText = record.Name;
-      nodeRecord.AppendChild(ellastname);
-
-      XmlElement elname = _xmlDocument.CreateElement("Number");
-      elname.InnerText = record.Number;
-      nodeRecord.AppendChild(elname);
-
-      XmlElement eltime = _xmlDocument.CreateElement("Time");
-      eltime.InnerText = record.Time.ToString();
-      nodeRecord.AppendChild(eltime);
-
-      XmlElement eldur = _xmlDocument.CreateElement("Duration");
-      eldur.InnerText = record.Duration.ToString();
-      nodeRecord.AppendChild(eldur);
-
-      XmlElement elcount = _xmlDocument.CreateElement("Count");
-      elcount.InnerText = count.ToString();
-      nodeRecord.AppendChild(elcount);
-
-      _xmlDocument.DocumentElement.AppendChild(nodeRecord);
+      else
+      {
+        deleteRecord(record.Number);
+        record.Count = calllogItem.Count + 1;
+        _callList.Push(record);
+      }
     }
 
     public void deleteRecord(string name)
     {
-      string path = "/phonebook/record" + "[name='" + name + "']";
-      XmlNode node = _xmlDocument.SelectSingleNode(path);
-      _xmlDocument.DocumentElement.RemoveChild(node);
+      CCallRecord[] tmplist = _callList.ToArray();
+      List<CCallRecord> list = new List<CCallRecord>(tmplist);
+      list.Reverse();
+      _callList.Clear();
 
-      save();
-    }
+      foreach (CCallRecord item in list)
+      {
+        if ((item.Number == name)||(item.Name == name))
+        {
+          //list.Remove(item);
+          continue;
+        }
+        _callList.Push(item);
+      }
 
-    public void clearAll()
-    {
-      XmlNodeList list = _xmlDocument.SelectNodes("/Calllog/Record");
-      _xmlDocument.DocumentElement.RemoveAll();
-
-      save();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
