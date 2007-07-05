@@ -185,7 +185,10 @@ namespace Telephony
     [DllImport("pjsipDll.dll")]
     private static extern int dll_removeBuddy(int buddyId);
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_sendMessage(int accId, string uri, string message);
+    private static extern int dll_sendMessage(int buddyId, string uri, string message);
+    //[DllImport("pjsipDll.dll")]
+    //private static extern int dll_setStatus(int buddyId, int statusId);
+    //use pjsua_acc_set_online_status
 
     // call API callbacks
     [DllImport("pjsipDll.dll")]
@@ -272,6 +275,7 @@ namespace Telephony
         //CAccount acc = CAccounts.getInstance()[i];
         if (Manager.getId(i).Length > 0)
         {
+          if (Manager.getAddress(i) == "0") continue;
           string uri = "sip:" + Manager.getId(i) + "@" + Manager.getAddress(i);
           string reguri = "sip:" + Manager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
           //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
