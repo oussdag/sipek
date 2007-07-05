@@ -250,7 +250,7 @@ namespace Telephony
     public static string CFUNumber
     {
       get { return Properties.Settings.Default.cfgCFUNumber; }
-      set { Properties.Settings.Default.cfgCFNRNumber = value; }
+      set { Properties.Settings.Default.cfgCFUNumber = value; }
     }
     public static bool CFNR
     {
@@ -267,7 +267,11 @@ namespace Telephony
       get { return Properties.Settings.Default.cfgCFBFlag; }
       set { Properties.Settings.Default.cfgCFBFlag = value; }
     }
-  
+    public static string CFBNumber
+    {
+      get { return Properties.Settings.Default.cfgCFBNumber; }
+      set { Properties.Settings.Default.cfgCFBNumber = value; }
+    }
   }
 
 }

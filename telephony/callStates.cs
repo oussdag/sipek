@@ -228,7 +228,6 @@ namespace Telephony
 
     public override void incomingCall(string callingNo)
     {
-      _smref.SigProxy.alerted();
       _smref.CallingNo = callingNo;
       _smref.Incoming = true;
       _smref.changeState(EStateId.INCOMING);
@@ -315,6 +314,7 @@ namespace Telephony
 
     public override void onEntry()
     {
+      _smref.Counting = true;
     }
 
     public override void onExit()
@@ -393,7 +393,7 @@ namespace Telephony
 
     public override void onEntry()
     {
-      if (Manager.CFUFlag == true)
+      if ((Manager.CFUFlag == true) && (Manager.CFUNumber.Length > 0))
       {
         _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CFU, Manager.CFUNumber);
       }
@@ -401,12 +401,16 @@ namespace Telephony
       {
         _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_DND, "");
       }
+      else if (CSettings.AA == true)
+      {
+        this.acceptCall();
+      }
       else
       {
+        _smref.SigProxy.alerted();
         _smref.Type = ECallType.EMissed;
+        CPjSipProxy.playTone(ETones.EToneRing);
       }
-
-      CPjSipProxy.playTone(ETones.EToneRing);
     }
 
     public override void onExit()
@@ -428,6 +432,12 @@ namespace Telephony
     {
       _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
       _smref.destroy();
+    }
+
+    public override bool xferCall(string number)
+    {
+      // In fact this is not Tranfser. It's Deflect => redirect...
+      return _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CD, number);
     }
   }
 

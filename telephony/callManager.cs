@@ -62,7 +62,10 @@ namespace Telephony
     {
       get { return CSettings.DND;  }
     }
-
+    public bool AAFlag
+    {
+      get { return CSettings.AA; }
+    }
     public int SipPort
     {
       get { return 5060; }
@@ -266,7 +269,7 @@ namespace Telephony
         // select other session
         _currentSession = _calls.GetEnumerator().Current.Key;
       }
-      //updateGui();
+      updateGui();
     }
 
     public void onUserRelease()

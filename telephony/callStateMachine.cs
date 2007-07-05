@@ -39,8 +39,8 @@ namespace Telephony
     private CHoldingState _stateHolding;
 
     private ECallType _callType = ECallType.EUndefined;
-    private System.DateTime _timestamp;
     private System.TimeSpan _duration;
+    private System.DateTime _timestamp;
 
 
     #endregion Variables
@@ -78,10 +78,11 @@ namespace Telephony
       get { return _callType; }
       set { _callType = value; }
     }
+
     public System.DateTime Time
     {
-      get { return _timestamp; }
       set { _timestamp = value; }
+      get { return _timestamp; }
     }
 
     public System.TimeSpan Duration
@@ -89,9 +90,16 @@ namespace Telephony
       set { _duration = value; }
       get { return _duration; }
     }
+
     public System.TimeSpan RuntimeDuration
     {
-      get { return System.DateTime.Now.Subtract(Time); }
+      get {
+        if (true == Counting)
+        {
+          return System.DateTime.Now.Subtract(Time);
+        }
+        return System.TimeSpan.Zero; 
+      }
     }
     
     private bool _isHeld = false;
@@ -106,6 +114,13 @@ namespace Telephony
     {
       get { return _is3Pty; }
       set { _is3Pty = value; }
+    }
+
+    private bool _counting = false; // if duration counter is started
+    public bool Counting
+    {
+      get { return _counting; }
+      set { _counting = value; }
     }
     #endregion
 
