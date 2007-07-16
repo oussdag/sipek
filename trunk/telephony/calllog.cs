@@ -267,6 +267,12 @@ namespace Telephony
       }
     }
 
+    public void clearAll()
+    {
+      _callList.Clear();
+      save();
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////
     public void addCall(ECallType type, string number, DateTime time, TimeSpan duration)
     {
