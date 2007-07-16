@@ -1347,7 +1347,7 @@ namespace Sipek
       if (buddy != null)
       {
         // Invoke SIP stack wrapper function to send message
-        CPjSipProxy.sendMessage(buddy.Number, _editBox.Caption);
+        CCallManager.getInstance().CommonProxy.sendMessage(buddy.Number, _editBox.Caption);
       }
       _controller.previousPage();
       return true;
