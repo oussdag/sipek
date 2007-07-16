@@ -36,7 +36,7 @@ namespace Telephony
   /// <summary>
   /// 
   /// </summary>
-  public class CCallProxy : CTelephonyInterface
+  public class CSipCallProxy : CTelephonyInterface
   {
     // call API
     [DllImport("pjsipDll.dll")]
@@ -72,7 +72,7 @@ namespace Telephony
 
     #region Constructor
 
-    public CCallProxy(int line)
+    public CSipCallProxy(int line)
     {
       _line = line;
     }
@@ -159,7 +159,7 @@ namespace Telephony
   /// <summary>
   /// 
   /// </summary>
-  public static class CPjSipProxy
+  public class CSipCommonProxy : CCommonProxyInterface
   {
 
     #region Wrapper functions
@@ -219,7 +219,7 @@ namespace Telephony
     static OnCallStateChanged csDel = new OnCallStateChanged(onCallStateChanged);
     static OnRegStateChanged rsDel = new OnRegStateChanged(onRegStateChanged);
     static OnCallIncoming ciDel = new OnCallIncoming(onCallIncoming);
-    static GetConfigData gdDel = new GetConfigData(getConfigData);
+    //static GetConfigData gdDel = new GetConfigData(getConfigData);
     static OnCallHoldConfirm chDel = new OnCallHoldConfirm(onCallHoldConfirm);
     static OnMessageReceivedCallback mrdel = new OnMessageReceivedCallback(onMessageReceived);
     static OnBuddyStatusChangedCallback bscdel = new OnBuddyStatusChangedCallback(onBuddyStatusChanged);
@@ -268,7 +268,7 @@ namespace Telephony
     /////////////////////////////////////////////////////////////////////////////////
     // Call API
     //
-    public static int registerAccounts()
+    public int registerAccounts()
     {
       for (int i = 0; i < Manager.NumAccounts; i++)
       {
@@ -289,29 +289,29 @@ namespace Telephony
       return 1;
     }
     ////
-    public static int playTone(ETones toneId)
+    public int playTone(ETones toneId)
     {
       return dll_playTone((int)toneId);
     }
 
-    public static int stopTone()
+    public int stopTone()
     {
       return dll_stopTone();
     }
 
     // Buddy list handling
-    public static int addBuddy(string ident)
+    public int addBuddy(string ident)
     {
       string uri = "sip:" + ident + "@" + Manager.getAddress();
       return dll_addBuddy(uri, true);
     }
 
-    public static int delBuddy(int buddyId)
+    public int delBuddy(int buddyId)
     {
       return dll_removeBuddy(buddyId);
     }
 
-    public static int sendMessage(string dest, string message)
+    public int sendMessage(string dest, string message)
     {
       string uri = "sip:" + dest + "@" + Manager.getAddress();
       return dll_sendMessage(Manager.DefaultAccountIndex, uri, message);
@@ -395,12 +395,6 @@ namespace Telephony
       return 1;
     }
 
-
-    private static int getConfigData(int cfgId)
-    {
-
-      return 1;
-    }
 
     private static int onCallHoldConfirm(int callId)
     {

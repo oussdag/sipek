@@ -30,6 +30,7 @@ namespace Telephony
 
     private CAbstractState _state;
 
+    // State instances....
     private CIdleState _stateIdle;
     private CConnectingState _stateCalling;
     private CAlertingState _stateAlerting;
@@ -41,7 +42,8 @@ namespace Telephony
     private ECallType _callType = ECallType.EUndefined;
     private System.TimeSpan _duration;
     private System.DateTime _timestamp;
-
+    private CCallManager _manager;
+    private CCallLog _calllog;
 
     #endregion Variables
 
@@ -54,10 +56,16 @@ namespace Telephony
       set { _session = value; }
     }
 
-    private CCallProxy _sigproxy;
-    public CCallProxy SigProxy
+    private CTelephonyInterface _sigproxy;
+    public CTelephonyInterface SigProxy
     {
       get { return _sigproxy; } 
+    }
+
+    private CCommonProxyInterface _commonproxy;
+    public CCommonProxyInterface CommonProxy
+    {
+      get { return _commonproxy; }
     }
 
     private string _callingNumber = "";
@@ -122,13 +130,46 @@ namespace Telephony
       get { return _counting; }
       set { _counting = value; }
     }
+
+    public bool CFUFlag
+    {
+      get { 
+        if (null == _manager) return false; 
+        return _manager.CFUFlag; 
+      }
+    }
+
+    public string CFUNumber
+    {
+      get {
+        if (null == _manager) return "";
+        return _manager.CFUNumber; 
+      }
+    }
+
+    public bool DNDFlag
+    {
+      get {
+        if (null == _manager) return false;
+        return _manager.DNDFlag; 
+      }
+    }
+    public bool AAFlag
+    {
+      get {
+        if (null == _manager) return false;
+        return _manager.AAFlag; 
+      }
+    }
     #endregion
 
     #region Constructor
 
-    public CStateMachine(CCallProxy proxy)
+    public CStateMachine(CCallManager manager, CTelephonyInterface proxy, CCommonProxyInterface commonproxy)
     {
+      _manager = manager;
       _sigproxy = proxy;
+      _commonproxy = commonproxy;
 
       _stateIdle = new CIdleState(this);
       _stateAlerting = new CAlertingState(this);
@@ -138,7 +179,7 @@ namespace Telephony
       _stateIncoming = new CIncomingState(this);
       _stateHolding = new CHoldingState(this);
       _state = _stateIdle;
-
+      
       Time = System.DateTime.Now;
       Duration = System.TimeSpan.Zero;
     }
@@ -147,6 +188,11 @@ namespace Telephony
 
 
     #region Methods
+
+    public void setCallLogInstance(CCallLog calllog)
+    {
+      _calllog = calllog;
+    }
 
     public CAbstractState getState()
     {
@@ -183,7 +229,7 @@ namespace Telephony
         case EStateId.INCOMING: changeState(_stateIncoming); break;
         case EStateId.HOLDING: changeState(_stateHolding); break;
       }
-      CCallManager.getInstance().updateGui();
+      if (null != _manager) _manager.updateGui();
     }
 
     public void destroy()
@@ -191,14 +237,26 @@ namespace Telephony
       // update call log
       if (((Type != ECallType.EDialed) || (CallingNo.Length > 0)) && (Type != ECallType.EUndefined))
       {
-        CCallLog.getInstance().addCall(Type, CallingNo, Time, Duration);
-        CCallLog.getInstance().save();
+        if (null != _calllog)
+        {
+          _calllog.addCall(Type, CallingNo, Time, Duration);
+          _calllog.save();
+        }
+        else
+        { 
+          ///!!!
+        }
+      }
+
+      if (true == Counting)
+      {
+        Duration = System.DateTime.Now.Subtract(Time);
       }
 
       CallingNo = "";
       Incoming = false;
       changeState(EStateId.IDLE);
-      CCallManager.getInstance().destroySession(Session);
+      if (null != _manager) _manager.destroySession(Session);
     }
 
     #endregion Methods

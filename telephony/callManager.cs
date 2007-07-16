@@ -36,10 +36,17 @@ namespace Telephony
 
     private bool _initialized = false;
 
+    private CCommonProxyInterface _sipCommonProxy;
+
     #endregion
 
 
     #region Properties
+
+    public CCommonProxyInterface CommonProxy 
+    {
+      get { return _sipCommonProxy; }
+    }
 
     public int Count
     {
@@ -126,6 +133,11 @@ namespace Telephony
       return _instance;
     }
 
+    private CCallManager()
+    {
+      _sipCommonProxy = new CSipCommonProxy();
+    }
+
     #endregion Constructor
 
     #region Events
@@ -163,20 +175,20 @@ namespace Telephony
         // Initialize call table
         _calls = new Dictionary<int, CStateMachine>(); 
         
-        CPjSipProxy.initialize();
+        CSipCommonProxy.initialize();
       }
       else
       {
         // todo unregister
-        CPjSipProxy.restart();
+        CSipCommonProxy.restart();
       }
-      CPjSipProxy.registerAccounts(); 
+      _sipCommonProxy.registerAccounts(); 
       _initialized = true;
     }
 
     public void shutdown()
     {
-      CPjSipProxy.shutdown();
+      CSipCommonProxy.shutdown();
     }
 
     public void updateGui()
@@ -332,7 +344,8 @@ namespace Telephony
 
     private CStateMachine createCall(int sessionId)
     {
-      CStateMachine call = new CStateMachine(new CCallProxy(sessionId));
+      CStateMachine call = new CStateMachine(this, new CSipCallProxy(sessionId), CommonProxy);
+      call.setCallLogInstance(CCallLog.getInstance());
       return call;
     }
 
