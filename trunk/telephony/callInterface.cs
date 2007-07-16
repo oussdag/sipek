@@ -20,7 +20,7 @@
 namespace Telephony
 {
 
-  interface CTelephonyInterface
+  public interface CTelephonyInterface
   {
     int makeCall(string dialedNo, int accountId);
 
@@ -50,7 +50,7 @@ namespace Telephony
   {
     #region Methods
 
-    void incomingCall( string callingNo);
+    void incomingCall(string callingNo);
 
     void onAlerting();
 
@@ -59,8 +59,23 @@ namespace Telephony
     void onReleased();
 
     void onHoldConfirm();
-    
+
     #endregion Methods
+  }
+
+  public interface CCommonProxyInterface
+  {
+    int registerAccounts();
+
+    int playTone(ETones toneId);
+
+    int stopTone();
+
+    int addBuddy(string ident);
+
+    int delBuddy(int buddyId);
+
+    int sendMessage(string dest, string message);
   }
 
 } // namespace Sipek

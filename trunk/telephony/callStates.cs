@@ -67,19 +67,9 @@ namespace Telephony
       set { _stateId = value; }
     }
 
-    protected CCallManager _manager;
-    protected CCallManager Manager
-    {
-      get { return _manager; }
-    }
-
     public string Name
     {
       get {
-        switch (this.StateId)
-        {
-          //case EStateId.IDLE: name = "IDLE";
-        }
         return StateId.ToString(); 
       }
     }
@@ -89,6 +79,7 @@ namespace Telephony
     #region Variables
 
     protected CStateMachine _smref;
+    protected CCommonProxyInterface _commonProxy;
 
     #endregion Variables
 
@@ -97,7 +88,7 @@ namespace Telephony
     public CAbstractState(CStateMachine sm)
     {
       _smref = sm;
-      _manager = CCallManager.getInstance();
+      _commonProxy = sm.CommonProxy;
     }
 
     #endregion Constructor
@@ -117,7 +108,7 @@ namespace Telephony
     public virtual bool endCall()
     {
       _smref.SigProxy.endCall();
-      //_smref.destroy();
+      _smref.changeState(EStateId.RELEASED);
       return true;
     }
 
@@ -219,8 +210,6 @@ namespace Telephony
 
     public override int makeCall(string dialedNo, int accountId)
     {
-      _smref.Type = ECallType.EDialed;
-
       _smref.CallingNo = dialedNo;
       _smref.changeState(EStateId.CONNECTING);
       return _smref.SigProxy.makeCall(dialedNo, accountId);
@@ -229,7 +218,6 @@ namespace Telephony
     public override void incomingCall(string callingNo)
     {
       _smref.CallingNo = callingNo;
-      _smref.Incoming = true;
       _smref.changeState(EStateId.INCOMING);
     }
 
@@ -248,6 +236,7 @@ namespace Telephony
 
     public override void onEntry()
     {
+      _smref.Type = ECallType.EDialed;
     }
 
     public override void onExit()
@@ -279,12 +268,12 @@ namespace Telephony
 
     public override void onEntry()
     {
-      CPjSipProxy.playTone(ETones.EToneRingback);
+      _commonProxy.playTone(ETones.EToneRingback);
     }
 
     public override void onExit()
     {
-      CPjSipProxy.stopTone();
+      _commonProxy.stopTone();
     }
 
     public override void onConnect()
@@ -349,8 +338,6 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
-
       _smref.destroy();
     }
   }
@@ -369,12 +356,17 @@ namespace Telephony
 
     public override void onEntry()
     {
-      CPjSipProxy.playTone(ETones.EToneCongestion);
+      _commonProxy.playTone(ETones.EToneCongestion);
     }
 
     public override void onExit()
     {
-      CPjSipProxy.stopTone();
+      _commonProxy.stopTone();
+    }
+
+    public override void onReleased()
+    {
+      _smref.destroy(); 
     }
 
   }
@@ -393,11 +385,13 @@ namespace Telephony
 
     public override void onEntry()
     {
-      if ((Manager.CFUFlag == true) && (Manager.CFUNumber.Length > 0))
+      _smref.Incoming = true;
+
+      if ((_smref.CFUFlag == true) && (_smref.CFUNumber.Length > 0))
       {
-        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CFU, Manager.CFUNumber);
+        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CFU, _smref.CFUNumber);
       }
-      else if (Manager.DNDFlag == true)
+      else if (_smref.DNDFlag == true)
       {
         _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_DND, "");
       }
@@ -406,16 +400,17 @@ namespace Telephony
         this.acceptCall();
       }
       else
+
       {
         _smref.SigProxy.alerted();
         _smref.Type = ECallType.EMissed;
-        CPjSipProxy.playTone(ETones.EToneRing);
+        _commonProxy.playTone(ETones.EToneRing);
       }
     }
 
     public override void onExit()
     {
-      CPjSipProxy.stopTone();
+      _commonProxy.stopTone();
     }    
 
     public override bool acceptCall()
@@ -430,7 +425,6 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
       _smref.destroy();
     }
 
@@ -469,8 +463,6 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
-
       _smref.destroy();
     }
   }

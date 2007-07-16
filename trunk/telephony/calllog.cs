@@ -99,15 +99,18 @@ namespace Telephony
 
     public CCallLog()
     {
-      load();
+    }
+    public void load()
+    {
+      this.load(XMLCallLogFile);
     }
 
-    private void load()
+    public void load(string fileName)
     {
       XmlDocument xmlDocument = new XmlDocument();
       try
       {
-        xmlDocument.Load(XMLCallLogFile);
+        xmlDocument.Load(fileName);
       }
       catch (System.IO.FileNotFoundException ee)
       {
