@@ -91,7 +91,7 @@ namespace Sipek
       control.initialize();
 
       // register callback
-      Telephony.CCallManager.getInstance().registerOnRefreshCallback(onTelephonyRefresh);
+      Telephony.CCallManager.getInstance().CallStateChanged += onTelephonyRefresh;
 
       // set active page...
       control.showPage((int)EPages.P_INIT);

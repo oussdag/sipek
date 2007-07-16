@@ -689,7 +689,7 @@ namespace Sipek
     {
       _list.removeAll();
 
-      Collection<CCallRecord> results = CCallLog.getInstance().getList();
+      Stack<CCallRecord> results = CCallLog.getInstance().getList();
 
       foreach (CCallRecord item in results)
       {
