@@ -138,10 +138,10 @@ static void default_config(struct app_config *cfg)
 	cfg->rec_port = PJSUA_INVALID_ID;
 	cfg->mic_level = cfg->speaker_level = 1.0;
 
-	cfg->wav_files[0] = pj_str("dial.wav");
-	cfg->wav_files[1] = pj_str("congestion.wav");
-	cfg->wav_files[2] = pj_str("ringback.wav");
-	cfg->wav_files[3] = pj_str("ring.wav");
+	cfg->wav_files[0] = pj_str("sounds\\dial.wav");
+	cfg->wav_files[1] = pj_str("sounds\\congestion.wav");
+	cfg->wav_files[2] = pj_str("sounds\\ringback.wav");
+	cfg->wav_files[3] = pj_str("sounds\\ring.wav");
 	cfg->wav_count = 4;
 }
 
