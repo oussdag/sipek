@@ -107,8 +107,6 @@ namespace Telephony
 
     public virtual bool endCall()
     {
-      _smref.SigProxy.endCall();
-      _smref.changeState(EStateId.RELEASED);
       return true;
     }
 
@@ -245,12 +243,20 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.destroy();
+      //_smref.destroy();
+      _smref.changeState(EStateId.RELEASED);
     }
 
     public override void onAlerting()
     {
       _smref.changeState(EStateId.ALERTING);
+    }
+
+    public override bool endCall()
+    {
+      _smref.SigProxy.endCall();
+      _smref.destroy();
+      return base.endCall();
     }
 
   }
@@ -284,9 +290,16 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.destroy();
+      //_smref.destroy();
+      _smref.changeState(EStateId.RELEASED);
     }
 
+    public override bool endCall()
+    {
+      _smref.SigProxy.endCall();
+      _smref.destroy();
+      return base.endCall();
+    }
   }
 
 
@@ -314,6 +327,8 @@ namespace Telephony
     {
       _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
 
+      _smref.SigProxy.endCall();
+      _smref.destroy();
       return base.endCall();
     }
 
@@ -338,7 +353,8 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.destroy();
+      //_smref.destroy();
+      _smref.changeState(EStateId.RELEASED);
     }
   }
 
@@ -366,7 +382,13 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.destroy(); 
+      _smref.changeState(EStateId.RELEASED);
+    }
+    
+    public override bool endCall()
+    {
+      _smref.destroy();
+      return base.endCall();
     }
 
   }
@@ -425,13 +447,21 @@ namespace Telephony
 
     public override void onReleased()
     {
-      _smref.destroy();
+      //_smref.destroy();
+      _smref.changeState(EStateId.RELEASED);
     }
 
     public override bool xferCall(string number)
     {
       // In fact this is not Tranfser. It's Deflect => redirect...
       return _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CD, number);
+    }
+
+    public override bool endCall()
+    {
+      _smref.SigProxy.endCall();
+      _smref.destroy();
+      return base.endCall();
     }
   }
 
@@ -463,7 +493,15 @@ namespace Telephony
 
     public override void onReleased()
     {
+      //_smref.destroy();
+      _smref.changeState(EStateId.RELEASED);
+    }
+
+    public override bool endCall()
+    {
+      _smref.SigProxy.endCall();
       _smref.destroy();
+      return base.endCall();
     }
   }
 
