@@ -316,7 +316,7 @@ namespace UnitTest
       //Assert.AreNotEqual(sm1.RuntimeDuration.ToString(), TimeSpan.Zero.ToString());
 
       sm1.getState().onReleased();
-      Assert.AreEqual(EStateId.IDLE, sm1.getStateId());
+      Assert.AreEqual(EStateId.RELEASED, sm1.getStateId());
       Assert.AreEqual(true, sm1.Counting);
       //Assert.AreNotEqual(sm1.RuntimeDuration.ToString(), TimeSpan.Zero.ToString());
     }
@@ -338,7 +338,7 @@ namespace UnitTest
       //Assert.AreNotEqual(sm1.RuntimeDuration.ToString(), TimeSpan.Zero.ToString());
 
       sm1.getState().onReleased();
-      Assert.AreEqual(EStateId.IDLE, sm1.getStateId());
+      Assert.AreEqual(EStateId.RELEASED, sm1.getStateId());
       Assert.AreEqual(true, sm1.Counting);
       //Assert.AreNotEqual(sm1.RuntimeDuration.ToString(), TimeSpan.Zero.ToString());
     }
@@ -423,12 +423,12 @@ namespace UnitTest
 
       // release first
       sm1.getState().onReleased();
-      Assert.AreEqual(EStateId.IDLE, sm1.getStateId());
+      Assert.AreEqual(EStateId.RELEASED, sm1.getStateId());
       sm2.getState().onHoldConfirm();
       Assert.AreEqual(EStateId.HOLDING, sm2.getStateId());
 
       sm2.getState().endCall();
-      Assert.AreEqual(EStateId.RELEASED, sm2.getStateId());
+      Assert.AreEqual(EStateId.IDLE, sm2.getStateId());
       sm2.getState().onReleased();
       Assert.AreEqual(EStateId.IDLE, sm2.getStateId());
     }
@@ -471,8 +471,8 @@ namespace UnitTest
 
       sm1.getState().endCall();
       sm2.getState().endCall();
-      Assert.AreEqual(EStateId.RELEASED, sm1.getStateId());
-      Assert.AreEqual(EStateId.RELEASED, sm2.getStateId());
+      Assert.AreEqual(EStateId.IDLE, sm1.getStateId());
+      Assert.AreEqual(EStateId.IDLE, sm2.getStateId());
       sm1.getState().onReleased();
       sm2.getState().onReleased();
       Assert.AreEqual(EStateId.IDLE, sm1.getStateId());
