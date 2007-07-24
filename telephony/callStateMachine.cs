@@ -234,6 +234,11 @@ namespace Telephony
 
     public void destroy()
     {
+      if (true == Counting)
+      {
+        Duration = System.DateTime.Now.Subtract(Time);
+      }
+
       // update call log
       if (((Type != ECallType.EDialed) || (CallingNo.Length > 0)) && (Type != ECallType.EUndefined))
       {
@@ -243,16 +248,11 @@ namespace Telephony
           _calllog.save();
         }
         else
-        { 
+        {
           ///!!!
         }
-      }
-
-      if (true == Counting)
-      {
-        Duration = System.DateTime.Now.Subtract(Time);
-      }
-
+      } 
+      // reset data
       CallingNo = "";
       Incoming = false;
       changeState(EStateId.IDLE);

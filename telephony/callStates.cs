@@ -447,8 +447,8 @@ namespace Telephony
 
     public override void onReleased()
     {
-      //_smref.destroy();
       _smref.changeState(EStateId.RELEASED);
+      _smref.destroy();
     }
 
     public override bool xferCall(string number)
