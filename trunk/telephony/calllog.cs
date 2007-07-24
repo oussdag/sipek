@@ -105,6 +105,21 @@ namespace Telephony
       this.load(XMLCallLogFile);
     }
 
+    #region Properties
+
+    public int Count
+    {
+      get { return _callList.Count; }
+    }
+
+    public CCallRecord Top
+    {
+      get { return _callList.Peek(); }
+    }
+
+    #endregion Properties
+
+
     public void load(string fileName)
     {
       XmlDocument xmlDocument = new XmlDocument();
