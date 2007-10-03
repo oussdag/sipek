@@ -65,7 +65,6 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalDependencies="Iphlpapi.lib dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib"
-				OutputFile="../../phone/lib/pjsipdll.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -196,16 +195,24 @@
 				RelativePath="..\src\pjsipDll.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\pjsipDll.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pjsipServerProxy.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pjsipServerProxy.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\src\pjsipDll.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
