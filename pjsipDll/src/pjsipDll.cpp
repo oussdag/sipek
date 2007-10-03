@@ -399,6 +399,22 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 	//pj_str_t label = pj_str("label");
 	//pjsua_playlist_create( app_config.wav_files, app_config.wav_count, &label, 0, &wav_id);
 
+	/* Optionally registers WAV file */
+    for (i=0; i<app_config.wav_count; ++i) 
+	{
+		pjsua_player_id wav_id;
+
+		status = pjsua_player_create(&app_config.wav_files[i], 0, 
+				     &wav_id);
+	
+		if (status != PJ_SUCCESS) return -1;
+	    //goto on_error;
+
+		if (app_config.wav_id == PJSUA_INVALID_ID) {
+			app_config.wav_id = wav_id;
+			app_config.wav_port = pjsua_player_get_conf_port(app_config.wav_id);
+		}
+    }
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
 	/* Add UDP transport unless it's disabled. */
@@ -546,7 +562,17 @@ PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb)
 
 PJSIPDLL_DLL_API int dll_shutdown()
 {
-	pjsua_destroy();
+pj_status_t status;
+
+	if (app_config.pool) {
+		pj_pool_release(app_config.pool);
+		app_config.pool = NULL;
+	}
+
+	status = pjsua_destroy();
+
+	pj_bzero(&app_config, sizeof(app_config));
+
 	return 0;
 }
 
