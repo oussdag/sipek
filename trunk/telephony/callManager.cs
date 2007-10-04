@@ -135,7 +135,9 @@ namespace Telephony
 
     private CCallManager()
     {
+      // todo::: do abstraction!!!
       _sipCommonProxy = new CSipCommonProxy();
+      //_sipCommonProxy = new CSipSocketCommonProxy();
     }
 
     #endregion Constructor
@@ -165,7 +167,7 @@ namespace Telephony
       return _initialized;
     }
 
-    public void initialize()
+    public int initialize()
     {
       ///
       if (!_initialized)
@@ -175,20 +177,22 @@ namespace Telephony
         // Initialize call table
         _calls = new Dictionary<int, CStateMachine>(); 
         
-        CSipCommonProxy.initialize();
+        _sipCommonProxy.initialize();
       }
       else
       {
         // todo unregister
-        CSipCommonProxy.restart();
+        _sipCommonProxy.shutdown();
+        _sipCommonProxy.initialize();
       }
       _sipCommonProxy.registerAccounts(); 
       _initialized = true;
+      return 1;
     }
 
     public void shutdown()
     {
-      CSipCommonProxy.shutdown();
+      _sipCommonProxy.shutdown();
     }
 
     public void updateGui()

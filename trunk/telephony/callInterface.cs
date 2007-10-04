@@ -65,11 +65,14 @@ namespace Telephony
 
   public interface CCommonProxyInterface
   {
+    int initialize(); 
+    int shutdown();
+
     int registerAccounts();
 
-    int playTone(ETones toneId);
+//    int playTone(ETones toneId);
 
-    int stopTone();
+//    int stopTone();
 
     int addBuddy(string ident);
 
