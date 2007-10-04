@@ -36,6 +36,14 @@ namespace UnitTest
   public class MockCommonProxy : CCommonProxyInterface
   {
     #region CCommonProxyInterface Members
+    public int initialize()
+    {
+      return 1;
+    }
+    public int shutdown()
+    {
+      return 1;
+    }
 
     public int registerAccounts()
     {
