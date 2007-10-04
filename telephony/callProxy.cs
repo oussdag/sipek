@@ -233,7 +233,7 @@ namespace Telephony
 
     #region Methods
 
-    public static void initialize()
+    public int initialize()
     {
       // register callbacks (delegates)
       onCallIncoming( ciDel );
@@ -244,24 +244,24 @@ namespace Telephony
       onMessageReceivedCallback(mrdel);
 
       // Initialize pjsip...
-      int port = CCallManager.getInstance().SipPort;
-      dll_init(port);
-      dll_main();
+      start();
+      return 1;
     }
 
-    public static int shutdown()
+    public int shutdown()
     {
       return dll_shutdown();
     }
 
-    public static void restart()
+    public static int start()
     {
-      shutdown();
-
+      int status = -1;
+      
       int port = CCallManager.getInstance().SipPort;
 
-      dll_init(port);
-      dll_main();
+      status = dll_init(port);
+      status = dll_main();
+      return status;
     }
 
     /////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,9 @@ namespace Telephony
     {
       for (int i = 0; i < Manager.NumAccounts; i++)
       {
-        //CAccount acc = CAccounts.getInstance()[i];
+        // reset account state
+        Manager.setAccountState(i, 0);
+
         if (Manager.getId(i).Length > 0)
         {
           if (Manager.getAddress(i) == "0") continue;

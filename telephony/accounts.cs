@@ -33,6 +33,7 @@ namespace Telephony
     private string _name;
     private int _port = 5060;
     private string _address;
+    private string _display;
     private string _id;
     private int _period = 3600;
     private string _username;
@@ -43,6 +44,12 @@ namespace Telephony
     {
       get { return _name; }
       set { _name = value; }
+    }
+
+    public string DisplayName
+    {
+      get { return _display; }
+      set { _display = value; }
     }
 
     public int Port
