@@ -81,4 +81,14 @@ namespace Telephony
     int sendMessage(string dest, string message);
   }
 
+  public interface CMediaProxyInterface
+  {
+    //int initialize();
+    //int shutdown();
+
+    int playTone(ETones toneId);
+
+    int stopTone();
+  }
+
 } // namespace Sipek

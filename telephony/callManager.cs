@@ -43,9 +43,15 @@ namespace Telephony
 
     #region Properties
 
-    public CCommonProxyInterface CommonProxy 
+    public CCommonProxyInterface CommonProxy
     {
       get { return _sipCommonProxy; }
+    }
+
+    private CMediaProxyInterface _mediaProxy;
+    public CMediaProxyInterface MediaProxy
+    {
+      get { return _mediaProxy; }
     }
 
     public int Count
@@ -137,6 +143,7 @@ namespace Telephony
     {
       // todo::: do abstraction!!!
       _sipCommonProxy = new CSipCommonProxy();
+      _mediaProxy = new CMediaPlayerProxy();
       //_sipCommonProxy = new CSipSocketCommonProxy();
     }
 
@@ -348,7 +355,7 @@ namespace Telephony
 
     private CStateMachine createCall(int sessionId)
     {
-      CStateMachine call = new CStateMachine(this, new CSipCallProxy(sessionId), CommonProxy);
+      CStateMachine call = new CStateMachine(this, new CSipCallProxy(sessionId), CommonProxy, MediaProxy);
       call.setCallLogInstance(CCallLog.getInstance());
       return call;
     }

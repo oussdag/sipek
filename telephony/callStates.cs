@@ -80,6 +80,7 @@ namespace Telephony
 
     protected CStateMachine _smref;
     protected CCommonProxyInterface _commonProxy;
+    protected CMediaProxyInterface _mediaProxy;
 
     #endregion Variables
 
@@ -89,6 +90,7 @@ namespace Telephony
     {
       _smref = sm;
       _commonProxy = sm.CommonProxy;
+      _mediaProxy = sm.MediaProxy;
     }
 
     #endregion Constructor
@@ -274,12 +276,12 @@ namespace Telephony
 
     public override void onEntry()
     {
-      _commonProxy.playTone(ETones.EToneRingback);
+      _mediaProxy.playTone(ETones.EToneRingback);
     }
 
     public override void onExit()
     {
-      _commonProxy.stopTone();
+      _mediaProxy.stopTone();
     }
 
     public override void onConnect()
@@ -372,12 +374,12 @@ namespace Telephony
 
     public override void onEntry()
     {
-      _commonProxy.playTone(ETones.EToneCongestion);
+      _mediaProxy.playTone(ETones.EToneCongestion);
     }
 
     public override void onExit()
     {
-      _commonProxy.stopTone();
+      _mediaProxy.stopTone();
     }
 
     public override void onReleased()
@@ -426,13 +428,13 @@ namespace Telephony
       {
         _smref.SigProxy.alerted();
         _smref.Type = ECallType.EMissed;
-        _commonProxy.playTone(ETones.EToneRing);
+        _mediaProxy.playTone(ETones.EToneRing);
       }
     }
 
     public override void onExit()
     {
-      _commonProxy.stopTone();
+      _mediaProxy.stopTone();
     }    
 
     public override bool acceptCall()
