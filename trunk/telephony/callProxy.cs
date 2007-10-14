@@ -160,7 +160,7 @@ namespace Telephony
   /// 
   /// </summary>
   public class CSipCommonProxy : CCommonProxyInterface
-  {
+  {  
 
     #region Wrapper functions
     // callback delegates
@@ -290,16 +290,6 @@ namespace Telephony
       }
       return 1;
     }
-    ////
-    public int playTone(ETones toneId)
-    {
-      return dll_playTone((int)toneId);
-    }
-
-    public int stopTone()
-    {
-      return dll_stopTone();
-    }
 
     // Buddy list handling
     public int addBuddy(string ident)
@@ -423,4 +413,51 @@ namespace Telephony
 
   }
 
+
+  // internal class
+  public class CMediaPlayerProxy : CMediaProxyInterface
+  {
+    [DllImport("WinMM.dll")]
+    public static extern bool PlaySound(string fname, int Mod, int flag);
+
+    // these are the SoundFlags we are using here, check mmsystem.h for more
+    public int SND_ASYNC = 0x0001; // play asynchronously
+    public int SND_FILENAME = 0x00020000; // use file name
+    public int SND_PURGE = 0x0040; // purge non-static events
+    public int SND_LOOP = 0x0008;  // loop the sound until next sndPlaySound 
+
+    public int playTone(ETones toneId)
+    {
+      string fname;
+      int SoundFlags = SND_FILENAME | SND_ASYNC | SND_LOOP;
+
+      switch (toneId)
+      {
+        case ETones.EToneDial:
+          fname = "sounds\\dial.wav";
+          break;
+        case ETones.EToneCongestion:
+          fname = "sounds\\congestion.wav";
+          break;
+        case ETones.EToneRingback:
+          fname = "sounds\\ringback.wav";
+          break;
+        case ETones.EToneRing:
+          fname = "sounds\\ring.wav";
+          break;
+        default:
+          fname = "";
+          break;
+      }
+
+      PlaySound(fname, 0, SoundFlags);
+      return 1;
+    }
+
+    public int stopTone()
+    {
+      PlaySound(null, 0, SND_PURGE);
+      return 1;
+    }
+  }
 } // namespace Sipek

@@ -68,6 +68,12 @@ namespace Telephony
       get { return _commonproxy; }
     }
 
+    private CMediaProxyInterface _mediaProxy;
+    public CMediaProxyInterface MediaProxy
+    {
+      get { return _mediaProxy; }
+    }
+
     private string _callingNumber = "";
     public string CallingNo
     {
@@ -165,11 +171,12 @@ namespace Telephony
 
     #region Constructor
 
-    public CStateMachine(CCallManager manager, CTelephonyInterface proxy, CCommonProxyInterface commonproxy)
+    public CStateMachine(CCallManager manager, CTelephonyInterface proxy, CCommonProxyInterface commonproxy, CMediaProxyInterface mediaproxy)
     {
       _manager = manager;
       _sigproxy = proxy;
       _commonproxy = commonproxy;
+      _mediaProxy = mediaproxy;
 
       _stateIdle = new CIdleState(this);
       _stateAlerting = new CAlertingState(this);
