@@ -70,10 +70,6 @@ namespace Telephony
 
     int registerAccounts();
 
-//    int playTone(ETones toneId);
-
-//    int stopTone();
-
     int addBuddy(string ident);
 
     int delBuddy(int buddyId);
