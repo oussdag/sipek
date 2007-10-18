@@ -691,6 +691,8 @@ namespace Sipek
 
       Stack<CCallRecord> results = CCallLog.getInstance().getList();
 
+      if (results == null) return;
+
       foreach (CCallRecord item in results)
       {
         CDoubleLink recordLink = new CDoubleLink(item.Number + " " + item.Name , " " + item.Time.ToString());
