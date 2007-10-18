@@ -299,7 +299,7 @@ namespace Telephony
     public override bool endCall()
     {
       _smref.SigProxy.endCall();
-      _smref.destroy();
+      //_smref.destroy();
       return base.endCall();
     }
   }
