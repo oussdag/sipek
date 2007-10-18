@@ -245,8 +245,8 @@ namespace Telephony
       onMessageReceivedCallback(mrdel);
 
       // Initialize pjsip...
-      start();
-      return 1;
+      int status = start();
+      return status;
     }
 
     public int shutdown()
@@ -261,7 +261,7 @@ namespace Telephony
       int port = CCallManager.getInstance().SipPort;
 
       status = dll_init(port);
-      status = dll_main();
+      status |= dll_main();
       return status;
     }
 
@@ -285,7 +285,6 @@ namespace Telephony
           string uri = "\"" +displayName+ "\"" + "<sip:" + Manager.getId(i) + "@" + Manager.getAddress(i)+">";
           string reguri = "sip:" + Manager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
 
-          //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
           string domain = Manager.getDomain(i);
           string username = Manager.getUsername(i);
           string password = Manager.getPassword(i);

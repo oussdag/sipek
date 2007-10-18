@@ -195,6 +195,8 @@ namespace Telephony
       {
         // todo unregister
         _sipCommonProxy.shutdown();
+        // wait for a moment...
+        System.Threading.Thread.Sleep(500);
         _sipCommonProxy.initialize();
       }
       _sipCommonProxy.registerAccounts(); 
