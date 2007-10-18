@@ -35,8 +35,8 @@ namespace Telephony
   public class CCallRecord
   { 
     private ECallType _type;
-    private string _name;
-    private string _number;
+    private string _name = "";
+    private string _number = "";
     private DateTime _time;
     private TimeSpan _duration;
     private int _count;
@@ -149,19 +149,26 @@ namespace Telephony
         if ((snode != null) && (null != snode.FirstChild) &&(snode.FirstChild.Value != null)) record.Name = snode.FirstChild.Value;
 
         snode = item.SelectSingleNode(NUMBER);
-        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Number = snode.FirstChild.Value;
+        if ((snode != null) && (null != snode.FirstChild) && (snode.FirstChild.Value != null))
+        {
+          record.Number = snode.FirstChild.Value;
+        }
+        else
+        {
+          continue;
+        }
 
         snode = item.SelectSingleNode(DATETIME);
-        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Time = DateTime.Parse(snode.FirstChild.Value);
+        if ((snode != null) && (null!= snode.FirstChild) && (snode.FirstChild.Value != null)) record.Time = DateTime.Parse(snode.FirstChild.Value);
 
         snode = item.SelectSingleNode(DURATION);
-        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Duration = TimeSpan.Parse(snode.FirstChild.Value);
+        if ((snode != null) && (null != snode.FirstChild) && (snode.FirstChild.Value != null)) record.Duration = TimeSpan.Parse(snode.FirstChild.Value);
 
         snode = item.SelectSingleNode(COUNT);
-        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Count = int.Parse(snode.FirstChild.Value);
+        if ((snode != null) && (null != snode.FirstChild) && (snode.FirstChild.Value != null)) record.Count = int.Parse(snode.FirstChild.Value);
 
         snode = item.SelectSingleNode(TYPE);
-        if ((snode != null) && (snode.FirstChild != null) && (snode.FirstChild.Value != null)) record.Type = (ECallType)int.Parse(snode.FirstChild.Value);
+        if ((snode != null) && (null != snode.FirstChild) && (snode.FirstChild.Value != null)) record.Type = (ECallType)int.Parse(snode.FirstChild.Value);
 
         _callList.Push(record);
       }

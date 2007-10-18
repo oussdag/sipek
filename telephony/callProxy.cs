@@ -85,6 +85,7 @@ namespace Telephony
     public int makeCall(string dialedNo, int accountId)
     {
       _accountId = accountId;
+
       string uri = "sip:" + dialedNo + "@" + Manager.getAddress(accountId);
       _line = dll_makeCall(accountId, uri);
       return _line;
@@ -278,8 +279,12 @@ namespace Telephony
         if (Manager.getId(i).Length > 0)
         {
           if (Manager.getAddress(i) == "0") continue;
-          string uri = "sip:" + Manager.getId(i) + "@" + Manager.getAddress(i);
+
+          string displayName = Manager.getDisplayName(); 
+
+          string uri = "\"" +displayName+ "\"" + "<sip:" + Manager.getId(i) + "@" + Manager.getAddress(i)+">";
           string reguri = "sip:" + Manager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
+
           //dll_registerAccount("sip:1341@interop.pingtel.com", "sip:interop.pingtel.com", "interop.pingtel.com", "1341", "1234");
           string domain = Manager.getDomain(i);
           string username = Manager.getUsername(i);

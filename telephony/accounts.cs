@@ -160,6 +160,7 @@ namespace Telephony
         account.Name = _settings.cfgSipAccountNames[i];
         account.Address = _settings.cfgSipAccountAddresses[i];
         account.Port = Int16.Parse(_settings.cfgSipAccountPorts[i]);
+        account.DisplayName = _settings.cfgSipAccountDisplayName[i];
         account.Username = _settings.cfgSipAccountUsername[i];
         account.Password = _settings.cfgSipAccountPassword[i];
         account.Domain = _settings.cfgSipAccountDomains[i];
@@ -179,6 +180,7 @@ namespace Telephony
         account.Id = _settings.cfgSipAccountIds[index];
         account.Address = _settings.cfgSipAccountAddresses[index];
         account.Port = Int16.Parse(_settings.cfgSipAccountPorts[index]);
+        account.DisplayName = _settings.cfgSipAccountDisplayName[index];
         account.Username = _settings.cfgSipAccountUsername[index];
         account.Password = _settings.cfgSipAccountPassword[index];
         account.Domain = _settings.cfgSipAccountDomains[index];
@@ -195,6 +197,7 @@ namespace Telephony
         _settings.cfgSipAccountAddresses[index] = account.Address = value.Address;
         account.Port = value.Port;
         _settings.cfgSipAccountPorts[index] = value.Port.ToString();
+        _settings.cfgSipAccountDisplayName[index] = account.DisplayName = value.DisplayName;
         _settings.cfgSipAccountUsername[index] = account.Username = value.Username;
         _settings.cfgSipAccountPassword[index] = account.Password = value.Password;
         _settings.cfgSipAccountDomains[index] = account.Domain = value.Domain;
@@ -221,6 +224,7 @@ namespace Telephony
         _settings.cfgSipAccountNames[index] = this[index].Name;
         _settings.cfgSipAccountRegPeriod[index] = this[index].Period.ToString();
         _settings.cfgSipAccountIds[index] = this[index].Id;
+        _settings.cfgSipAccountDisplayName[index] = this[index].DisplayName;
         _settings.cfgSipAccountUsername[index] = this[index].Username;
         _settings.cfgSipAccountPassword[index] = this[index].Password;
         _settings.cfgSipAccountDomains[index] = this[index].Domain;

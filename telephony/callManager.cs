@@ -118,6 +118,11 @@ namespace Telephony
       return CAccounts.getInstance()[accId].Domain;
     }
 
+    public string getDisplayName()
+    {
+      return CAccounts.getInstance()[this.DefaultAccountIndex].DisplayName;
+    }
+
     public int NumAccounts
     {
       get { return CAccounts.getInstance().getSize(); }
@@ -302,7 +307,7 @@ namespace Telephony
     
     public void onUserRelease(int session)
     {
-      CStateMachine call = getCall(_currentSession);
+      CStateMachine call = getCall(session);
       if (call != null) call.getState().endCall();
     }
 
