@@ -187,9 +187,8 @@ namespace Telephony
     private static extern int dll_removeBuddy(int buddyId);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_sendMessage(int buddyId, string uri, string message);
-    //[DllImport("pjsipDll.dll")]
-    //private static extern int dll_setStatus(int buddyId, int statusId);
-    //use pjsua_acc_set_online_status
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_setStatus(int accId, int presence_state);                          
 
     // call API callbacks
     [DllImport("pjsipDll.dll")]
@@ -254,7 +253,7 @@ namespace Telephony
       return dll_shutdown();
     }
 
-    public static int start()
+    public int start()
     {
       int status = -1;
       
@@ -281,8 +280,9 @@ namespace Telephony
           if (Manager.getAddress(i) == "0") continue;
 
           string displayName = Manager.getDisplayName(); 
-
-          string uri = "\"" +displayName+ "\"" + "<sip:" + Manager.getId(i) + "@" + Manager.getAddress(i)+">";
+          // Publish do not work if display name in uri 
+          //string uri = "\"" +displayName+ "\"" + "<sip:" + Manager.getId(i) + "@" + Manager.getAddress(i)+">";
+          string uri = "sip:" + Manager.getId(i) + "@" + Manager.getAddress(i) + "";
           string reguri = "sip:" + Manager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
 
           string domain = Manager.getDomain(i);
@@ -311,6 +311,11 @@ namespace Telephony
     {
       string uri = "sip:" + dest + "@" + Manager.getAddress();
       return dll_sendMessage(Manager.DefaultAccountIndex, uri, message);
+    }
+
+    public int setStatus(int accId, EUserStatus status)
+    {
+      return dll_setStatus(accId, (int)status);
     }
 
     #endregion Methods
