@@ -35,8 +35,6 @@ static fptr_callretrieveconf* cb_callretrieveconf = 0;
 static fptr_buddystatus* cb_buddystatus = 0;
 static fptr_msgrec* cb_messagereceived = 0;
 
-// for playing files (tones)
-static pjmedia_snd_port* snd_port;
 
 enum {
     SC_Deflect,
@@ -46,8 +44,27 @@ enum {
     SC_3Pty
 };
 
+////////////////////////////////////////////////////////////////////////
+// Presence structs 
+
+enum {
+	AVAILABLE, BUSY, OTP, IDLE, AWAY, BRB, OFFLINE, OPT_MAX
+};
+
+struct presence_status {
+	int id;
+	char *name;
+} opts[] = {
+		{ AVAILABLE, "Available" },
+		{ BUSY, "Busy"},
+		{ OTP, "On the phone"},
+		{ IDLE, "Idle"},
+		{ AWAY, "Away"},
+		{ BRB, "Be right back"},
+		{ OFFLINE, "Offline"}
+    };
+
 //////////////////////////////////////////////////////////////////////////
-int initTones();
 //////////////////////////////////////////////////////////////////////////
 
 /* Call specific data */
@@ -148,6 +165,51 @@ static void default_config(struct app_config *cfg)
 //////////////////////////////////////////////////////////////////////////
 // Callbacks
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+PJSIPDLL_DLL_API int onRegStateCallback(fptr_regstate cb)
+{
+	cb_regstate = cb;
+	return 1;
+}
+ 
+PJSIPDLL_DLL_API int onCallStateCallback(fptr_callstate cb)
+{
+	cb_callstate = cb;
+	return 1;
+}
+
+PJSIPDLL_DLL_API int onCallIncoming(fptr_callincoming cb)
+{
+	cb_callincoming = cb;
+	return 1;
+}
+
+PJSIPDLL_DLL_API int getConfigDataCallback(fptr_getconfigdata cb)
+{
+	cb_getconfigdata = cb;
+	return 1;
+}
+
+PJSIPDLL_DLL_API int onCallHoldConfirmCallback(fptr_callholdconf cb)
+{
+  cb_callholdconf = cb;
+	return 1;
+}
+
+PJSIPDLL_DLL_API int onMessageReceivedCallback(fptr_msgrec cb)
+{
+  cb_messagereceived = cb;
+  return 1;
+}
+
+PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb)
+{
+  cb_buddystatus = cb;
+  return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
 {
@@ -395,27 +457,6 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	// Initialiye Wav file player
-	//pj_str_t label = pj_str("label");
-	//pjsua_playlist_create( app_config.wav_files, app_config.wav_count, &label, 0, &wav_id);
-
-	/* Optionally registers WAV file */
-    for (i=0; i<app_config.wav_count; ++i) 
-	{
-		pjsua_player_id wav_id;
-
-		status = pjsua_player_create(&app_config.wav_files[i], 0, 
-				     &wav_id);
-	
-		if (status != PJ_SUCCESS) return -1;
-	    //goto on_error;
-
-		if (app_config.wav_id == PJSUA_INVALID_ID) {
-			app_config.wav_id = wav_id;
-			app_config.wav_port = pjsua_player_get_conf_port(app_config.wav_id);
-		}
-    }
-	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
 	/* Add UDP transport unless it's disabled. */
 	if (!app_config.no_udp) {
@@ -425,7 +466,7 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 			&app_config.udp_cfg, 
 			&transport_id);
 		if (status != PJ_SUCCESS)
-			goto on_error;
+			goto on_error;		
 	}
 
 	/* Add TCP transport unless it's disabled */
@@ -437,8 +478,8 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 			goto on_error;
 
 		/* Add local account */
-//		pjsua_acc_add_local(transport_id, PJ_TRUE, NULL);
-//		pjsua_acc_set_online_status(current_acc, PJ_TRUE);
+		//pjsua_acc_add_local(transport_id, PJ_TRUE, NULL);
+		//pjsua_acc_set_online_status(current_acc, PJ_TRUE);
 	}
 
 
@@ -515,50 +556,6 @@ PJSIPDLL_DLL_API int dll_main(void)
 
 //////////////////////////////////////////////////////////////////////////
 
-PJSIPDLL_DLL_API int onRegStateCallback(fptr_regstate cb)
-{
-	cb_regstate = cb;
-	return 1;
-}
- 
-PJSIPDLL_DLL_API int onCallStateCallback(fptr_callstate cb)
-{
-	cb_callstate = cb;
-	return 1;
-}
-
-PJSIPDLL_DLL_API int onCallIncoming(fptr_callincoming cb)
-{
-	cb_callincoming = cb;
-	return 1;
-}
-
-PJSIPDLL_DLL_API int getConfigDataCallback(fptr_getconfigdata cb)
-{
-	cb_getconfigdata = cb;
-	return 1;
-}
-
-PJSIPDLL_DLL_API int onCallHoldConfirmCallback(fptr_callholdconf cb)
-{
-  cb_callholdconf = cb;
-	return 1;
-}
-
-PJSIPDLL_DLL_API int onMessageReceivedCallback(fptr_msgrec cb)
-{
-  cb_messagereceived = cb;
-  return 1;
-}
-
-PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb)
-{
-  cb_buddystatus = cb;
-  return 1;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
 
 PJSIPDLL_DLL_API int dll_shutdown()
 {
@@ -579,13 +576,15 @@ pj_status_t status;
 //////////////////////////////////////////////////////////////////////////
 int dll_registerAccount(char* uri, char* reguri, char* domain, char* username, char* password)
 {
-	pjsua_acc_config thisAccountsCfg; // = mSipConfiguration->getAccountCfg(aAccId);
+pjsua_acc_config thisAccountsCfg; 
+
 	pjsua_acc_config_default(&thisAccountsCfg);
 
 	//4.) set parameters 
 	thisAccountsCfg.id = pj_str(uri);
 	thisAccountsCfg.reg_timeout = 3600;
 	thisAccountsCfg.reg_uri = pj_str(reguri);
+	thisAccountsCfg.publish_enabled = PJ_TRUE; // enable publish
 
 	// AUTHENTICATION
 	thisAccountsCfg.cred_count = 1;
@@ -594,13 +593,26 @@ int dll_registerAccount(char* uri, char* reguri, char* domain, char* username, c
 	thisAccountsCfg.cred_info[0].scheme = pj_str("digest");
 	thisAccountsCfg.cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
 	thisAccountsCfg.cred_info[0].data = pj_str(password);
-	
+
 	pjsua_acc_id pjAccId= -1;
 	int status = pjsua_acc_add(&thisAccountsCfg, PJ_TRUE, &pjAccId);
-  
-  pjsua_acc_set_online_status(pjAccId, PJ_TRUE);
 
-  return pjAccId;
+	return pjAccId;
+}
+
+int dll_removeAccounts()
+{
+pj_status_t status;
+unsigned int count = 5;
+pjsua_acc_id ids[16];
+
+	pjsua_enum_accs( &ids[0], &count);
+
+	for (int i=0; i<count; i++)
+	{
+		status |= pjsua_acc_del(ids[i]);
+	}
+	return status;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -746,9 +758,15 @@ pjsua_buddy_config buddy_cfg;
 
   buddy_cfg.uri = pj_str(uri);
   buddy_cfg.subscribe = (subscribe == true) ? 1 : 0;
-  // Add buddy
+  // Add buddy...
   int buddyId = -1;
-	status = pjsua_buddy_add(&buddy_cfg, &buddyId);
+  status = pjsua_buddy_add(&buddy_cfg, &buddyId);
+  
+  // enable presence monitoring...
+  if (status >= 0)
+  {
+    status = pjsua_buddy_subscribe_pres(buddyId, PJ_TRUE);
+  }
   return buddyId;
 }
 
@@ -764,70 +782,48 @@ int dll_sendMessage(int accId, char* uri, char* message)
 	return pjsua_im_send(accId, &tmp_uri, NULL, &tmp, NULL, NULL);
 }
 
+int dll_setStatus(int accId, int presence_state)
+{
+pj_status_t online_status;
+pj_bool_t is_online = PJ_FALSE;
+pjrpid_element elem;
+
+    pj_bzero(&elem, sizeof(elem));
+    elem.type = PJRPID_ELEMENT_TYPE_PERSON;
+
+    online_status = PJ_TRUE;
+
+    switch (presence_state) {
+    case AVAILABLE:
+	break;
+    case BUSY:
+		elem.activity = PJRPID_ACTIVITY_BUSY;
+		elem.note = pj_str("Busy");
+	break;
+    case OTP:
+		elem.activity = PJRPID_ACTIVITY_BUSY;
+		elem.note = pj_str("On the phone");
+	break;
+    case IDLE:
+		elem.activity = PJRPID_ACTIVITY_UNKNOWN;
+		elem.note = pj_str("Idle");
+	break;
+    case AWAY:
+		elem.activity = PJRPID_ACTIVITY_AWAY;
+		elem.note = pj_str("Away");
+	break;
+    case BRB:
+		elem.activity = PJRPID_ACTIVITY_UNKNOWN;
+		elem.note = pj_str("Be right back");
+	break;
+    case OFFLINE:
+		online_status = PJ_FALSE;
+	break;
+    }
+
+    pj_status_t status = pjsua_acc_set_online_status2(accId, online_status, &elem);
+
+	return status;
+}
+
 //////////////////////////////////////////////////////////////////////////////
-
-int dll_playTone(int toneId)
-{
-int status = -1;
-pjmedia_port *file_port;
-
-/*
-     pjsua_player_id player_id;
-     
-     status = pjsua_player_create(&app_config.wav_files[toneId], 0, &player_id);
-     if (status != PJ_SUCCESS)
-        return status;
-*/
-
-    /* Create file media port from the WAV file */
-    status = pjmedia_wav_player_port_create( app_config.pool,	/* memory pool	    */
-					      app_config.wav_files[toneId].ptr,	/* file to play	    */
-					      20,	/* ptime.	    */
-					      0,	/* flags	    */
-					      0,	/* default buffer   */
-					      &file_port/* returned port    */
-					      );
-
-    if (status != PJ_SUCCESS) {
-		//app_perror(THIS_FILE, "Unable to use WAV file", status);
-		return 1;
-    }
-
-	     /* Create sound player port. */
-    status = pjmedia_snd_port_create_player( 
-		 app_config.pool,				    /* pool		    */
-		 -1,				    /* use default dev.	    */
-		 file_port->info.clock_rate,	    /* clock rate.	    */
-		 file_port->info.channel_count,	    /* # of channels.	    */
-		 file_port->info.samples_per_frame, /* samples per frame.   */
-		 file_port->info.bits_per_sample,   /* bits per sample.	    */
-		 0,				    /* options		    */
-		 &snd_port			    /* returned port	    */
-		 );
-
-    if (status != PJ_SUCCESS) {
-		//app_perror(THIS_FILE, "Unable to open sound device", status);
-		return 1;
-    }
-
-    /* Connect file port to the sound player.
-     * Stream playing will commence immediately.
-     */
-    status = pjmedia_snd_port_connect( snd_port, file_port);
-
-	return status;
-}
-
-int dll_stopTone()
-{
-	pj_status_t status;
-    /* Start deinitialization: */
-
-    /* Disconnect sound port from file port */
-    status = pjmedia_snd_port_disconnect(snd_port);
-    PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
-	
-	return status;
-}
-
-

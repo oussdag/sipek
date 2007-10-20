@@ -1,4 +1,4 @@
-// dllTest.cpp : Defines the entry point for the console application.
+// pjsipDll.h : Declares the entry point for the .Net GUI application.
 //
 
 
@@ -33,7 +33,6 @@ extern "C" PJSIPDLL_DLL_API int dll_init(int listenPort);
 extern "C" PJSIPDLL_DLL_API int dll_shutdown(); 
 extern "C" PJSIPDLL_DLL_API int dll_main(void);
 // pjsip call API
-//extern "C" PJSIPDLL_DLL_API int dll_registerAccount(char* uri, char* reguri); 
 extern "C" PJSIPDLL_DLL_API int dll_registerAccount(char* uri, char* reguri, char* name, char* username, char* password);
 extern "C" PJSIPDLL_DLL_API int dll_makeCall(int accountId, char* uri); 
 extern "C" PJSIPDLL_DLL_API int dll_releaseCall(int callId); 
@@ -44,11 +43,9 @@ extern "C" PJSIPDLL_DLL_API int dll_xferCall(int callid, char* uri);
 extern "C" PJSIPDLL_DLL_API int dll_xferCallWithReplaces(int callId, int dstSession);
 extern "C" PJSIPDLL_DLL_API int dll_serviceReq(int callId, int serviceCode, const char* destUri);
 extern "C" PJSIPDLL_DLL_API int dll_dialDtmf(int callId, char* digits, int mode);
+extern "C" PJSIPDLL_DLL_API int dll_removeAccounts();
 // IM & Presence api
 extern "C" PJSIPDLL_DLL_API int dll_addBuddy(char* uri, bool subscribe);
 extern "C" PJSIPDLL_DLL_API int dll_removeBuddy(int buddyId);
 extern "C" PJSIPDLL_DLL_API int dll_sendMessage(int accId, char* uri, char* message);
-
-// Tones api
-extern "C" PJSIPDLL_DLL_API int dll_playTone(int toneId);
-extern "C" PJSIPDLL_DLL_API int dll_stopTone();
+extern "C" PJSIPDLL_DLL_API int dll_setStatus(int accId, int presence_state);
