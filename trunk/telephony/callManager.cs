@@ -190,16 +190,20 @@ namespace Telephony
         _calls = new Dictionary<int, CStateMachine>(); 
         
         _sipCommonProxy.initialize();
+      
+        _sipCommonProxy.registerAccounts(false);
       }
       else
       {
         // todo unregister
-        _sipCommonProxy.shutdown();
+        //_sipCommonProxy.shutdown();
         // wait for a moment...
-        System.Threading.Thread.Sleep(500);
-        _sipCommonProxy.initialize();
+        //System.Threading.Thread.Sleep(500);
+        //_sipCommonProxy.initialize();
+        
+        // reregister 
+        _sipCommonProxy.registerAccounts(true); 
       }
-      _sipCommonProxy.registerAccounts(); 
       _initialized = true;
       return 1;
     }

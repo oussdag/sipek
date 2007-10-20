@@ -80,6 +80,7 @@ namespace Telephony
     int shutdown();
 
     int registerAccounts();
+    int registerAccounts(bool renew);
 
     int addBuddy(string ident);
 
