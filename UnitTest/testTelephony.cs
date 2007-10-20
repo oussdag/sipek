@@ -47,6 +47,10 @@ namespace UnitTest
 
     public int registerAccounts()
     {
+      return registerAccounts(false);
+    }
+    public int registerAccounts(bool renew)
+    {
       return 1;
     }
 
@@ -65,6 +69,10 @@ namespace UnitTest
       return 1;
     }
 
+    public int setStatus(int accId, EUserStatus status)
+    {
+      return 1;
+    }
     #endregion
   }
 
