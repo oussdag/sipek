@@ -19,6 +19,17 @@
 
 namespace Telephony
 {
+  public enum EUserStatus : int
+  { 
+  	AVAILABLE, 
+    BUSY, 
+    OTP, 
+    IDLE, 
+    AWAY, 
+    BRB, 
+    OFFLINE, 
+    OPT_MAX
+  }
 
   public interface CTelephonyInterface
   {
@@ -75,6 +86,8 @@ namespace Telephony
     int delBuddy(int buddyId);
 
     int sendMessage(string dest, string message);
+
+    int setStatus(int accId, EUserStatus presence_state);
   }
 
   public interface CMediaProxyInterface
