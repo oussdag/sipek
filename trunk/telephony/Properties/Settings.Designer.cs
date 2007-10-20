@@ -51,25 +51,6 @@ namespace Telephony.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>0</string>
-  <string>0</string>
-  <string>0</string>
-  <string>0</string>
-  <string>0</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection cfgSipAccountAddresses {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountAddresses"]));
-            }
-            set {
-                this["cfgSipAccountAddresses"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <string>5060</string>
   <string>5060</string>
   <string>5060</string>
@@ -82,39 +63,6 @@ namespace Telephony.Properties {
             }
             set {
                 this["cfgSipAccountPorts"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>1234</string>
-  <string>1235</string>
-  <string>1236</string>
-  <string>1237</string>
-  <string>1238</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection cfgSipAccountPassword {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountPassword"]));
-            }
-            set {
-                this["cfgSipAccountPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection cfgSipAccountNames {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountNames"]));
-            }
-            set {
-                this["cfgSipAccountNames"] = value;
             }
         }
         
@@ -146,34 +94,6 @@ namespace Telephony.Properties {
             }
             set {
                 this["cfgSipAccountDefault"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection cfgSipAccountIds {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountIds"]));
-            }
-            set {
-                this["cfgSipAccountIds"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection cfgSipAccountUsername {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountUsername"]));
-            }
-            set {
-                this["cfgSipAccountUsername"] = value;
             }
         }
         
@@ -322,6 +242,81 @@ namespace Telephony.Properties {
             }
             set {
                 this["cfgSipAccountDisplayName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountAddresses {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountAddresses"]));
+            }
+            set {
+                this["cfgSipAccountAddresses"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountPassword {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountPassword"]));
+            }
+            set {
+                this["cfgSipAccountPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountNames {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountNames"]));
+            }
+            set {
+                this["cfgSipAccountNames"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountIds {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountIds"]));
+            }
+            set {
+                this["cfgSipAccountIds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring />\r\n  <string />\r\n  <string />\r\n  <string />\r\n  <string />\r\n</ArrayOfStrin" +
+            "g>")]
+        public global::System.Collections.Specialized.StringCollection cfgSipAccountUsername {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["cfgSipAccountUsername"]));
+            }
+            set {
+                this["cfgSipAccountUsername"] = value;
             }
         }
     }
