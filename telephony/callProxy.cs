@@ -188,7 +188,9 @@ namespace Telephony
     [DllImport("pjsipDll.dll")]
     private static extern int dll_sendMessage(int buddyId, string uri, string message);
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_setStatus(int accId, int presence_state);                          
+    private static extern int dll_setStatus(int accId, int presence_state);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_removeAccounts();
 
     // call API callbacks
     [DllImport("pjsipDll.dll")]
@@ -270,6 +272,16 @@ namespace Telephony
     //
     public int registerAccounts()
     {
+      return registerAccounts(false);
+    }
+
+    public int registerAccounts(bool renew)
+    {
+      if (renew == true)
+      {
+        dll_removeAccounts();
+      } 
+
       for (int i = 0; i < Manager.NumAccounts; i++)
       {
         // reset account state
@@ -288,7 +300,9 @@ namespace Telephony
           string domain = Manager.getDomain(i);
           string username = Manager.getUsername(i);
           string password = Manager.getPassword(i);
-          int accId = dll_registerAccount(uri, reguri, domain, username, password);
+
+          dll_registerAccount(uri, reguri, domain, username, password);
+
           // todo:::check if accId corresponds to account index!!!
         }
       }

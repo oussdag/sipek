@@ -292,14 +292,13 @@ namespace Telephony
 
     public override void onReleased()
     {
-      //_smref.destroy();
       _smref.changeState(EStateId.RELEASED);
     }
 
     public override bool endCall()
     {
       _smref.SigProxy.endCall();
-      //_smref.destroy();
+      _smref.destroy();
       return base.endCall();
     }
   }
@@ -355,7 +354,6 @@ namespace Telephony
 
     public override void onReleased()
     {
-      //_smref.destroy();
       _smref.changeState(EStateId.RELEASED);
     }
   }
