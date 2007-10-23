@@ -171,7 +171,7 @@ namespace Telephony
     delegate int OnCallIncoming(int callId, string number);
     delegate int OnCallHoldConfirm(int callId);
     delegate int OnMessageReceivedCallback(string from, string message);
-    delegate int OnBuddyStatusChangedCallback(int buddyId, int status);
+    delegate int OnBuddyStatusChangedCallback(int buddyId, int status, string statusText);
 
     [DllImport("pjsipDll.dll")]
     private static extern int dll_init(int listenPort);
@@ -426,9 +426,9 @@ namespace Telephony
       return 1;
     }
 
-    private static int onBuddyStatusChanged(int buddyId, int status)
+    private static int onBuddyStatusChanged(int buddyId, int status, string text)
     {
-      Manager.setBuddyState(buddyId, status);
+      Manager.setBuddyState(buddyId, status, text);
       return 1;
     }
 
