@@ -158,7 +158,7 @@ namespace Telephony
 
     public delegate void CallStateChangedDelegate();  // define callback type 
     public delegate void MessageReceivedCallbackDelegate(string from, string message);  // define callback type 
-    public delegate void BuddyStatusCallbackDelegate(int buddyId, int status);  // define callback type 
+    public delegate void BuddyStatusCallbackDelegate(int buddyId, int status, string text);  // define callback type 
 
     public event CallStateChangedDelegate CallStateChanged;
     public event MessageReceivedCallbackDelegate MessageReceived;
@@ -406,9 +406,9 @@ namespace Telephony
       if (MessageReceived!= null) MessageReceived(from, message);
     }
 
-    public void setBuddyState(int buddyId, int status)
+    public void setBuddyState(int buddyId, int status, string text)
     {
-      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status);
+      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
     }
 
     public void HoldRetrieve(int session)
