@@ -355,8 +355,10 @@ static void on_buddy_state(pjsua_buddy_id buddy_id)
 	      (int)info.status_text.slen,
 	      info.status_text.ptr));
 
+		char text[255] = {0};
+		strncpy(text, info.status_text.ptr, (info.status_text.slen < 255) ? info.status_text.slen : 255);
 	// callback
-  if (cb_buddystatus != 0) cb_buddystatus(buddy_id, info.status);
+  if (cb_buddystatus != 0) cb_buddystatus(buddy_id, info.status, text);
 }
 
 

@@ -16,7 +16,7 @@ typedef int __stdcall fptr_getconfigdata(int);	// get config data
 typedef int __stdcall fptr_callholdconf(int);
 typedef int __stdcall fptr_callretrieveconf(int);
 typedef int __stdcall fptr_msgrec (char*, char*);
-typedef int __stdcall fptr_buddystatus(int, int);
+typedef int __stdcall fptr_buddystatus(int, int, const char*);
 
 // Callback registration 
 extern "C" PJSIPDLL_DLL_API int onRegStateCallback(fptr_regstate cb);	  // register registration notifier
