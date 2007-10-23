@@ -40,9 +40,6 @@ namespace Telephony
   {
     // call API
     [DllImport("pjsipDll.dll")]
-    private static extern int dll_registerAccount(string uri, string reguri, string domain, string username, string password);
-
-    [DllImport("pjsipDll.dll")]
     private static extern int dll_makeCall(int accountId, string uri);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_releaseCall(int callId);
@@ -293,8 +290,8 @@ namespace Telephony
 
           string displayName = Manager.getDisplayName(); 
           // Publish do not work if display name in uri 
-          //string uri = "\"" +displayName+ "\"" + "<sip:" + Manager.getId(i) + "@" + Manager.getAddress(i)+">";
-          string uri = "sip:" + Manager.getId(i) + "@" + Manager.getAddress(i) + "";
+          string uri = displayName+ "<sip:" + Manager.getId(i) + "@" + Manager.getAddress(i)+">";
+          //string uri = "sip:" + Manager.getId(i) + "@" + Manager.getAddress(i) + "";
           string reguri = "sip:" + Manager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
 
           string domain = Manager.getDomain(i);
