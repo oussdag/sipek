@@ -301,6 +301,7 @@ namespace Telephony
       int delta = (int)duration.TotalSeconds;
 
       CCallRecord record = new CCallRecord();
+      // todo:::extract name from number
       record.Name = "";
       record.Number = number;
       record.Duration = duration;
