@@ -117,7 +117,7 @@ namespace Telephony
           
     public bool xferCall(int sessionId, string number)
     {
-      string uri = "sip:" + number + "@" + Manager.getAddress(_accountId);
+      string uri = "sip:" + number + "@" + Manager.getAddress(Manager.DefaultAccountIndex);
       dll_xferCall(sessionId, uri);
       return true;
     }
