@@ -36,22 +36,48 @@ namespace Telephony
 
     private bool _initialized = false;
 
-    private CCommonProxyInterface _sipCommonProxy;
 
     #endregion
 
 
     #region Properties
 
-    public CCommonProxyInterface CommonProxy
+    public CStateMachine this[int index]
     {
-      get { return _sipCommonProxy; }
+      get
+      {
+        if (!_calls.ContainsKey(index)) return null;
+        return _calls[index];
+      }
+
     }
 
-    private CMediaProxyInterface _mediaProxy;
-    public CMediaProxyInterface MediaProxy
+    private static CCommonProxyInterface _sipCommonProxy;
+    public static CCommonProxyInterface CommonProxy
+    {
+      get { return _sipCommonProxy; }
+      set { _sipCommonProxy = value; }
+    }
+
+    private static CCallProxyInterface _sipCallProxy;
+    public static CCallProxyInterface CallProxy
+    {
+      get { return _sipCallProxy; }
+      set { _sipCallProxy = value; }
+    }
+
+    private static CMediaProxyInterface _mediaProxy;
+    public static CMediaProxyInterface MediaProxy
     {
       get { return _mediaProxy; }
+      set { _mediaProxy = value; }
+    }
+
+    private static ICallLogInterface _callLogInstance;
+    public static ICallLogInterface CallLog
+    {
+      get { return _callLogInstance; }
+      set { _callLogInstance = value; }
     }
 
     public int Count
@@ -144,14 +170,6 @@ namespace Telephony
       return _instance;
     }
 
-    private CCallManager()
-    {
-      // todo::: do abstraction!!!
-      _sipCommonProxy = new CSipCommonProxy();
-      _mediaProxy = new CMediaPlayerProxy();
-      //_sipCommonProxy = new CSipSocketCommonProxy();
-    }
-
     #endregion Constructor
 
     #region Events
@@ -194,13 +212,7 @@ namespace Telephony
         _sipCommonProxy.registerAccounts(false);
       }
       else
-      {
-        // todo unregister
-        //_sipCommonProxy.shutdown();
-        // wait for a moment...
-        //System.Threading.Thread.Sleep(500);
-        //_sipCommonProxy.initialize();
-        
+      {       
         // reregister 
         _sipCommonProxy.registerAccounts(true); 
       }
@@ -215,7 +227,7 @@ namespace Telephony
 
     public void updateGui()
     {
-       CallStateChanged();
+      if (null != CallStateChanged) CallStateChanged();
     }
 
     public CStateMachine getCurrentCall()
@@ -250,10 +262,10 @@ namespace Telephony
     /// Handler for outgoing calls (sessionId is not known yet).
     /// </summary>
     /// <param name="number"></param>
-    public void createSession(string number)
+    public CStateMachine createSession(string number)
     {
       int accId = CAccounts.getInstance().DefAccount.Index;
-      this.createSession(number, accId);
+      return this.createSession(number, accId);
     }
 
     /// <summary>
@@ -261,7 +273,7 @@ namespace Telephony
     /// </summary>
     /// <param name="number"></param>
     /// <param name="accountId">Specified account Id </param>
-    public void createSession(string number, int accountId)
+    public CStateMachine createSession(string number, int accountId)
     {
       CStateMachine call = createCall(0);
       int newsession = call.getState().makeCall(number, accountId);
@@ -271,7 +283,10 @@ namespace Telephony
         _calls.Add(newsession, call);
         _currentSession = newsession;
       }
+      
       updateGui();
+
+      return call;
     }
     
     /// <summary>
@@ -310,11 +325,10 @@ namespace Telephony
     {
       onUserRelease(_currentSession);
     }
-    
+
     public void onUserRelease(int session)
     {
-      CStateMachine call = getCall(session);
-      if (call != null) call.getState().endCall();
+      this[session].getState().endCall(session);
     }
 
     public void onUserAnswer()
@@ -322,52 +336,30 @@ namespace Telephony
       onUserAnswer(_currentSession);
     }
 
+    /// <summary>
+    /// Accept call
+    /// In case of multi call put current active call to Hold
+    /// </summary>
+    /// <param name="session"></param>
     public void onUserAnswer(int session)
     {
-      CStateMachine call = getCall(session);
-      call.getState().acceptCall();
+      List<CStateMachine> list = (List<CStateMachine>)this.enumCallsInState(EStateId.ACTIVE);
+      // should not be more than 1
+      if (list.Count > 0)
+      {
+        // put it on hold
+        CStateMachine sm = list[0];
+        if (null != sm) sm.getState().holdCall(sm.Session);
+      }
+      this[session].getState().acceptCall(session);
     }
 
-    public void nextSession()
-    {
-      int newsession = _currentSession;
-      bool stop = false;
-      foreach (KeyValuePair<int, CStateMachine> kvp in _calls)
-      {
-        if (stop) 
-        {
-          newsession = kvp.Value.Session;
-          break;
-        }
-        if (_currentSession == kvp.Value.Session) stop = true;
-      }
-      // in case last session is active choose first one
-      if (newsession == _currentSession)
-      {
-        _currentSession = _calls.GetEnumerator().Current.Key;
-      }
-      else
-      {
-        _currentSession = newsession;
-      }
-      // update gui
-      updateGui();
-    }
-    
-    public void previousSession()
-    {
-      //
-      foreach (KeyValuePair<int, CStateMachine> call in _calls)
-      { 
-        //call.
-      }
-    }
+
     /////////////////////////////////////////////////////////////////////
 
     private CStateMachine createCall(int sessionId)
     {
-      CStateMachine call = new CStateMachine(this, new CSipCallProxy(sessionId), CommonProxy, MediaProxy);
-      call.setCallLogInstance(CCallLog.getInstance());
+      CStateMachine call = new CStateMachine(this, CallProxy, MediaProxy);
       return call;
     }
 
@@ -387,6 +379,21 @@ namespace Telephony
         }
       }
       return cnt;
+    }
+
+
+    public ICollection<CStateMachine> enumCallsInState(EStateId stateId)
+    {
+      List<CStateMachine> list = new List<CStateMachine>();
+
+      foreach (KeyValuePair<int, CStateMachine> kvp in _calls)
+      {
+        if (stateId == kvp.Value.getStateId())
+        {
+          list.Add(kvp.Value);
+        }
+      }
+      return list;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -411,17 +418,25 @@ namespace Telephony
       if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
     }
 
-    public void HoldRetrieve(int session)
+    public void onUserHoldRetrieve(int session)
     {
       // check Hold or Retrieve
-      CAbstractState state = this.getCall(session).getState();
+      CAbstractState state = this[session].getState();
       if (state.StateId == EStateId.ACTIVE)
       {
-        this.getCall(session).getState().holdCall();
+        this.getCall(session).getState().holdCall(session);
       }
       else if (state.StateId == EStateId.HOLDING)
       {
-        this.getCall(session).getState().retrieveCall();
+        List<CStateMachine> list = (List<CStateMachine>)this.enumCallsInState(EStateId.ACTIVE);
+        // should not be more than 1
+        if (list.Count > 0)
+        {
+          // put it on hold
+          CStateMachine sm = list[0];
+          if (null != sm) sm.getState().holdCall(sm.Session);
+        }
+        this[session].getState().retrieveCall(session);
       }
       else
       { 
@@ -431,7 +446,7 @@ namespace Telephony
 
     public void onUserTransfer(int session, string number)
     {
-      this.getCall(session).getState().xferCall(number);
+      this.getCall(session).getState().xferCall(session, number);
     }
 
     #endregion Methods

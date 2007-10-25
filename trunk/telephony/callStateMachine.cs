@@ -43,7 +43,6 @@ namespace Telephony
     private System.TimeSpan _duration;
     private System.DateTime _timestamp;
     private CCallManager _manager;
-    private CCallLog _calllog;
 
     #endregion Variables
 
@@ -56,16 +55,12 @@ namespace Telephony
       set { _session = value; }
     }
 
-    private CTelephonyInterface _sigproxy;
-    public CTelephonyInterface SigProxy
+    ////////////////////////////////////////////////////////////////////////////////
+    /// Proxies
+    private CCallProxyInterface _sigproxy;
+    public CCallProxyInterface SigProxy
     {
       get { return _sigproxy; } 
-    }
-
-    private CCommonProxyInterface _commonproxy;
-    public CCommonProxyInterface CommonProxy
-    {
-      get { return _commonproxy; }
     }
 
     private CMediaProxyInterface _mediaProxy;
@@ -73,6 +68,8 @@ namespace Telephony
     {
       get { return _mediaProxy; }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
 
     private string _callingNumber = "";
     public string CallingNo
@@ -171,11 +168,11 @@ namespace Telephony
 
     #region Constructor
 
-    public CStateMachine(CCallManager manager, CTelephonyInterface proxy, CCommonProxyInterface commonproxy, CMediaProxyInterface mediaproxy)
+    public CStateMachine(CCallManager manager, CCallProxyInterface proxy, CMediaProxyInterface mediaproxy)
     {
       _manager = manager;
+
       _sigproxy = proxy;
-      _commonproxy = commonproxy;
       _mediaProxy = mediaproxy;
 
       _stateIdle = new CIdleState(this);
@@ -195,11 +192,6 @@ namespace Telephony
 
 
     #region Methods
-
-    public void setCallLogInstance(CCallLog calllog)
-    {
-      _calllog = calllog;
-    }
 
     public CAbstractState getState()
     {
@@ -249,15 +241,8 @@ namespace Telephony
       // update call log
       if (((Type != ECallType.EDialed) || (CallingNo.Length > 0)) && (Type != ECallType.EUndefined))
       {
-        if (null != _calllog)
-        {
-          _calllog.addCall(Type, CallingNo, Time, Duration);
-          _calllog.save();
-        }
-        else
-        {
-          ///!!!
-        }
+        CCallManager.CallLog.addCall(Type, CallingNo, Time, Duration);
+        CCallManager.CallLog.save();
       } 
       // reset data
       CallingNo = "";

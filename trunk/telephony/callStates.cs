@@ -55,7 +55,7 @@ namespace Telephony
   /// signal event from call server. 
   /// It's a base for all call states used by CStateMachine. 
   /// </summary>
-  public abstract class CAbstractState : CTelephonyInterface, CTelephonyCallback
+  public abstract class CAbstractState : CCallProxyInterface, CTelephonyCallback
   {
 
     #region Properties
@@ -74,6 +74,19 @@ namespace Telephony
       }
     }
 
+    private CCallProxyInterface _callProxy;
+    public CCallProxyInterface CallProxy
+    {
+      get
+      {
+        return _callProxy;
+      }
+      set
+      {
+        _callProxy = value;
+      }
+    }
+
     #endregion
 
     #region Variables
@@ -89,7 +102,7 @@ namespace Telephony
     public CAbstractState(CStateMachine sm)
     {
       _smref = sm;
-      _commonProxy = sm.CommonProxy;
+      _callProxy = sm.SigProxy;
       _mediaProxy = sm.MediaProxy;
     }
 
@@ -107,58 +120,58 @@ namespace Telephony
       return -1;
     }
 
-    public virtual bool endCall()
+    public virtual bool endCall(int sesionnId)
     {
       return true;
     }
 
-    public virtual bool acceptCall()
+    public virtual bool acceptCall(int sesionnId)
     {
       return true;
     }
 
 
-    public virtual bool alerted()
+    public virtual bool alerted(int sesionnId)
     {
       return true;
     }
 
-    public virtual bool holdCall()
+    public virtual bool holdCall(int sesionnId)
     {
       return true;
     }
-    
-    public virtual bool retrieveCall()
+
+    public virtual bool retrieveCall(int sesionnId)
     {
       return true;
     }
-    public virtual bool xferCall(string number)
+    public virtual bool xferCall(int sesionnId, string number)
     {
       return true;
     }
-    public virtual bool xferCallSession(int session)
+    public virtual bool xferCallSession(int sesionnId, int session)
     {
       return true;
     }
-    public bool threePtyCall(int session)
+    public bool threePtyCall(int sesionnId, int session)
     {
       return true;
     }
 /*    public bool serviceRequest(EServiceCodes code, int session)
     {
-      _smref.SigProxy.serviceRequest(code, session);
+      CallProxy.serviceRequest(code, session);
       return true;
     }
  */ 
-    public bool serviceRequest(int code, string dest)
+    public bool serviceRequest(int sesionnId, int code, string dest)
     {
-      _smref.SigProxy.serviceRequest(code, dest);
+      CallProxy.serviceRequest(sesionnId, code, dest);
       return true;
     }
 
-    public bool dialDtmf(int mode, string digits)
+    public bool dialDtmf(int sessionId, int mode, string digits)
     {
-      _smref.SigProxy.dialDtmf(mode, digits);
+      CallProxy.dialDtmf(sessionId, mode, digits);
       return true;
     }
 
@@ -212,7 +225,7 @@ namespace Telephony
     {
       _smref.CallingNo = dialedNo;
       _smref.changeState(EStateId.CONNECTING);
-      return _smref.SigProxy.makeCall(dialedNo, accountId);
+      return CallProxy.makeCall(dialedNo, accountId);
     }
 
     public override void incomingCall(string callingNo)
@@ -254,11 +267,11 @@ namespace Telephony
       _smref.changeState(EStateId.ALERTING);
     }
 
-    public override bool endCall()
+    public override bool endCall(int sessionId)
     {
-      _smref.SigProxy.endCall();
+      CallProxy.endCall(sessionId);
       _smref.destroy();
-      return base.endCall();
+      return base.endCall(sessionId);
     }
 
   }
@@ -295,11 +308,11 @@ namespace Telephony
       _smref.changeState(EStateId.RELEASED);
     }
 
-    public override bool endCall()
+    public override bool endCall(int sesionnId)
     {
-      _smref.SigProxy.endCall();
+      CallProxy.endCall(sesionnId);
       _smref.destroy();
-      return base.endCall();
+      return base.endCall(sesionnId);
     }
   }
 
@@ -323,28 +336,28 @@ namespace Telephony
     public override void onExit()
     {
     }
-    
-    public override bool endCall()
+
+    public override bool endCall(int sesionnId)
     {
       _smref.Duration = System.DateTime.Now.Subtract(_smref.Time);
 
-      _smref.SigProxy.endCall();
+      CallProxy.endCall(sesionnId);
       _smref.destroy();
-      return base.endCall();
+      return base.endCall(sesionnId);
     }
 
-    public override bool holdCall()
+    public override bool holdCall(int sesionnId)
     {
-      return _smref.SigProxy.holdCall();
+      return CallProxy.holdCall(sesionnId);
     }
 
-    public override bool xferCall(string number)
+    public override bool xferCall(int sesionnId, string number)
     {
-      return _smref.SigProxy.xferCall(number);
+      return CallProxy.xferCall(sesionnId, number);
     }
-    public override bool xferCallSession(int session)
+    public override bool xferCallSession(int sesionnId, int session)
     {
-      return _smref.SigProxy.xferCallSession(session);
+      return CallProxy.xferCallSession(sesionnId, session);
     }
 
     public override void onHoldConfirm()
@@ -384,11 +397,11 @@ namespace Telephony
     {
       _smref.changeState(EStateId.RELEASED);
     }
-    
-    public override bool endCall()
+
+    public override bool endCall(int sesionnId)
     {
       _smref.destroy();
-      return base.endCall();
+      return base.endCall(sesionnId);
     }
 
   }
@@ -409,22 +422,24 @@ namespace Telephony
     {
       _smref.Incoming = true;
 
+      int sessionId = _smref.Session;
+
       if ((_smref.CFUFlag == true) && (_smref.CFUNumber.Length > 0))
       {
-        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CFU, _smref.CFUNumber);
+        CallProxy.serviceRequest(sessionId, (int)EServiceCodes.SC_CFU, _smref.CFUNumber);
       }
       else if (_smref.DNDFlag == true)
       {
-        _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_DND, "");
+        CallProxy.serviceRequest(sessionId, (int)EServiceCodes.SC_DND, "");
       }
       else if (CSettings.AA == true)
       {
-        this.acceptCall();
+        this.acceptCall(sessionId);
       }
       else
 
       {
-        _smref.SigProxy.alerted();
+        CallProxy.alerted(sessionId);
         _smref.Type = ECallType.EMissed;
         _mediaProxy.playTone(ETones.EToneRing);
       }
@@ -433,14 +448,14 @@ namespace Telephony
     public override void onExit()
     {
       _mediaProxy.stopTone();
-    }    
+    }
 
-    public override bool acceptCall()
+    public override bool acceptCall(int sesionnId)
     {
       _smref.Type = ECallType.EReceived;
       _smref.Time = System.DateTime.Now;
 
-      _smref.SigProxy.acceptCall();
+      CallProxy.acceptCall(sesionnId);
       _smref.changeState(EStateId.ACTIVE);
       return true;
     }
@@ -451,17 +466,17 @@ namespace Telephony
       _smref.destroy();
     }
 
-    public override bool xferCall(string number)
+    public override bool xferCall(int sessionId, string number)
     {
       // In fact this is not Tranfser. It's Deflect => redirect...
-      return _smref.SigProxy.serviceRequest((int)EServiceCodes.SC_CD, number);
+      return CallProxy.serviceRequest(sessionId, (int)EServiceCodes.SC_CD, number);
     }
 
-    public override bool endCall()
+    public override bool endCall(int sessionId)
     {
-      _smref.SigProxy.endCall();
+      CallProxy.endCall(sessionId);
       _smref.destroy();
-      return base.endCall();
+      return base.endCall(sessionId);
     }
   }
 
@@ -484,9 +499,9 @@ namespace Telephony
     {
     }
 
-    public override bool retrieveCall()
+    public override bool retrieveCall(int sessionId)
     {
-      _smref.SigProxy.retrieveCall();
+      CallProxy.retrieveCall(sessionId);
       _smref.changeState(EStateId.ACTIVE);
       return true;
     }
@@ -497,11 +512,11 @@ namespace Telephony
       _smref.changeState(EStateId.RELEASED);
     }
 
-    public override bool endCall()
+    public override bool endCall(int sessionId)
     {
-      _smref.SigProxy.endCall();
+      CallProxy.endCall(sessionId);
       _smref.destroy();
-      return base.endCall();
+      return base.endCall(sessionId);
     }
   }
 
