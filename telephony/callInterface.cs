@@ -31,30 +31,30 @@ namespace Telephony
     OPT_MAX
   }
 
-  public interface CTelephonyInterface
+  public interface CCallProxyInterface
   {
     int makeCall(string dialedNo, int accountId);
 
-    bool endCall();
+    bool endCall(int sessionId);
 
-    bool alerted();
+    bool alerted(int sessionId);
 
-    bool acceptCall();
+    bool acceptCall(int sessionId);
 
-    bool holdCall();
+    bool holdCall(int sessionId);
 
-    bool retrieveCall();
+    bool retrieveCall(int sessionId);
 
-    bool xferCall(string number);
+    bool xferCall(int sessionId, string number);
 
-    bool xferCallSession(int session);
+    bool xferCallSession(int sessionId, int session);
 
-    bool threePtyCall(int session);
+    bool threePtyCall(int sessionId, int session);
 
     //bool serviceRequest(EServiceCodes code, int session);
-    bool serviceRequest(int code, string dest);
+    bool serviceRequest(int sessionId, int code, string dest);
 
-    bool dialDtmf(int mode, string digits);
+    bool dialDtmf(int sessionId, int mode, string digits);
   }
 
   interface CTelephonyCallback
@@ -99,6 +99,13 @@ namespace Telephony
     int playTone(ETones toneId);
 
     int stopTone();
+  }
+
+  public interface ICallLogInterface
+  {
+    void addCall(ECallType type, string number, System.DateTime time, System.TimeSpan duration);
+
+    void save();
   }
 
 } // namespace Sipek

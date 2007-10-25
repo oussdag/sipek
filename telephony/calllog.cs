@@ -73,7 +73,10 @@ namespace Telephony
     }
   }
 
-  public class CCallLog
+  /// <summary>
+  /// Call Log handling class
+  /// </summary>
+  public class CCallLog : ICallLogInterface
   {
     private const string NAME = "Name";
     private const string NUMBER = "Number";

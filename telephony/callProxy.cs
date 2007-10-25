@@ -36,7 +36,7 @@ namespace Telephony
   /// <summary>
   /// 
   /// </summary>
-  public class CSipCallProxy : CTelephonyInterface
+  public class CSipCallProxy : CCallProxyInterface
   {
     // call API
     [DllImport("pjsipDll.dll")]
@@ -59,8 +59,6 @@ namespace Telephony
     private static extern int dll_dialDtmf(int callId, string digits, int mode);
 
     // identify line
-    private int _line;
-    private int _accountId;
 
     private CCallManager Manager
     {
@@ -69,84 +67,83 @@ namespace Telephony
 
     #region Constructor
 
-    public CSipCallProxy(int line)
-    {
-      _line = line;
-    }
-
     #endregion Constructor
 
 
     #region Methods
 
+    /// <summary>
+    /// Method makeCall creates call session
+    /// </summary>
+    /// <param name="dialedNo"></param>
+    /// <param name="accountId"></param>
+    /// <returns>SessionId selected by sip stack</returns>
     public int makeCall(string dialedNo, int accountId)
     {
-      _accountId = accountId;
-
       string uri = "sip:" + dialedNo + "@" + Manager.getAddress(accountId);
-      _line = dll_makeCall(accountId, uri);
-      return _line;
+      int sessionId = dll_makeCall(accountId, uri);
+      return sessionId;
     }
 
-    public bool endCall()
+    public bool endCall(int sessionId)
     {
-      dll_releaseCall(_line);
+      dll_releaseCall(sessionId);
       return true;
     }
 
-    public bool alerted()
+    public bool alerted(int sessionId)
     {
-      dll_answerCall(_line, 180);
+      dll_answerCall(sessionId, 180);
       return true;
     }
 
-    public bool acceptCall()
+    public bool acceptCall(int sessionId)
     {
-      dll_answerCall(_line, 200);
+      dll_answerCall(sessionId, 200);
       return true;
     }
     
-    public bool holdCall()
+    public bool holdCall(int sessionId)
     {
-      dll_holdCall(_line);
+      dll_holdCall(sessionId);
       return true;
     }
     
-    public bool retrieveCall()
+    public bool retrieveCall(int sessionId)
     {
-      dll_retrieveCall(_line);
+      dll_retrieveCall(sessionId);
       return true;
     }
           
-    public bool xferCall(string number)
+    public bool xferCall(int sessionId, string number)
     {
       string uri = "sip:" + number + "@" + Manager.getAddress(_accountId);
-      dll_xferCall(_line, uri);
+      dll_xferCall(sessionId, uri);
       return true;
     }
     
-    public bool xferCallSession(int session)
+    public bool xferCallSession(int sessionId, int session)
     {
-      dll_xferCallWithReplaces(_line, session);
+      dll_xferCallWithReplaces(sessionId, session);
       return true;
     }
 
-    public bool threePtyCall(int session)
+    public bool threePtyCall(int sessionId, int session)
     {
-      dll_serviceReq(_line, (int)EServiceCodes.SC_3PTY,"");
+      dll_serviceReq(sessionId, (int)EServiceCodes.SC_3PTY, "");
       return true;
     }
     
-    public bool serviceRequest(int code, string dest)
+    public bool serviceRequest(int sessionId, int code, string dest)
     {
       string destUri = "<sip:" + dest + "@" + Manager.getAddress() + ">";
-      dll_serviceReq(_line, (int)code, destUri);
+      dll_serviceReq(sessionId, (int)code, destUri);
       return true;
     }
 
-    public bool dialDtmf(int mode, string digits)
+    public bool dialDtmf(int sessionId, int mode, string digits)
     {
-      dll_dialDtmf(_line, digits, mode);
+      dll_dialDtmf(sessionId, digits, mode);
       return true;
     }
 
@@ -223,7 +220,7 @@ namespace Telephony
     static OnMessageReceivedCallback mrdel = new OnMessageReceivedCallback(onMessageReceived);
     static OnBuddyStatusChangedCallback bscdel = new OnBuddyStatusChangedCallback(onBuddyStatusChanged);
 
-    private static CCallManager Manager
+    private static CCallManager CallManager
     {
       get { return CCallManager.getInstance(); }
     }
@@ -256,7 +253,7 @@ namespace Telephony
     {
       int status = -1;
       
-      int port = CCallManager.getInstance().SipPort;
+      int port = CallManager.SipPort;
 
       status = dll_init(port);
       status |= dll_main();
@@ -279,24 +276,24 @@ namespace Telephony
         dll_removeAccounts();
       } 
 
-      for (int i = 0; i < Manager.NumAccounts; i++)
+      for (int i = 0; i < CallManager.NumAccounts; i++)
       {
         // reset account state
-        Manager.setAccountState(i, 0);
+        CallManager.setAccountState(i, 0);
 
-        if (Manager.getId(i).Length > 0)
+        if (CallManager.getId(i).Length > 0)
         {
-          if (Manager.getAddress(i) == "0") continue;
+          if (CallManager.getAddress(i) == "0") continue;
 
-          string displayName = Manager.getDisplayName(); 
+          string displayName = CallManager.getDisplayName(); 
           // Publish do not work if display name in uri 
-          string uri = displayName+ "<sip:" + Manager.getId(i) + "@" + Manager.getAddress(i)+">";
+          string uri = displayName + "<sip:" + CallManager.getId(i) + "@" + CallManager.getAddress(i) + ">";
           //string uri = "sip:" + Manager.getId(i) + "@" + Manager.getAddress(i) + "";
-          string reguri = "sip:" + Manager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
+          string reguri = "sip:" + CallManager.getAddress(i); // +":" + CCallManager.getInstance().SipProxyPort;
 
-          string domain = Manager.getDomain(i);
-          string username = Manager.getUsername(i);
-          string password = Manager.getPassword(i);
+          string domain = CallManager.getDomain(i);
+          string username = CallManager.getUsername(i);
+          string password = CallManager.getPassword(i);
 
           dll_registerAccount(uri, reguri, domain, username, password);
 
@@ -309,7 +306,7 @@ namespace Telephony
     // Buddy list handling
     public int addBuddy(string ident)
     {
-      string uri = "sip:" + ident + "@" + Manager.getAddress();
+      string uri = "sip:" + ident + "@" + CallManager.getAddress();
       return dll_addBuddy(uri, true);
     }
 
@@ -320,8 +317,8 @@ namespace Telephony
 
     public int sendMessage(string dest, string message)
     {
-      string uri = "sip:" + dest + "@" + Manager.getAddress();
-      return dll_sendMessage(Manager.DefaultAccountIndex, uri, message);
+      string uri = "sip:" + dest + "@" + CallManager.getAddress();
+      return dll_sendMessage(CallManager.DefaultAccountIndex, uri, message);
     }
 
     public int setStatus(int accId, EUserStatus status)
@@ -344,7 +341,7 @@ namespace Telephony
 //    PJSIP_INV_STATE_DISCONNECTED,   /**< Session is terminated.		    */
       if (callState == 2) return 0;
 
-      CStateMachine sm = CCallManager.getInstance().getCall(callId);
+      CStateMachine sm = CallManager.getCall(callId);
       if (sm == null) return 0;
 
       switch (callState)
@@ -395,7 +392,7 @@ namespace Telephony
 
       }
 
-      CStateMachine sm = CCallManager.getInstance().createSession(callId, number);
+      CStateMachine sm = CallManager.createSession(callId, number);
       sm.getState().incomingCall(number);
       return 1;
     }
@@ -403,14 +400,14 @@ namespace Telephony
 
     private static int onRegStateChanged(int accId, int regState)
     {
-      Manager.setAccountState(accId, regState);
+      CallManager.setAccountState(accId, regState);
       return 1;
     }
 
 
     private static int onCallHoldConfirm(int callId)
     {
-      CStateMachine sm = CCallManager.getInstance().getCall(callId);
+      CStateMachine sm = CallManager.getCall(callId);
       if (sm != null) sm.getState().onHoldConfirm();
       return 1;
     }
@@ -419,13 +416,13 @@ namespace Telephony
 
     private static int onMessageReceived(string from, string message)
     {
-      Manager.SetMessageReceived(from, message);
+      CallManager.SetMessageReceived(from, message);
       return 1;
     }
 
     private static int onBuddyStatusChanged(int buddyId, int status, string text)
     {
-      Manager.setBuddyState(buddyId, status, text);
+      CallManager.setBuddyState(buddyId, status, text);
       return 1;
     }
 
