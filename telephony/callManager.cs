@@ -32,11 +32,6 @@ namespace Telephony
 
     private Dictionary<int, CStateMachine> _calls;  //!< Call table
 
-    private int _currentSession = -1;
-
-    private bool _initialized = false;
-
-
     #endregion
 
 
@@ -49,7 +44,11 @@ namespace Telephony
         if (!_calls.ContainsKey(index)) return null;
         return _calls[index];
       }
+    }
 
+    public Dictionary<int, CStateMachine> CallList
+    {
+      get { return _calls; }
     }
 
     private static CCommonProxyInterface _sipCommonProxy;
@@ -155,6 +154,11 @@ namespace Telephony
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    private bool _initialized = false;
+    public bool isInitialized
+    {
+      get { return _initialized; }
+    }
 
     #endregion Properties
 
@@ -187,20 +191,18 @@ namespace Telephony
     {
     }
 
-    #endregion
+    #endregion Events
 
 
     #region Methods
 
-    public bool isInitialized()
-    {
-      return _initialized;
-    }
+    ///////////////////////////////////////////////////////////////////
+    /// Common routines
 
     public int initialize()
     {
       ///
-      if (!_initialized)
+      if (!isInitialized)
       {
         CallStateChanged += dummy;
 
@@ -225,43 +227,24 @@ namespace Telephony
       _sipCommonProxy.shutdown();
     }
 
-    public void updateGui()
-    {
-      if (null != CallStateChanged) CallStateChanged();
-    }
+    /////////////////////////////////////////////////////////////////////////////////////////
+    // Call handling routines
 
-    public CStateMachine getCurrentCall()
+    /// <summary>
+    /// Create an instance of state machine
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns></returns>
+    private CStateMachine createCall(int sessionId)
     {
-      if (_currentSession < 0) return null;
-      return _calls[_currentSession];
-    }
-
-    public int getCurrentCallIndex()
-    {
-      int index = 0;
-      foreach (KeyValuePair<int, CStateMachine> kvp in _calls)
-      { 
-        index++;
-        if (kvp.Value.Session == _currentSession) break;
-      }
-      return index;
-    }
-
-    public CStateMachine getCall(int session)
-    {
-      if ((_calls.Count == 0)||(!_calls.ContainsKey(session))) return null;
-      return _calls[session];
-    }
-
-    public Dictionary<int, CStateMachine> getCallList()
-    {
-      return _calls;
+      CStateMachine call = new CStateMachine(this, CallProxy, MediaProxy);
+      return call;
     }
 
     /// <summary>
-    /// Handler for outgoing calls (sessionId is not known yet).
+    /// Handler for outgoing calls (accountId is not known).
     /// </summary>
-    /// <param name="number"></param>
+    /// <param name="number">Number to call</param>
     public CStateMachine createSession(string number)
     {
       int accId = CAccounts.getInstance().DefAccount.Index;
@@ -271,7 +254,7 @@ namespace Telephony
     /// <summary>
     /// Handler for outgoing calls (sessionId is not known yet).
     /// </summary>
-    /// <param name="number"></param>
+    /// <param name="number">Number to call</param>
     /// <param name="accountId">Specified account Id </param>
     public CStateMachine createSession(string number, int accountId)
     {
@@ -281,9 +264,9 @@ namespace Telephony
       {
         call.Session = newsession;
         _calls.Add(newsession, call);
-        _currentSession = newsession;
       }
-      
+
+      // Call callback method to update GUI
       updateGui();
 
       return call;
@@ -299,73 +282,33 @@ namespace Telephony
     public CStateMachine createSession(int sessionId, string number)
     {
       CStateMachine call = createCall(sessionId);
+
+      if (null == call) return null; 
+
+      // save session parameters
       call.Session = sessionId;
       _calls.Add(sessionId, call);
-      _currentSession = sessionId;
+      
       updateGui();
+
       return call;
-    }
-
-    public void destroySession(int session)
-    {
-      _calls.Remove(session);
-      if (_calls.Count == 0)
-      {
-        _currentSession = -1;
-      }
-      else 
-      {
-        // select other session
-        _currentSession = _calls.GetEnumerator().Current.Key;
-      }
-      updateGui();
-    }
-
-    public void onUserRelease()
-    {
-      onUserRelease(_currentSession);
-    }
-
-    public void onUserRelease(int session)
-    {
-      this[session].getState().endCall(session);
-    }
-
-    public void onUserAnswer()
-    {
-      onUserAnswer(_currentSession);
     }
 
     /// <summary>
-    /// Accept call
-    /// In case of multi call put current active call to Hold
+    /// Destroy call 
     /// </summary>
-    /// <param name="session"></param>
-    public void onUserAnswer(int session)
-    {
-      List<CStateMachine> list = (List<CStateMachine>)this.enumCallsInState(EStateId.ACTIVE);
-      // should not be more than 1
-      if (list.Count > 0)
-      {
-        // put it on hold
-        CStateMachine sm = list[0];
-        if (null != sm) sm.getState().holdCall(sm.Session);
-      }
-      this[session].getState().acceptCall(session);
-    }
-
-
-    /////////////////////////////////////////////////////////////////////
-
-    private CStateMachine createCall(int sessionId)
-    {
-      CStateMachine call = new CStateMachine(this, CallProxy, MediaProxy);
-      return call;
-    }
-
-    public void destroy(int session)
+    /// <param name="session">session identification</param>
+    public void destroySession(int session)
     {
       _calls.Remove(session);
+
+      updateGui();
+    }
+
+    public CStateMachine getCall(int session)
+    {
+      if ((_calls.Count == 0) || (!_calls.ContainsKey(session))) return null;
+      return _calls[session];
     }
 
     public int getNoCallsInState(EStateId stateId)
@@ -381,7 +324,11 @@ namespace Telephony
       return cnt;
     }
 
-
+    /// <summary>
+    /// Collect statemachines being in a given state
+    /// </summary>
+    /// <param name="stateId">state machine state</param>
+    /// <returns>List of state machines</returns>
     public ICollection<CStateMachine> enumCallsInState(EStateId stateId)
     {
       List<CStateMachine> list = new List<CStateMachine>();
@@ -396,28 +343,40 @@ namespace Telephony
       return list;
     }
 
-    /////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // User handling routines
+
     /// <summary>
-    /// 
+    /// User triggers a call release for a given session
     /// </summary>
-    /// <param name="accId"></param>
-    /// <param name="regState"></param>
-    public void setAccountState(int accId, int regState)
+    /// <param name="session">session identification</param>
+    public void onUserRelease(int session)
     {
-      CAccounts.getInstance()[accId].RegState = regState;
-      updateGui();
-    }
-    
-    public void SetMessageReceived(string from, string message)
-    {
-      if (MessageReceived!= null) MessageReceived(from, message);
+      this[session].getState().endCall(session);
     }
 
-    public void setBuddyState(int buddyId, int status, string text)
+    /// <summary>
+    /// User accepts call for a given session
+    /// In case of multi call put current active call to Hold
+    /// </summary>
+    /// <param name="session">session identification</param>
+    public void onUserAnswer(int session)
     {
-      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
+      List<CStateMachine> list = (List<CStateMachine>)this.enumCallsInState(EStateId.ACTIVE);
+      // should not be more than 1
+      if (list.Count > 0)
+      {
+        // put it on hold
+        CStateMachine sm = list[0];
+        if (null != sm) sm.getState().holdCall(sm.Session);
+      }
+      this[session].getState().acceptCall(session);
     }
 
+    /// <summary>
+    /// User put call on hold or retrieve 
+    /// </summary>
+    /// <param name="session">session identification</param>
     public void onUserHoldRetrieve(int session)
     {
       // check Hold or Retrieve
@@ -439,21 +398,67 @@ namespace Telephony
         this[session].getState().retrieveCall(session);
       }
       else
-      { 
+      {
         // illegal
       }
-    }    
+    }
 
+    /// <summary>
+    /// User starts a call transfer
+    /// </summary>
+    /// <param name="session">session identification</param>
+    /// <param name="number">number to transfer</param>
     public void onUserTransfer(int session, string number)
     {
-      this.getCall(session).getState().xferCall(session, number);
+      this[session].getState().xferCall(session, number);
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////
+    // Callback handlers
+
+    /// <summary>
+    /// Inform GUI to be refreshed 
+    /// </summary>
+    public void updateGui()
+    {
+      if (null != CallStateChanged) CallStateChanged();
+    }
+    
+    /// <summary>
+    /// Account state changed
+    /// </summary>
+    /// <param name="accId">account identification</param>
+    /// <param name="regState">state of account</param>
+    public void setAccountState(int accId, int regState)
+    {
+      CAccounts.getInstance()[accId].RegState = regState;
+      updateGui();
+    }
+    
+    /// <summary>
+    /// Inform about new incoming message 
+    /// </summary>
+    /// <param name="from">identification of sender</param>
+    /// <param name="message">content of message</param>
+    public void setMessageReceived(string from, string message)
+    {
+      if (MessageReceived!= null) MessageReceived(from, message);
+    }
+
+    /// <summary>
+    /// Buddy presence state changed
+    /// </summary>
+    /// <param name="buddyId">buddy identification</param>
+    /// <param name="status">buddy status</param>
+    /// <param name="text">buddy status additional text</param>
+    public void setBuddyState(int buddyId, int status, string text)
+    {
+      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
     }
 
     #endregion Methods
 
   }
-
-
-
 
 } // namespace Sipek

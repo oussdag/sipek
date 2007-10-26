@@ -416,7 +416,7 @@ namespace Telephony
 
     private static int onMessageReceived(string from, string message)
     {
-      CallManager.SetMessageReceived(from, message);
+      CallManager.setMessageReceived(from, message);
       return 1;
     }
 
