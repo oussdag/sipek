@@ -307,7 +307,7 @@ namespace UnitTest
 
       Assert.AreEqual(sm1.RuntimeDuration, TimeSpan.Zero);
 
-      Telephony.CCallManager.getInstance().onUserAnswer();
+      Telephony.CCallManager.getInstance().onUserAnswer(sm1.Session);
       //sm1.getState().acceptCall(sm1.Session);
       //sm1.changeState(EStateId.ACTIVE);
       Assert.AreEqual(EStateId.ACTIVE, sm1.getStateId());
