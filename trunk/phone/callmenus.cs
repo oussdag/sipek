@@ -58,6 +58,13 @@ namespace Sipek
     protected CStateMachine _currentCall = null;
     protected CCallManager _callManager = CCallManager.getInstance();
 
+    static int _currentCallIdx = -1;
+    public static int CurrentCallIdx
+    {
+      get { return _currentCallIdx; }
+      set { _currentCallIdx = value; }
+    }
+
     public CTelephonyPage(ECallPages pageId, string pageName) 
       : base((int)pageId, false,true)
 	  {
@@ -107,7 +114,8 @@ namespace Sipek
       base.onEntry();
 
       // get current call instance
-      _currentCall = CCallManager.getInstance().getCurrentCall();
+      //_currentCall = CCallManager.getInstance().getCurrentCall();
+      _currentCall = CCallManager.getInstance()[CurrentCallIdx];
 
       if (_currentCall == null) return;
 
@@ -122,7 +130,7 @@ namespace Sipek
       //_id.Caption = currentCall.CallingNo;
 
 	    // call sessions...
-      _sessions.Caption = _callManager.getCurrentCallIndex().ToString()
+      _sessions.Caption = CurrentCallIdx.ToString()
         + "/" + _callManager.Count.ToString();
     }
 
@@ -684,7 +692,7 @@ namespace Sipek
 
       _xfer2List.removeAll();
       
-      Dictionary<int, CStateMachine> list = _callManager.getCallList();
+      Dictionary<int, CStateMachine> list = _callManager.CallList;
       foreach (KeyValuePair<int, CStateMachine> kvp in list)
       {
         CStateMachine call = kvp.Value;
@@ -747,7 +755,7 @@ namespace Sipek
 
       _3pty2List.removeAll();
 
-      Dictionary<int, CStateMachine> list = _callManager.getCallList();
+      Dictionary<int, CStateMachine> list = _callManager.CallList;
       foreach (KeyValuePair<int, CStateMachine> kvp in list)
       {
         CStateMachine call = kvp.Value;

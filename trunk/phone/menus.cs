@@ -204,7 +204,7 @@ namespace Sipek
 
     public override void onEntry()
     {
-      if (!CCallManager.getInstance().isInitialized())
+      if (!CCallManager.getInstance().isInitialized)
       {
         // initialize telephony...
         CCallManager.getInstance().initialize();
@@ -1349,7 +1349,7 @@ namespace Sipek
       if (buddy != null)
       {
         // Invoke SIP stack wrapper function to send message
-        CCallManager.getInstance().CommonProxy.sendMessage(buddy.Number, _editBox.Caption);
+        CCallManager.CommonProxy.sendMessage(buddy.Number, _editBox.Caption);
       }
       _controller.previousPage();
       return true;

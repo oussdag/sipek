@@ -309,7 +309,7 @@ namespace Sipek
     {
       // Call stack to add buddy and get buddy id
       // TODO
-      int buddyindex = Telephony.CCallManager.getInstance().CommonProxy.addBuddy(record.Number);
+      int buddyindex = Telephony.CCallManager.CommonProxy.addBuddy(record.Number);
       if (buddyindex == -1)
       {
         Random rnd = new System.Random(DateTime.Now.Millisecond);

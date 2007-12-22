@@ -11,7 +11,7 @@
     <AssemblyName>Sipek</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <TargetZone>LocalIntranet</TargetZone>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <ManifestCertificateThumbprint>4E4063BD046C47C63138554000D951E3B2927EC6</ManifestCertificateThumbprint>
     <ManifestKeyFile>Sipek_TemporaryKey.pfx</ManifestKeyFile>
@@ -95,6 +95,7 @@
       <DependentUpon>PhoneForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <BaseApplicationManifest Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -117,7 +117,7 @@ namespace Sipek
         return;
       }
 
-      Dictionary<int, CStateMachine> calls = CCallManager.getInstance().getCallList();
+      Dictionary<int, CStateMachine> calls = CCallManager.getInstance().CallList;
       CStateMachine call = CCallManager.getInstance().getCurrentCall();
       if (call != null)
       {
