@@ -62,6 +62,7 @@ extern "C" PJSIPDLL_DLL_API int dll_xferCallWithReplaces(int callId, int dstSess
 extern "C" PJSIPDLL_DLL_API int dll_serviceReq(int callId, int serviceCode, const char* destUri);
 extern "C" PJSIPDLL_DLL_API int dll_dialDtmf(int callId, char* digits, int mode);
 extern "C" PJSIPDLL_DLL_API int dll_removeAccounts();
+extern "C" PJSIPDLL_DLL_API int dll_sendInfo(int callid, char* content);
 // IM & Presence api
 extern "C" PJSIPDLL_DLL_API int dll_addBuddy(char* uri, bool subscribe);
 extern "C" PJSIPDLL_DLL_API int dll_removeBuddy(int buddyId);

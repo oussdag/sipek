@@ -14,6 +14,9 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+*
+* This code is based on pjsip from Benny Prijono <benny@prijono.org>
+* 
 */
 
 #include "pjsipDll.h"
@@ -747,9 +750,14 @@ int dll_serviceReq(int callId, int serviceCode, const char* destUri)
 
 int dll_dialDtmf(int callId, char* digits, int mode)
 {
-  pj_str_t dg = pj_str(digits);
-	int status = pjsua_call_dial_dtmf(callId, &dg);
-  return status;
+	// todo:::implemenent dtmf mode
+	pj_status_t status = pjsua_call_dial_dtmf(callId, &pj_str(digits));
+	if (status != PJ_SUCCESS) {
+	    pjsua_perror(THIS_FILE, "Unable to send DTMF", status);
+	} else {
+	    puts("DTMF digits enqueued for transmission");
+	}
+	return status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -827,5 +835,21 @@ pjrpid_element elem;
 
 	return status;
 }
+
+int dll_sendInfo(int callid, char* content)
+{
+pj_status_t status;
+pjsua_msg_data msg_data;
+
+	string temp = "Signal="; 
+	temp += content;
+
+	msg_data.content_type = pj_str("application/dtmf-relay");
+	msg_data.msg_body = pj_str((char*)temp.c_str());
+		
+	status = pjsua_call_send_request(callid, &pj_str("INFO"), &msg_data);
+
+	return status;
+}	
 
 //////////////////////////////////////////////////////////////////////////////

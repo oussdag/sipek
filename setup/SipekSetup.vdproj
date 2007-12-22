@@ -15,19 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0627437B6599D15129923770E010D064"
-        "OwnerKey" = "8:_4E71028215E449ADAED4503DACBD9868"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1E9C227F5A854E1D8FCECEC6F3318E67"
+        "MsmKey" = "8:_20ECFD42F7304196AD470B919A2E04D6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_35D0308FE7C64EB78941EE4275F83B76"
+        "MsmKey" = "8:_2A7B1628BD0646019CA6E466C69A601F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -39,20 +33,32 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_6C8EF72A40F09A7D192A5E795B9E0C4C"
-        "OwnerKey" = "8:_4E71028215E449ADAED4503DACBD9868"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6F5262C3B5D547ECA82F0F6414747D27"
+        "MsmKey" = "8:_782D9033C85D4E0781B03E6562AFB05E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_9C246F5F8E2B4AB39FF6EF4A6F1FB60B"
+        "MsmKey" = "8:_953853AF5756FEDBEBC7272B334EC30F"
+        "OwnerKey" = "8:_4E71028215E449ADAED4503DACBD9868"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_96FB2F45220E4764A8CAEF953CC8DE5C"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BBC5523607F14DEDA988F186BF7FD75D"
+        "OwnerKey" = "8:_4E71028215E449ADAED4503DACBD9868"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C6BB9F3AF7C2291FAD3FE027CC821FD5"
+        "OwnerKey" = "8:_4E71028215E449ADAED4503DACBD9868"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -64,13 +70,19 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0627437B6599D15129923770E010D064"
+        "OwnerKey" = "8:_C6BB9F3AF7C2291FAD3FE027CC821FD5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6C8EF72A40F09A7D192A5E795B9E0C4C"
+        "OwnerKey" = "8:_953853AF5756FEDBEBC7272B334EC30F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_BBC5523607F14DEDA988F186BF7FD75D"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -163,14 +175,74 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0627437B6599D15129923770E010D064"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_20ECFD42F7304196AD470B919A2E04D6"
+            {
+            "SourcePath" = "8:..\\telephony\\sounds\\dial.wav"
+            "TargetName" = "8:dial.wav"
+            "Tag" = "8:"
+            "Folder" = "8:_78906BD4E4D94FD48C03C2EB0D4115EA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A7B1628BD0646019CA6E466C69A601F"
+            {
+            "SourcePath" = "8:..\\telephony\\sounds\\ring.wav"
+            "TargetName" = "8:ring.wav"
+            "Tag" = "8:"
+            "Folder" = "8:_78906BD4E4D94FD48C03C2EB0D4115EA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_782D9033C85D4E0781B03E6562AFB05E"
+            {
+            "SourcePath" = "8:..\\telephony\\sounds\\ringback.wav"
+            "TargetName" = "8:ringback.wav"
+            "Tag" = "8:"
+            "Folder" = "8:_78906BD4E4D94FD48C03C2EB0D4115EA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_953853AF5756FEDBEBC7272B334EC30F"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:UiFrameworkLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0627437B6599D15129923770E010D064"
+                    "_953853AF5756FEDBEBC7272B334EC30F"
                     {
                     "Name" = "8:UiFrameworkLib.dll"
                     "Attributes" = "3:512"
@@ -194,12 +266,12 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E9C227F5A854E1D8FCECEC6F3318E67"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_96FB2F45220E4764A8CAEF953CC8DE5C"
             {
-            "SourcePath" = "8:..\\phone\\bin\\ringback.wav"
-            "TargetName" = "8:ringback.wav"
+            "SourcePath" = "8:..\\telephony\\sounds\\congestion.wav"
+            "TargetName" = "8:congestion.wav"
             "Tag" = "8:"
-            "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
+            "Folder" = "8:_78906BD4E4D94FD48C03C2EB0D4115EA"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -214,10 +286,21 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_35D0308FE7C64EB78941EE4275F83B76"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BBC5523607F14DEDA988F186BF7FD75D"
             {
-            "SourcePath" = "8:..\\phone\\bin\\dial.wav"
-            "TargetName" = "8:dial.wav"
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Telephony, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_BBC5523607F14DEDA988F186BF7FD75D"
+                    {
+                    "Name" = "8:Telephony.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Telephony.dll"
+            "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
             "Condition" = "8:"
@@ -231,17 +314,17 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6C8EF72A40F09A7D192A5E795B9E0C4C"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C6BB9F3AF7C2291FAD3FE027CC821FD5"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:pjsipDll, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_6C8EF72A40F09A7D192A5E795B9E0C4C"
+                    "_C6BB9F3AF7C2291FAD3FE027CC821FD5"
                     {
                     "Name" = "8:pjsipDll.dll"
                     "Attributes" = "3:512"
@@ -263,46 +346,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6F5262C3B5D547ECA82F0F6414747D27"
-            {
-            "SourcePath" = "8:..\\phone\\bin\\ring.wav"
-            "TargetName" = "8:ring.wav"
-            "Tag" = "8:"
-            "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9C246F5F8E2B4AB39FF6EF4A6F1FB60B"
-            {
-            "SourcePath" = "8:..\\phone\\bin\\congestion.wav"
-            "TargetName" = "8:congestion.wav"
-            "Tag" = "8:"
-            "Folder" = "8:_7CCADDD78D1D482F980B3F6F17A4923B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
@@ -332,6 +375,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_78906BD4E4D94FD48C03C2EB0D4115EA"
+                    {
+                    "Name" = "8:sounds"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_673B4A80296447DA8C9F680A2CA259AD"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_9633F2748EEA4693868AC8BE524B729E"
@@ -372,7 +426,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SIPek"
         "ProductCode" = "8:{206AFE21-564D-4AA4-8C7C-2CF19329D173}"
-        "PackageCode" = "8:{5A547316-8614-4569-97F2-5E9EC0D6574A}"
+        "PackageCode" = "8:{9238FB6B-28F9-49E4-B7E2-2627DBE28BD8}"
         "UpgradeCode" = "8:{29CE83EC-8ACB-4E49-85BA-73D22ECEA660}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

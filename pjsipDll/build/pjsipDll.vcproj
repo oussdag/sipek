@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../pjsip/include,../../pjlib/include,../../pjlib-util/include,../../pjmedia/include,../../pjnath/include"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/pjsip/include&quot;;&quot;$(SolutionDir)/pjlib/include&quot;;&quot;$(SolutionDir)/pjlib-util/include&quot;;&quot;$(SolutionDir)/pjmedia/include&quot;;&quot;$(SolutionDir)/pjnath/include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;PJ_WIN32=1;PJ_M_I386=1;_USRDLL;PJSIPDLL_EXPORTS"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -65,6 +65,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalDependencies="Iphlpapi.lib dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib"
+				OutputFile="$(ProjectDir)\..\lib\$(ProjectName)d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -127,7 +128,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../pjsip/include,../../pjlib/include,../../pjlib-util/include,../../pjmedia/include,../../pjnath/include"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/pjsip/include&quot;;&quot;$(SolutionDir)/pjlib/include&quot;;&quot;$(SolutionDir)/pjlib-util/include&quot;;&quot;$(SolutionDir)/pjmedia/include&quot;;&quot;$(SolutionDir)/pjnath/include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PJSIPDLL_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -148,7 +149,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalDependencies="Iphlpapi.lib dsound.lib dxguid.lib netapi32.lib mswsock.lib ws2_32.lib odbc32.lib odbccp32.lib"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="$(ProjectDir)\..\lib\$(ProjectName).dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
