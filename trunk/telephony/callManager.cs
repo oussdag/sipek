@@ -413,7 +413,16 @@ namespace Telephony
       this[session].getState().xferCall(session, number);
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="session"></param>
+    /// <param name="digits"></param>
+    /// <param name="mode"></param>
+    public void onUserDialDigit(int session, string digits, int mode)
+    {
+      this[session].getState().dialDtmf(session, digits, 0);
+    }
     /////////////////////////////////////////////////////////////////////////
     // Callback handlers
 

@@ -57,8 +57,9 @@ namespace Telephony
     private static extern int dll_serviceReq(int callId, int serviceCode, string destUri);
     [DllImport("pjsipDll.dll")]
     private static extern int dll_dialDtmf(int callId, string digits, int mode);
+    [DllImport("pjsipDll.dll")]
+    private static extern int dll_sendInfo(int callid, string content);
 
-    // identify line
 
     private CCallManager Manager
     {
@@ -141,9 +142,17 @@ namespace Telephony
       return true;
     }
 
-    public bool dialDtmf(int sessionId, int mode, string digits)
+    public bool dialDtmf(int sessionId, string digits, int mode)
     {
-      dll_dialDtmf(sessionId, digits, mode);
+      // todo:::check the dtmf mode
+      if (mode == 0)
+      {
+        dll_dialDtmf(sessionId, digits, mode);
+      }
+      else
+      {
+        dll_sendInfo(sessionId, digits);
+      }
       return true;
     }
 
