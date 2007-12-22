@@ -169,9 +169,9 @@ namespace Telephony
       return true;
     }
 
-    public bool dialDtmf(int sessionId, int mode, string digits)
+    public bool dialDtmf(int sessionId, string digits, int mode)
     {
-      CallProxy.dialDtmf(sessionId, mode, digits);
+      CallProxy.dialDtmf(sessionId, digits, mode);
       return true;
     }
 

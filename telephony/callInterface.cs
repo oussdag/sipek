@@ -54,7 +54,7 @@ namespace Telephony
     //bool serviceRequest(EServiceCodes code, int session);
     bool serviceRequest(int sessionId, int code, string dest);
 
-    bool dialDtmf(int sessionId, int mode, string digits);
+    bool dialDtmf(int sessionId, string digits, int mode);
   }
 
   interface CTelephonyCallback
