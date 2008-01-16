@@ -222,7 +222,7 @@ static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
 
 	pjsua_call_get_info(call_id, &call_info);
 
-	if (cb_regstate != 0) cb_callstate(call_id, call_info.state);
+	if (cb_callstate != 0) cb_callstate(call_id, call_info.state);
 }
 
 static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
