@@ -36,8 +36,9 @@ namespace Telephony
   /// <summary>
   /// 
   /// </summary>
-  public class CSipCallProxy : CCallProxyInterface
+  public class CSipCallProxy : ICallProxyInterface
   {
+    #region DLL declarations
     // call API
     [DllImport("pjsipDll.dll")]
     private static extern int dll_makeCall(int accountId, string uri);
@@ -60,11 +61,14 @@ namespace Telephony
     [DllImport("pjsipDll.dll")]
     private static extern int dll_sendInfo(int callid, string content);
 
+    #endregion
 
+    #region Properties
     private CCallManager Manager
     {
       get { return CCallManager.getInstance(); }
     }
+    #endregion
 
     #region Constructor
 
@@ -163,7 +167,7 @@ namespace Telephony
   /// <summary>
   /// 
   /// </summary>
-  public class CSipCommonProxy : CCommonProxyInterface
+  public class CSipCommonProxy : ICommonProxyInterface
   {  
 
     #region Wrapper functions
@@ -262,8 +266,8 @@ namespace Telephony
     {
       int status = -1;
       
-      int port = CallManager.SipPort;
-
+      //int port = CallManager.SipPort;
+      int port = 5060;
       status = dll_init(port);
       status |= dll_main();
       return status;
@@ -376,33 +380,43 @@ namespace Telephony
 
     private static int onCallIncoming(int callId, string uri)
     {
-      string number = uri.Replace("<sip:","");
-
-      int atPos = number.IndexOf('@');
-      if (atPos >= 0)
+      string display  = "";
+      string number = "";
+      
+      // get indices
+      int startNum = uri.IndexOf("<sip:");
+      int atPos = uri.IndexOf('@');
+      // search for number
+      if ((startNum > 0)&&(atPos > startNum))
       {
-        number = number.Remove(atPos);
+        number = uri.Substring(startNum + 5, atPos - startNum - 5);  
+      }
+
+      // extract display name if exists
+      if (startNum >= 0)
+      {
+        display = uri.Remove(startNum).Trim();
       }
       else 
       { 
-        int semiPos = number.IndexOf(';');
+        int semiPos = display.IndexOf(';');
         if (semiPos >= 0)
         {
-          number = number.Remove(semiPos);
+          display = display.Remove(semiPos);
         }
         else 
         {
-          int colPos = number.IndexOf(':');
+          int colPos = display.IndexOf(':');
           if (colPos >= 0)
           {
-            number = number.Remove(colPos);
+            display = display.Remove(colPos);
           }
         }
 
       }
 
       CStateMachine sm = CallManager.createSession(callId, number);
-      sm.getState().incomingCall(number);
+      sm.getState().incomingCall(number, display);
       return 1;
     }
 
@@ -440,50 +454,5 @@ namespace Telephony
   }
 
 
-  // internal class
-  public class CMediaPlayerProxy : CMediaProxyInterface
-  {
-    [DllImport("WinMM.dll")]
-    public static extern bool PlaySound(string fname, int Mod, int flag);
 
-    // these are the SoundFlags we are using here, check mmsystem.h for more
-    public int SND_ASYNC = 0x0001; // play asynchronously
-    public int SND_FILENAME = 0x00020000; // use file name
-    public int SND_PURGE = 0x0040; // purge non-static events
-    public int SND_LOOP = 0x0008;  // loop the sound until next sndPlaySound 
-
-    public int playTone(ETones toneId)
-    {
-      string fname;
-      int SoundFlags = SND_FILENAME | SND_ASYNC | SND_LOOP;
-
-      switch (toneId)
-      {
-        case ETones.EToneDial:
-          fname = "sounds\\dial.wav";
-          break;
-        case ETones.EToneCongestion:
-          fname = "sounds\\congestion.wav";
-          break;
-        case ETones.EToneRingback:
-          fname = "sounds\\ringback.wav";
-          break;
-        case ETones.EToneRing:
-          fname = "sounds\\ring.wav";
-          break;
-        default:
-          fname = "";
-          break;
-      }
-
-      PlaySound(fname, 0, SoundFlags);
-      return 1;
-    }
-
-    public int stopTone()
-    {
-      PlaySound(null, 0, SND_PURGE);
-      return 1;
-    }
-  }
-} // namespace Sipek
+} // namespace Telephony

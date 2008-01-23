@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
  */
 
-
 namespace Telephony
 {
   /// <summary>
@@ -55,7 +54,7 @@ namespace Telephony
   /// signal event from call server. 
   /// It's a base for all call states used by CStateMachine. 
   /// </summary>
-  public abstract class CAbstractState : CCallProxyInterface, CTelephonyCallback
+  public abstract class CAbstractState : ICallProxyInterface, ITelephonyCallback
   {
 
     #region Properties
@@ -74,17 +73,13 @@ namespace Telephony
       }
     }
 
-    private CCallProxyInterface _callProxy;
-    public CCallProxyInterface CallProxy
+    public ICallProxyInterface CallProxy
     {
-      get
-      {
-        return _callProxy;
-      }
-      set
-      {
-        _callProxy = value;
-      }
+      get { return _smref.SigProxy; }
+    }
+    public IMediaProxyInterface MediaProxy
+    {
+      get { return _smref.MediaProxy; }
     }
 
     #endregion
@@ -92,8 +87,6 @@ namespace Telephony
     #region Variables
 
     protected CStateMachine _smref;
-    protected CCommonProxyInterface _commonProxy;
-    protected CMediaProxyInterface _mediaProxy;
 
     #endregion Variables
 
@@ -102,8 +95,6 @@ namespace Telephony
     public CAbstractState(CStateMachine sm)
     {
       _smref = sm;
-      _callProxy = sm.SigProxy;
-      _mediaProxy = sm.MediaProxy;
     }
 
     #endregion Constructor
@@ -175,11 +166,21 @@ namespace Telephony
       return true;
     }
 
+    public virtual bool noReplyTimerExpired(int sessionId)
+    {
+      return true;
+    }
+
+    public virtual bool releasedTimerExpired(int sessionId)
+    {
+      return true;
+    }
+
     #endregion Methods
 
     #region Callbacks
 
-    public virtual void incomingCall(string callingNo)
+    public virtual void incomingCall(string callingNo, string display)
     { 
     }
 
@@ -228,9 +229,10 @@ namespace Telephony
       return CallProxy.makeCall(dialedNo, accountId);
     }
 
-    public override void incomingCall(string callingNo)
+    public override void incomingCall(string callingNo, string display)
     {
       _smref.CallingNo = callingNo;
+      _smref.CallingName = display;
       _smref.changeState(EStateId.INCOMING);
     }
 
@@ -289,12 +291,12 @@ namespace Telephony
 
     public override void onEntry()
     {
-      _mediaProxy.playTone(ETones.EToneRingback);
+      MediaProxy.playTone(ETones.EToneRingback);
     }
 
     public override void onExit()
     {
-      _mediaProxy.stopTone();
+      MediaProxy.stopTone();
     }
 
     public override void onConnect()
@@ -385,25 +387,27 @@ namespace Telephony
 
     public override void onEntry()
     {
-      _mediaProxy.playTone(ETones.EToneCongestion);
+      MediaProxy.playTone(ETones.EToneCongestion);
+      _smref.startTimer(ETimerType.ERELEASED);
     }
 
     public override void onExit()
     {
-      _mediaProxy.stopTone();
-    }
-
-    public override void onReleased()
-    {
-      _smref.changeState(EStateId.RELEASED);
+      MediaProxy.stopTone();
+      _smref.stopAllTimers();
     }
 
     public override bool endCall(int sesionnId)
     {
       _smref.destroy();
-      return base.endCall(sesionnId);
+      return true;
     }
 
+    public override bool releasedTimerExpired(int sessionId)
+    {
+      _smref.destroy();
+      return true;
+    }
   }
 
 
@@ -424,30 +428,35 @@ namespace Telephony
 
       int sessionId = _smref.Session;
 
-      if ((_smref.CFUFlag == true) && (_smref.CFUNumber.Length > 0))
+      if ((_smref.Config.CFUFlag == true) && (_smref.Config.CFUNumber.Length > 0))
       {
-        CallProxy.serviceRequest(sessionId, (int)EServiceCodes.SC_CFU, _smref.CFUNumber);
+        CallProxy.serviceRequest(sessionId, (int)EServiceCodes.SC_CFU, _smref.Config.CFUNumber);
       }
-      else if (_smref.DNDFlag == true)
+      else if (_smref.Config.DNDFlag == true)
       {
         CallProxy.serviceRequest(sessionId, (int)EServiceCodes.SC_DND, "");
       }
-      else if (CSettings.AA == true)
+      else if (_smref.Config.AAFlag == true)
       {
         this.acceptCall(sessionId);
       }
       else
-
       {
         CallProxy.alerted(sessionId);
         _smref.Type = ECallType.EMissed;
-        _mediaProxy.playTone(ETones.EToneRing);
+        MediaProxy.playTone(ETones.EToneRing);
+      }
+
+      // if CFNR active start timer
+      if (_smref.Config.CFNRFlag)
+      {
+        _smref.startTimer(ETimerType.ENOREPLY);
       }
     }
 
     public override void onExit()
     {
-      _mediaProxy.stopTone();
+      MediaProxy.stopTone();
     }
 
     public override bool acceptCall(int sesionnId)
@@ -478,6 +487,13 @@ namespace Telephony
       _smref.destroy();
       return base.endCall(sessionId);
     }
+
+    public override bool noReplyTimerExpired(int sessionId)
+    {
+      CallProxy.serviceRequest(sessionId, (int)EServiceCodes.SC_CFNR, _smref.Config.CFUNumber);
+      return true;
+    }
+
   }
 
     /// <summary>

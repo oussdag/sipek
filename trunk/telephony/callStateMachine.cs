@@ -16,9 +16,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
  */
 
+using System.Timers;
+using System;
 
 namespace Telephony
 {
+
+  public enum ETimerType
+  {
+    ENOREPLY,
+    ERELEASED,
+  }
+
   /// <summary>
   /// CStateMachine class is a telephony data container for one call. It maintains call state, 
   /// communicates with signaling via proxy and informs GUI about signaling events.
@@ -39,10 +48,13 @@ namespace Telephony
     private CIncomingState _stateIncoming;
     private CHoldingState _stateHolding;
 
-    private ECallType _callType = ECallType.EUndefined;
+    private ECallType _callType ;
     private System.TimeSpan _duration;
     private System.DateTime _timestamp;
     private CCallManager _manager;
+    protected ITimer _noreplyTimer;
+    protected ITimer _releasedTimer;
+    delegate bool NoReplyDelegate(int sessionId);
 
     #endregion Variables
 
@@ -57,16 +69,15 @@ namespace Telephony
 
     ////////////////////////////////////////////////////////////////////////////////
     /// Proxies
-    private CCallProxyInterface _sigproxy;
-    public CCallProxyInterface SigProxy
+    private ICallProxyInterface _sigProxy;
+    public ICallProxyInterface SigProxy
     {
-      get { return _sigproxy; } 
+      get { return _sigProxy; } 
     }
 
-    private CMediaProxyInterface _mediaProxy;
-    public CMediaProxyInterface MediaProxy
+    public IMediaProxyInterface MediaProxy
     {
-      get { return _mediaProxy; }
+      get { return _manager.Factory.getMediaProxy(); }
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +87,13 @@ namespace Telephony
     {
       get { return _callingNumber; }
       set { _callingNumber = value; }
+    }
+
+    private string _callingName = "";
+    public string CallingName
+    {
+      get { return _callingName; }
+      set { _callingName = value; }
     }
 
     private bool _incoming = false;
@@ -134,47 +152,30 @@ namespace Telephony
       set { _counting = value; }
     }
 
-    public bool CFUFlag
+    /////////////////////////////////////////////////////////////////////////
+    public IConfiguratorInterface Config
     {
-      get { 
-        if (null == _manager) return false; 
-        return _manager.CFUFlag; 
-      }
+      get { return _manager.Factory.getConfigurator();  }
     }
 
-    public string CFUNumber
+    protected ICallLogInterface CallLoger
     {
-      get {
-        if (null == _manager) return "";
-        return _manager.CFUNumber; 
-      }
+      get { return _manager.Factory.getCallLogger();  }
     }
 
-    public bool DNDFlag
-    {
-      get {
-        if (null == _manager) return false;
-        return _manager.DNDFlag; 
-      }
-    }
-    public bool AAFlag
-    {
-      get {
-        if (null == _manager) return false;
-        return _manager.AAFlag; 
-      }
-    }
     #endregion
 
     #region Constructor
 
-    public CStateMachine(CCallManager manager, CCallProxyInterface proxy, CMediaProxyInterface mediaproxy)
+    public CStateMachine(CCallManager manager)
     {
+      // store manager reference...
       _manager = manager;
 
-      _sigproxy = proxy;
-      _mediaProxy = mediaproxy;
+      // create call proxy
+      _sigProxy = _manager.Factory.createCallProxy();
 
+      // initialize call states
       _stateIdle = new CIdleState(this);
       _stateAlerting = new CAlertingState(this);
       _stateActive = new CActiveState(this);
@@ -182,16 +183,40 @@ namespace Telephony
       _stateReleased = new CReleasedState(this);
       _stateIncoming = new CIncomingState(this);
       _stateHolding = new CHoldingState(this);
+      // change state
       _state = _stateIdle;
       
+      // initialize data
       Time = System.DateTime.Now;
       Duration = System.TimeSpan.Zero;
+
+      // Initialize timers
+      if (null != _manager)
+      { 
+        _noreplyTimer = _manager.Factory.createTimer();
+        _noreplyTimer.Interval = 15000; // hardcoded to 15s
+        _noreplyTimer.Elapsed = new TimerExpiredCallback(_noreplyTimer_Elapsed);
+
+        _releasedTimer = _manager.Factory.createTimer();
+        _releasedTimer.Interval = 5000; // hardcoded to 15s
+        _releasedTimer.Elapsed = new TimerExpiredCallback(_releasedTimer_Elapsed);
+      }
     }
 
     #endregion Constructor
 
 
     #region Methods
+
+    void _noreplyTimer_Elapsed(object sender, EventArgs e)
+    {
+      this.getState().noReplyTimerExpired(this.Session);
+    }
+
+    void _releasedTimer_Elapsed(object sender, EventArgs e)
+    {
+      this.getState().releasedTimerExpired(this.Session);
+    }
 
     public CAbstractState getState()
     {
@@ -241,8 +266,8 @@ namespace Telephony
       // update call log
       if (((Type != ECallType.EDialed) || (CallingNo.Length > 0)) && (Type != ECallType.EUndefined))
       {
-        CCallManager.CallLog.addCall(Type, CallingNo, Time, Duration);
-        CCallManager.CallLog.save();
+        CallLoger.addCall(Type, CallingNo, CallingName, Time, Duration);
+        CallLoger.save();
       } 
       // reset data
       CallingNo = "";
@@ -250,6 +275,42 @@ namespace Telephony
       changeState(EStateId.IDLE);
       if (null != _manager) _manager.destroySession(Session);
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Timers
+    public void startTimer(ETimerType ttype)
+    {
+      switch (ttype)
+      {
+        case ETimerType.ENOREPLY:
+          _noreplyTimer.Start();
+          break;
+        case ETimerType.ERELEASED:
+          _releasedTimer.Start();
+          break;
+      }
+    }
+
+    public void stopTimer(ETimerType ttype)
+    {
+      switch (ttype)
+      {
+        case ETimerType.ENOREPLY:
+          _noreplyTimer.Stop();
+          break;
+        case ETimerType.ERELEASED:
+          _releasedTimer.Stop();
+          break;
+      }
+    }
+
+    public void stopAllTimers()
+    {
+      _noreplyTimer.Stop();
+      _releasedTimer.Stop();
+      // ...
+    }
+
 
     #endregion Methods
   }

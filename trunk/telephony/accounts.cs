@@ -283,6 +283,13 @@ namespace Telephony
       get { return Properties.Settings.Default.cfgCFBNumber; }
       set { Properties.Settings.Default.cfgCFBNumber = value; }
     }
+
+    #region Methods
+    public static void Save()
+    {
+      Properties.Settings.Default.Save();
+    }
+    #endregion Methods
   }
 
 }
