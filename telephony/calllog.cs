@@ -24,55 +24,6 @@ using System.Collections.ObjectModel;
 
 namespace Telephony
 {
-  public enum ECallType : int
-  {
-    EDialed,
-    EReceived,
-    EMissed,
-    EUndefined
-  }  
-  
-  public class CCallRecord
-  { 
-    private ECallType _type;
-    private string _name = "";
-    private string _number = "";
-    private DateTime _time;
-    private TimeSpan _duration;
-    private int _count;
-
-    public string Name
-    {
-      get { return _name; }
-      set { _name = value; }
-    }
-    public string Number
-    {
-      get { return _number; }
-      set { _number = value; }
-    }
-    public ECallType Type
-    {
-      get { return _type; }
-      set { _type = value; }
-    }
-    public TimeSpan Duration
-    {
-      get { return _duration; }
-      set { _duration = value; }
-    }
-    public DateTime Time
-    {
-      get { return _time; }
-      set { _time = value; }
-    }
-    public int Count
-    {
-      get { return _count; }
-      set { _count = value; }
-    }
-  }
-
   /// <summary>
   /// Call Log handling class
   /// </summary>
@@ -91,19 +42,12 @@ namespace Telephony
 
     private Stack<CCallRecord> _callList;
 
-    public static CCallLog getInstance()
-    {
-      if (_instance == null)
-      {
-        _instance = new CCallLog();
-      }
-      return _instance;
-    }
-
     public CCallLog()
     {
+      load();
     }
-    public void load()
+
+    private void load()
     {
       this.load(XMLCallLogFile);
     }
@@ -234,8 +178,15 @@ namespace Telephony
     ////////////////////////////////////////////////////////////////////////////////////////////
     public Stack<CCallRecord> getList(ECallType type)
     {
-      // todo!!!
-      return _callList;
+      Stack<CCallRecord> tempList = new Stack<CCallRecord>();
+      foreach (CCallRecord item in _callList)
+      {
+        if ((item.Type == type)||(type == ECallType.EAll))
+        {
+          tempList.Push(item);
+        }
+      } 
+      return tempList;
     }
 
     public Stack<CCallRecord> getList()
@@ -299,13 +250,13 @@ namespace Telephony
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
-    public void addCall(ECallType type, string number, DateTime time, TimeSpan duration)
+    public void addCall(ECallType type, string number, string name, DateTime time, TimeSpan duration)
     {
       int delta = (int)duration.TotalSeconds;
 
       CCallRecord record = new CCallRecord();
       // todo:::extract name from number
-      record.Name = "";
+      record.Name = name;
       record.Number = number;
       record.Duration = duration;
       record.Type = type;

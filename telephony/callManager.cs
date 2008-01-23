@@ -18,11 +18,322 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Telephony
 {
+
+  public delegate void TimerExpiredCallback(object sender, EventArgs e);
+
+  public abstract class ITimer
+  {
+    public abstract void Start();
+    public abstract void Stop();
+
+    public abstract int Interval { get; set;}
+
+    public abstract TimerExpiredCallback Elapsed { set;}
+
+  }
+
+  public abstract class IConfiguratorInterface
+  {
+    public abstract bool CFUFlag { get;  }
+    public abstract string CFUNumber { get; }
+    public abstract bool CFNRFlag { get; }
+    public abstract string CFNRNumber { get; }
+    public abstract bool DNDFlag { get; }
+    public abstract bool AAFlag { get; }
+    public abstract int SipPort { get; }   
+  }
+
+  public interface AbstractFactory
+  {
+    // factory methods
+    ITimer createTimer();
+    
+    ICallProxyInterface createCallProxy();
+
+    // getters
+    IMediaProxyInterface getMediaProxy();
+
+    ICallLogInterface getCallLogger();
+
+    IConfiguratorInterface getConfigurator();
+
+    ICommonProxyInterface getCommonProxy();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  #region Null patterns
+  public class NullTimer : ITimer
+  {
+    #region ITimer Members
+    public override void Start() { }
+    public override void Stop() { }
+    public override int Interval
+    {
+      get { return 100; }
+      set { }
+    }
+
+    public override TimerExpiredCallback Elapsed
+    {
+      set { }
+    }
+    #endregion
+  }
+
+  public class NullConfigurator : IConfiguratorInterface
+  {
+    #region IConfiguratorInterface Members
+
+    public override bool CFUFlag
+    {
+      get { return false; }
+    }
+
+    public override string CFUNumber
+    {
+      get { return ""; }
+    }
+
+    public override bool CFNRFlag
+    {
+      get { return false; }
+    }
+
+    public override string CFNRNumber
+    {
+      get { return ""; }
+    }
+
+    public override bool DNDFlag
+    {
+      get { return false; }
+    }
+
+    public override bool AAFlag
+    {
+      get { return false; }
+    }
+
+    public override int SipPort
+    {
+      get { return 5060; }
+    }
+    #endregion
+  }
+
+  public class NullCallProxy : ICallProxyInterface
+  {
+    #region ICallProxyInterface Members
+
+    public int makeCall(string dialedNo, int accountId)
+    {
+      return 1;
+    }
+
+    public bool endCall(int sessionId)
+    {
+      return false;
+    }
+
+    public bool alerted(int sessionId)
+    {
+      return false;
+    }
+
+    public bool acceptCall(int sessionId)
+    {
+      return false;
+    }
+
+    public bool holdCall(int sessionId)
+    {
+      return false;
+    }
+
+    public bool retrieveCall(int sessionId)
+    {
+      return false;
+    }
+
+    public bool xferCall(int sessionId, string number)
+    {
+      return false;
+    }
+
+    public bool xferCallSession(int sessionId, int session)
+    {
+      return false;
+    }
+
+    public bool threePtyCall(int sessionId, int session)
+    {
+      return false;
+    }
+
+    public bool serviceRequest(int sessionId, int code, string dest)
+    {
+      return false;
+    }
+
+    public bool dialDtmf(int sessionId, string digits, int mode)
+    {
+      return false;
+    }
+
+    #endregion
+  }
+
+  public class NullCommonProxy : ICommonProxyInterface
+  {
+    #region ICommonProxyInterface Members
+
+    public int initialize()
+    {
+      return 1;    
+    }
+
+    public int shutdown()
+    {
+      return 1;
+    }
+
+    public int registerAccounts()
+    {
+      return 1;
+    }
+
+    public int registerAccounts(bool renew)
+    {
+      return 1;
+    }
+
+    public int addBuddy(string ident)
+    {
+      return 1;
+    }
+
+    public int delBuddy(int buddyId)
+    {
+      return 1;
+    }
+
+    public int sendMessage(string dest, string message)
+    {
+      return 1;
+    }
+
+    public int setStatus(int accId, EUserStatus presence_state)
+    {
+      return 1;
+    }
+
+    #endregion
+  }
+
+  public class NullMediaProxy : IMediaProxyInterface
+  {
+    #region IMediaProxyInterface Members
+
+  public int  playTone(ETones toneId)
+  {
+    return 1;
+  }
+
+  public int  stopTone()
+  {
+    return 1;
+  }
+
+  #endregion
+  }
+
+  public class NullCallLogger : ICallLogInterface
+  {
+    #region ICallLogInterface Members
+
+    public void  addCall(ECallType type, string number, string name, DateTime time, TimeSpan duration)
+    {
+    }
+
+    public void  save()
+    {
+    }
+
+    public Stack<CCallRecord>  getList()
+    {
+ 	    return new Stack<CCallRecord>();
+    }
+
+    public Stack<CCallRecord>  getList(ECallType type)
+    {
+      return new Stack<CCallRecord>();
+    }
+
+    public void  deleteRecord(CCallRecord record)
+    {
+    }
+
+    #endregion
+  }
+
+
   /// <summary>
-  /// 
+  /// Null Factory implementation
+  /// </summary>
+  public class NullFactory : AbstractFactory
+  {
+    IConfiguratorInterface _config = new NullConfigurator();
+    ICommonProxyInterface _common = new NullCommonProxy();
+    IMediaProxyInterface _media = new NullMediaProxy();
+    ICallLogInterface _logger = new NullCallLogger();
+
+    #region AbstractFactory members
+    // factory methods
+    public ITimer createTimer()
+    {
+      return new NullTimer();
+    }
+
+    //TODO
+    public ICallProxyInterface createCallProxy() 
+    {
+      return new NullCallProxy();
+    }
+
+    public ICommonProxyInterface getCommonProxy()
+    {
+      return _common;
+    }
+
+    public IConfiguratorInterface getConfigurator()
+    {
+      return _config;
+    }
+
+    // Implement getters
+    public IMediaProxyInterface getMediaProxy() 
+    { 
+      return _media; 
+    }
+
+    public ICallLogInterface getCallLogger() 
+    { 
+      return _logger;
+    }
+    #endregion
+  }
+
+  #endregion
+
+  //////////////////////////////////////////////////////////////////////////
+
+  /// <summary>
+  /// CCallManager
+  /// Main telephony class
   /// </summary>
   public class CCallManager
   {
@@ -32,10 +343,18 @@ namespace Telephony
 
     private Dictionary<int, CStateMachine> _calls;  //!< Call table
 
+    private AbstractFactory _factory = new NullFactory();
+
     #endregion
 
 
     #region Properties
+
+    public AbstractFactory Factory
+    {
+      get { return _factory; }
+      set { _factory = value; }
+    }
 
     public CStateMachine this[int index]
     {
@@ -51,34 +370,6 @@ namespace Telephony
       get { return _calls; }
     }
 
-    private static CCommonProxyInterface _sipCommonProxy;
-    public static CCommonProxyInterface CommonProxy
-    {
-      get { return _sipCommonProxy; }
-      set { _sipCommonProxy = value; }
-    }
-
-    private static CCallProxyInterface _sipCallProxy;
-    public static CCallProxyInterface CallProxy
-    {
-      get { return _sipCallProxy; }
-      set { _sipCallProxy = value; }
-    }
-
-    private static CMediaProxyInterface _mediaProxy;
-    public static CMediaProxyInterface MediaProxy
-    {
-      get { return _mediaProxy; }
-      set { _mediaProxy = value; }
-    }
-
-    private static ICallLogInterface _callLogInstance;
-    public static ICallLogInterface CallLog
-    {
-      get { return _callLogInstance; }
-      set { _callLogInstance = value; }
-    }
-
     public int Count
     {
       get { return _calls.Count; }
@@ -86,28 +377,7 @@ namespace Telephony
 
     ///////////////////////////////////////////////////////////////////////////
     // Configuration settings
-    public bool CFUFlag
-    {
-      get { return CSettings.CFU;  }
-    }
 
-    public string CFUNumber
-    {
-      get { return CSettings.CFUNumber;  }
-    }
-
-    public bool DNDFlag
-    {
-      get { return CSettings.DND;  }
-    }
-    public bool AAFlag
-    {
-      get { return CSettings.AA; }
-    }
-    public int SipPort
-    {
-      get { return 5060; }
-    }   
 
     /////////////////////////////////////////////////////////////////////
     // Accounts
@@ -174,6 +444,10 @@ namespace Telephony
       return _instance;
     }
 
+    protected CCallManager()
+    {
+    }
+
     #endregion Constructor
 
     #region Events
@@ -209,14 +483,14 @@ namespace Telephony
         // Initialize call table
         _calls = new Dictionary<int, CStateMachine>(); 
         
-        _sipCommonProxy.initialize();
-      
-        _sipCommonProxy.registerAccounts(false);
+        Factory.getCommonProxy().initialize();
+
+        Factory.getCommonProxy().registerAccounts(false);
       }
       else
       {       
         // reregister 
-        _sipCommonProxy.registerAccounts(true); 
+        Factory.getCommonProxy().registerAccounts(true); 
       }
       _initialized = true;
       return 1;
@@ -224,31 +498,21 @@ namespace Telephony
 
     public void shutdown()
     {
-      _sipCommonProxy.shutdown();
+      this.CallList.Clear();
+      Factory.getCommonProxy().shutdown();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
     // Call handling routines
 
     /// <summary>
-    /// Create an instance of state machine
-    /// </summary>
-    /// <param name="sessionId"></param>
-    /// <returns></returns>
-    private CStateMachine createCall(int sessionId)
-    {
-      CStateMachine call = new CStateMachine(this, CallProxy, MediaProxy);
-      return call;
-    }
-
-    /// <summary>
     /// Handler for outgoing calls (accountId is not known).
     /// </summary>
     /// <param name="number">Number to call</param>
-    public CStateMachine createSession(string number)
+    public CStateMachine createOutboundCall(string number)
     {
       int accId = CAccounts.getInstance().DefAccount.Index;
-      return this.createSession(number, accId);
+      return this.createOutboundCall(number, accId);
     }
 
     /// <summary>
@@ -256,20 +520,33 @@ namespace Telephony
     /// </summary>
     /// <param name="number">Number to call</param>
     /// <param name="accountId">Specified account Id </param>
-    public CStateMachine createSession(string number, int accountId)
+    public CStateMachine createOutboundCall(string number, int accountId)
     {
-      CStateMachine call = createCall(0);
-      int newsession = call.getState().makeCall(number, accountId);
-      if (newsession != -1)
+      // check if current call automatons allow session creation.
+      // if at least 1 connected try to put it on hold
+      if (this.getNoCallsInState(EStateId.ACTIVE) == 0)
       {
+        // create state machine
+        // TODO check max calls!!!!
+        CStateMachine call = new CStateMachine(this);
+
+        // make call request (stack provides new sessionId)
+        int newsession = call.getState().makeCall(number, accountId);
+        if (newsession == -1)
+        {
+          return null;
+        }
+        // update call table
         call.Session = newsession;
         _calls.Add(newsession, call);
+        return call;
       }
-
-      // Call callback method to update GUI
-      updateGui();
-
-      return call;
+      else // we have at least one ACTIVE call
+      {
+        // put connected call on hold
+        // TODO
+      }
+      return null;
     }
     
     /// <summary>
@@ -281,7 +558,7 @@ namespace Telephony
     /// <returns>call instance</returns>
     public CStateMachine createSession(int sessionId, string number)
     {
-      CStateMachine call = createCall(sessionId);
+      CStateMachine call = new CStateMachine(this);
 
       if (null == call) return null; 
 
@@ -289,6 +566,7 @@ namespace Telephony
       call.Session = sessionId;
       _calls.Add(sessionId, call);
       
+      // notify GUI
       updateGui();
 
       return call;
@@ -305,10 +583,31 @@ namespace Telephony
       updateGui();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="session"></param>
+    /// <returns></returns>
     public CStateMachine getCall(int session)
     {
       if ((_calls.Count == 0) || (!_calls.ContainsKey(session))) return null;
       return _calls[session];
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="session"></param>
+    /// <param name="stateId"></param>
+    /// <returns></returns>
+    public CStateMachine getCallInState(EStateId stateId)
+    {
+      if (_calls.Count == 0)  return null;
+      foreach (KeyValuePair<int, CStateMachine> call in _calls)
+      {
+        if (call.Value.getStateId() == stateId) return call.Value;
+      }
+      return null;
     }
 
     public int getNoCallsInState(EStateId stateId)
@@ -363,12 +662,15 @@ namespace Telephony
     public void onUserAnswer(int session)
     {
       List<CStateMachine> list = (List<CStateMachine>)this.enumCallsInState(EStateId.ACTIVE);
-      // should not be more than 1
+      // should not be more than 1 call active
       if (list.Count > 0)
       {
         // put it on hold
         CStateMachine sm = list[0];
         if (null != sm) sm.getState().holdCall(sm.Session);
+
+        // set ANSWER event pending for HoldConfirm
+        // TODO
       }
       this[session].getState().acceptCall(session);
     }
@@ -423,6 +725,24 @@ namespace Telephony
     {
       this[session].getState().dialDtmf(session, digits, 0);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="session"></param>
+    public void onUserConference(int session)
+    {
+      // check preconditions: 1 call active, other held
+      // 1st if current call is held -> search if any active -> execute retrieve
+      if ((getNoCallsInState(EStateId.ACTIVE) == 1)&&(getNoCallsInState(EStateId.HOLDING) >= 1))
+      {
+        CStateMachine call = getCallInState(EStateId.HOLDING);
+        call.getState().retrieveCall(call.Session);
+        // set conference flag
+        return;
+      }
+    }
+
     /////////////////////////////////////////////////////////////////////////
     // Callback handlers
 
