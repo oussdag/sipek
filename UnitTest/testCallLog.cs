@@ -11,19 +11,32 @@ namespace UnitTest
   [TestFixture]
   public class testCallLog
   {
+    private CCallLog _callLogger = new CCallLog();
+
+    [SetUp]
+    public void Init()
+    {
+      Assert.AreEqual(0, _callLogger.Count);
+    }
+
+    [TearDown]
+    public void Destroy()
+    {
+      _callLogger.clearAll();
+    }
+
+
     [Test]
     public void testInit()
     {
-      CCallLog.getInstance().load();
-      Stack<CCallRecord> list = CCallLog.getInstance().getList();
+      Stack<CCallRecord> list = _callLogger.getList();
       Assert.AreEqual(0, list.Count);
     }
 
     [Test]
     public void testCheckRecordContent()
     {
-      CCallLog.getInstance().load();
-      Stack<CCallRecord> list = CCallLog.getInstance().getList();
+      Stack<CCallRecord> list = _callLogger.getList();
       Assert.AreEqual(0, list.Count);
       CCallRecord rec = new CCallRecord();
       rec.Count = 1;
@@ -52,8 +65,7 @@ namespace UnitTest
     [Test]
     public void testAddCallRecords()
     {
-      CCallLog.getInstance().load();
-      Stack<CCallRecord> list = CCallLog.getInstance().getList();
+      Stack<CCallRecord> list = _callLogger.getList();
       Assert.AreEqual(0, list.Count);
 
       CCallRecord rec = new CCallRecord();
@@ -64,7 +76,7 @@ namespace UnitTest
       rec.Time = new DateTime(2007, 7, 20, 11, 50, 45);
       rec.Type = ECallType.EDialed;
 
-      CCallLog.getInstance().addCall(rec.Type,rec.Number,rec.Time,rec.Duration);
+      _callLogger.addCall(rec.Type,rec.Number,rec.Name,rec.Time,rec.Duration);
       Assert.AreEqual(1, list.Count);
     }
 
@@ -72,45 +84,62 @@ namespace UnitTest
     public void testClearRecords()
     {
       testAddCallRecords();
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
 
       // only two entries because of same type and number
-      Assert.AreEqual(2, CCallLog.getInstance().Count);
+      Assert.AreEqual(2, _callLogger.Count);
       
-      CCallLog.getInstance().clearAll();
+      _callLogger.clearAll();
 
-      Assert.AreEqual(0, CCallLog.getInstance().Count);
+      Assert.AreEqual(0, _callLogger.Count);
     }
 
     [Test]
     public void testRemoveCallRecord()
     {
       testAddCallRecords();
-      Assert.AreEqual(1, CCallLog.getInstance().Count);
-      CCallLog.getInstance().deleteRecord("1234", ECallType.EDialed);
-      Assert.AreEqual(0, CCallLog.getInstance().Count);
+      Assert.AreEqual(1, _callLogger.Count);
+      _callLogger.deleteRecord("1234", ECallType.EDialed);
+      Assert.AreEqual(0, _callLogger.Count);
     }
 
     [Test]
     public void testDuplicateRecord()
     {
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
-      CCallLog.getInstance().addCall(ECallType.EMissed, "1111", new DateTime(), new TimeSpan());
-      Assert.AreEqual(1, CCallLog.getInstance().Count);
-
-
-
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      Assert.AreEqual(1, _callLogger.Count);
     }
 
     [Test]
     public void testAddRecordMax()
     {
       Assert.Ignore();
+    }
+
+    [Test]
+    public void testGetRecordType()
+    {
+      _callLogger.addCall(ECallType.EMissed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EDialed, "1111", "", new DateTime(), new TimeSpan());
+      _callLogger.addCall(ECallType.EReceived, "1111", "", new DateTime(), new TimeSpan());
+      Assert.AreEqual(3, _callLogger.Count);
+      Stack<CCallRecord> rec = _callLogger.getList(ECallType.EDialed);
+      Assert.AreEqual(1, rec.Count);
+
+      Stack<CCallRecord> rec1 = _callLogger.getList(ECallType.EReceived);
+      Assert.AreEqual(1, rec1.Count);
+
+      Stack<CCallRecord> rec2 = _callLogger.getList(ECallType.EMissed);
+      Assert.AreEqual(1, rec2.Count);
+
+      Stack<CCallRecord> rec3 = _callLogger.getList(ECallType.EAll);
+      Assert.AreEqual(3, rec3.Count);
     }
 
 
