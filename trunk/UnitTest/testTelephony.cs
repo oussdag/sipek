@@ -167,6 +167,22 @@ namespace UnitTest
       Assert.AreEqual(true, sm1.Incoming);
 
       Assert.AreEqual(sm1.RuntimeDuration, TimeSpan.Zero);
+      
+      return sm1;
+    }
+
+    CStateMachine makeIncomingCallWithAnswer(int sessionId)
+    {
+      string number = "1234";
+      //CStateMachine sm1 = new CStateMachine(null);
+      CStateMachine sm1 = _manager.createSession(sessionId, number);
+      sm1.getState().incomingCall(number, "");
+
+      //sm1.changeState(EStateId.INCOMING);
+      Assert.AreEqual(EStateId.INCOMING, sm1.getStateId());
+      Assert.AreEqual(true, sm1.Incoming);
+
+      Assert.AreEqual(sm1.RuntimeDuration, TimeSpan.Zero);
 
       _manager.onUserAnswer(sm1.Session);
       //sm1.getState().acceptCall(sm1.Session);
@@ -174,7 +190,7 @@ namespace UnitTest
       Assert.AreEqual(EStateId.ACTIVE, sm1.getStateId());
       Assert.AreEqual(true, sm1.Incoming);
       Assert.AreNotSame(sm1.RuntimeDuration, TimeSpan.Zero);
-      
+
       return sm1;
     }
 
@@ -479,7 +495,27 @@ namespace UnitTest
 
       sm1.destroy();
       Assert.AreEqual(EStateId.IDLE, sm1.getStateId());
+    }
 
+    [Test]
+    public void testCallFeaturesCallHoldConfirm()
+    {
+      CStateMachine inc = this.makeIncomingCallWithAnswer(1);
+
+      // try hold confirmation without hold request
+      inc.getState().onHoldConfirm();
+      // no effect
+      Assert.AreEqual(EStateId.ACTIVE, inc.getStateId());
+      Assert.AreEqual(false, inc.HoldRequested);
+      // hold request
+      inc.getState().holdCall(inc.Session);
+      Assert.AreEqual(true, inc.HoldRequested);
+      // no effect
+      Assert.AreEqual(EStateId.ACTIVE, inc.getStateId());
+      inc.getState().onHoldConfirm();
+      Assert.AreEqual(EStateId.HOLDING, inc.getStateId());
+      
+      inc.destroy();
     }
 
     [Test]
@@ -665,7 +701,56 @@ namespace UnitTest
 
       Assert.AreEqual(0, CCallManager.getInstance().Count);
     }
-  }
 
+
+    [Test]
+    public void testCallPendingOnUserAnswer()
+    {
+      CStateMachine call = this.makeOutgoingCall();
+
+
+      CStateMachine inccall = _manager.createSession(2, "1234");
+      inccall.getState().incomingCall("1234", "");
+      // nothing changed yet (waiting Hold Conf)
+      Assert.AreEqual(EStateId.ACTIVE, call.getStateId());
+      Assert.AreEqual(EStateId.INCOMING, inccall.getStateId());
+
+      _manager.onUserAnswer(inccall.Session); // set pending action
+      // hold conf
+      call.getState().onHoldConfirm();
+      // states changed
+      Assert.AreEqual(EStateId.HOLDING, call.getStateId());
+      Assert.AreEqual(EStateId.ACTIVE, inccall.getStateId());
+
+      call.destroy();
+      inccall.destroy();
+    }
+
+    [Test]
+    public void testCallPendingOnUserRetrieve()
+    {
+      CStateMachine call = this.makeOutgoingCall();
+      call.getState().holdCall(call.Session);
+      call.getState().onHoldConfirm();
+      Assert.AreEqual(EStateId.HOLDING, call.getStateId());
+
+      CStateMachine inccall = this.makeIncomingCallWithAnswer(2);
+      Assert.AreEqual(EStateId.ACTIVE, inccall.getStateId());
+
+      // retrieve 1st call (HOLDING)
+      _manager.onUserHoldRetrieve(call.Session);
+      Assert.AreEqual(EStateId.HOLDING, call.getStateId());
+      Assert.AreEqual(EStateId.ACTIVE, inccall.getStateId());
+
+      // hold conf
+      inccall.getState().onHoldConfirm();
+      // states changed
+      Assert.AreEqual(EStateId.ACTIVE, call.getStateId());
+      Assert.AreEqual(EStateId.HOLDING, inccall.getStateId());
+
+      call.destroy();
+      inccall.destroy();
+    }
+  }
 
 }
