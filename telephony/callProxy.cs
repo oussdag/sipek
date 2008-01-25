@@ -215,12 +215,6 @@ namespace Telephony
     [DllImport("pjsipDll.dll")]
     private static extern int onBuddyStatusChangedCallback(OnBuddyStatusChangedCallback cb);
 
-    // tones api
-    [DllImport("pjsipDll.dll")]
-    private static extern int dll_playTone(int toneId);
-    [DllImport("pjsipDll.dll")]
-    private static extern int dll_stopTone();
-
     #endregion Wrapper functions
 
     #region Variables

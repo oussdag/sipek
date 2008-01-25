@@ -60,6 +60,11 @@ namespace Telephony
 
     #region Properties
 
+    public CCallManager Manager
+    {
+      get { return _manager; }
+    }
+
     private int _session = -1;
     public int Session
     {
@@ -152,6 +157,19 @@ namespace Telephony
       set { _counting = value; }
     }
 
+    private bool _holdRequested = false;
+    public bool HoldRequested
+    {
+      get { return _holdRequested; }
+      set { _holdRequested = value;  }
+    }
+
+    private bool _retrieveRequested = false;
+    public bool RetrieveRequested
+    {
+      get { return _retrieveRequested; }
+      set { _retrieveRequested = value; }
+    }
     /////////////////////////////////////////////////////////////////////////
     public IConfiguratorInterface Config
     {
