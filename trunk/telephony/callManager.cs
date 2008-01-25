@@ -345,6 +345,10 @@ namespace Telephony
 
     private AbstractFactory _factory = new NullFactory();
 
+    delegate void PendingDelegate(int sessionId); // for onUserAnswer
+
+    PendingAction _pendingAction;
+ 
     #endregion
 
 
@@ -373,6 +377,14 @@ namespace Telephony
     public int Count
     {
       get { return _calls.Count; }
+    }
+
+    public bool Is3Pty
+    {
+      get 
+      {
+        return (getNoCallsInState(EStateId.ACTIVE) == 2) ? true : false;
+      }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -463,6 +475,30 @@ namespace Telephony
     // dummy callback method in case no other registered
     private void dummy()
     {
+    }
+
+    class PendingAction
+    {
+      private PendingDelegate _delegate;
+      private int _sessionId;
+      private string _number;
+
+      public PendingAction(PendingDelegate fctr, int sessionId)
+        : this(fctr, sessionId, "")
+      { }
+
+      public PendingAction(PendingDelegate fctr, int sessionId, string number)
+      {
+        _delegate = fctr;
+        _sessionId = sessionId;
+        _number = number;
+      }
+
+      public void Activate()
+      {
+        if (null != _delegate) _delegate(_sessionId);
+        _delegate = null;
+      }
     }
 
     #endregion Events
@@ -671,6 +707,8 @@ namespace Telephony
 
         // set ANSWER event pending for HoldConfirm
         // TODO
+        _pendingAction = new PendingAction(onUserAnswer, session);
+        return;
       }
       this[session].getState().acceptCall(session);
     }
@@ -689,14 +727,19 @@ namespace Telephony
       }
       else if (state.StateId == EStateId.HOLDING)
       {
-        List<CStateMachine> list = (List<CStateMachine>)this.enumCallsInState(EStateId.ACTIVE);
-        // should not be more than 1
-        if (list.Count > 0)
+        // execute retrieve
+        // check if any ACTIVE calls
+        if (this.getNoCallsInState(EStateId.ACTIVE) > 0)
         {
-          // put it on hold
-          CStateMachine sm = list[0];
+          // get 1st and put it on hold
+          CStateMachine sm = ((List<CStateMachine>)enumCallsInState(EStateId.ACTIVE))[0];
           if (null != sm) sm.getState().holdCall(sm.Session);
+
+          // set Retrieve event pending for HoldConfirm
+          _pendingAction = new PendingAction(onUserHoldRetrieve, session);
+          return;
         }
+
         this[session].getState().retrieveCall(session);
       }
       else
@@ -784,6 +827,13 @@ namespace Telephony
     public void setBuddyState(int buddyId, int status, string text)
     {
       if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    public void activatePendingAction()
+    {
+      if (null != _pendingAction) _pendingAction.Activate();
+      _pendingAction = null;
     }
 
     #endregion Methods

@@ -350,6 +350,7 @@ namespace Telephony
 
     public override bool holdCall(int sesionnId)
     {
+      _smref.HoldRequested = true;
       return CallProxy.holdCall(sesionnId);
     }
 
@@ -364,7 +365,14 @@ namespace Telephony
 
     public override void onHoldConfirm()
     {
-      _smref.changeState(EStateId.HOLDING);
+      // check if Hold requested
+      if (_smref.HoldRequested)
+      {
+        _smref.changeState(EStateId.HOLDING);
+        // activate pending action if any
+        _smref.Manager.activatePendingAction();
+      }
+      _smref.HoldRequested = false;
     }
 
     public override void onReleased()
@@ -517,10 +525,21 @@ namespace Telephony
 
     public override bool retrieveCall(int sessionId)
     {
+      _smref.RetrieveRequested = true;
       CallProxy.retrieveCall(sessionId);
       _smref.changeState(EStateId.ACTIVE);
       return true;
     }
+
+    // TODO implement in stack interface
+    //public override onRetrieveConfirm()
+    //{
+    //  if (_smref.RetrieveRequested)
+    //  {
+    //    _smref.changeState(EStateId.ACTIVE);
+    //  }
+    //  _smref.RetrieveRequested = false;
+    //}
 
     public override void onReleased()
     {
