@@ -23,8 +23,8 @@ namespace Telephony
   /// </summary>
   public enum EStateId  : int 
   {
-    IDLE = 1, // associated with home page = P_IDLE
-    CONNECTING = 1974,
+    IDLE,
+    CONNECTING,
     ALERTING, 
     ACTIVE,
     RELEASED,
