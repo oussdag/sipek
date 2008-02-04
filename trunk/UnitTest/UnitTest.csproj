@@ -43,6 +43,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\phone\Gui.csproj">
+      <Project>{D3EE2A06-D617-45F8-879E-8D0931BC8982}</Project>
+      <Name>Gui</Name>
+    </ProjectReference>
     <ProjectReference Include="..\telephony\Telephony.csproj">
       <Project>{7C60E672-0016-457E-9D23-445F88FB1640}</Project>
       <Name>Telephony</Name>
