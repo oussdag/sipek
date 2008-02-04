@@ -16,53 +16,41 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
  */
 
+/*! \mainpage Sipek Phone Project
+ *
+ * \section intro_sec Introduction
+ *
+ * SIPek is a small open source project that is intended to share common VoIP software design concepts 
+ * and practices. It'd also like to become a simple and easy-to-use SIP phone with many useful features.
+ * 
+ * SIPek's telephony engine is based on common library used in Sipek project. The telephony part is powered 
+ * by great SIP stack engine PJSIP (http://www.pjsip.org). The connection between pjsip code (C) 
+ * and .Net GUI (C#) is handled by simple wrapper which is also suitable for mobile devices. Sipek use C# Audio library from http://www.codeproject.com/KB/graphics/AudioLib.aspx. 
+ * The SIPek's simple software design enables efficient development, easy upgrading and 
+ * user menus customizations.
+ * 
+ * Visit SIPek's home page at http://sipekphone.googlepages.com/ 
+ *
+ * \section install_sec Installation
+ *
+ * \subsection step1 Step 1: 
+ *  
+ * etc...
+ */
+
+
+/*! \namespace Telephony
+    \brief Module Telephony is a general Call Automaton engine.
+
+    A more detailed namespace description.
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using System;
 
 namespace Telephony
 {
-
-  public delegate void TimerExpiredCallback(object sender, EventArgs e);
-
-  public abstract class ITimer
-  {
-    public abstract void Start();
-    public abstract void Stop();
-
-    public abstract int Interval { get; set;}
-
-    public abstract TimerExpiredCallback Elapsed { set;}
-
-  }
-
-  public abstract class IConfiguratorInterface
-  {
-    public abstract bool CFUFlag { get;  }
-    public abstract string CFUNumber { get; }
-    public abstract bool CFNRFlag { get; }
-    public abstract string CFNRNumber { get; }
-    public abstract bool DNDFlag { get; }
-    public abstract bool AAFlag { get; }
-    public abstract int SipPort { get; }   
-  }
-
-  public interface AbstractFactory
-  {
-    // factory methods
-    ITimer createTimer();
-    
-    ICallProxyInterface createCallProxy();
-
-    // getters
-    IMediaProxyInterface getMediaProxy();
-
-    ICallLogInterface getCallLogger();
-
-    IConfiguratorInterface getConfigurator();
-
-    ICommonProxyInterface getCommonProxy();
-  }
 
   //////////////////////////////////////////////////////////////////////////
   #region Null patterns
@@ -91,38 +79,77 @@ namespace Telephony
     public override bool CFUFlag
     {
       get { return false; }
+      set {}
     }
 
     public override string CFUNumber
     {
       get { return ""; }
+      set { }
     }
 
     public override bool CFNRFlag
     {
       get { return false; }
+      set { }
     }
 
     public override string CFNRNumber
     {
       get { return ""; }
+      set { }
+    }
+
+    public override bool CFBFlag
+    {
+      get { return false; }
+      set { }
+    }
+
+    public override string CFBNumber
+    {
+      get { return ""; }
+      set { }
     }
 
     public override bool DNDFlag
     {
       get { return false; }
+      set { }
     }
 
     public override bool AAFlag
     {
       get { return false; }
+      set { }
     }
-
-    public override int SipPort
+    public override int SIPPort
     {
       get { return 5060; }
+      set { }
     }
+    public override int DefaultAccountIndex
+    {
+      get { return 0; }
+      set { }
+    }
+
+    public override int NumOfAccounts
+    {
+      get { return 1; }
+      set {}
+    }
+
+    public override IAccount getAccount(int index)
+    {
+      return null;
+    }
+
+    public override void Save()
+    {}
+
     #endregion
+
   }
 
   public class NullCallProxy : ICallProxyInterface
@@ -238,48 +265,17 @@ namespace Telephony
   {
     #region IMediaProxyInterface Members
 
-  public int  playTone(ETones toneId)
-  {
-    return 1;
-  }
-
-  public int  stopTone()
-  {
-    return 1;
-  }
-
-  #endregion
-  }
-
-  public class NullCallLogger : ICallLogInterface
-  {
-    #region ICallLogInterface Members
-
-    public void  addCall(ECallType type, string number, string name, DateTime time, TimeSpan duration)
+    public int  playTone(ETones toneId)
     {
+      return 1;
     }
 
-    public void  save()
+    public int  stopTone()
     {
+      return 1;
     }
-
-    public Stack<CCallRecord>  getList()
-    {
- 	    return new Stack<CCallRecord>();
-    }
-
-    public Stack<CCallRecord>  getList(ECallType type)
-    {
-      return new Stack<CCallRecord>();
-    }
-
-    public void  deleteRecord(CCallRecord record)
-    {
-    }
-
     #endregion
   }
-
 
   /// <summary>
   /// Null Factory implementation
@@ -289,7 +285,7 @@ namespace Telephony
     IConfiguratorInterface _config = new NullConfigurator();
     ICommonProxyInterface _common = new NullCommonProxy();
     IMediaProxyInterface _media = new NullMediaProxy();
-    ICallLogInterface _logger = new NullCallLogger();
+    ICallLogInterface _logger = new CNullCallLog();
 
     #region AbstractFactory members
     // factory methods
@@ -360,6 +356,11 @@ namespace Telephony
       set { _factory = value; }
     }
 
+    public IConfiguratorInterface Config
+    {
+      get { return Factory.getConfigurator(); }
+    }
+
     public CStateMachine this[int index]
     {
       get
@@ -385,54 +386,6 @@ namespace Telephony
       {
         return (getNoCallsInState(EStateId.ACTIVE) == 2) ? true : false;
       }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Configuration settings
-
-
-    /////////////////////////////////////////////////////////////////////
-    // Accounts
-    public int DefaultAccountIndex
-    {
-      get { return CAccounts.getInstance().DefAccount.Index; }
-    }
-
-    public string getAddress()
-    {
-      return getAddress(this.DefaultAccountIndex);
-    }
-
-    public string getAddress(int accId)
-    {
-      return CAccounts.getInstance()[accId].Address;
-    }
-
-    public string getId(int accId)
-    {
-      return CAccounts.getInstance()[accId].Id;
-    }
-    public string getUsername(int accId)
-    {
-      return CAccounts.getInstance()[accId].Username;
-    }
-    public string getPassword(int accId)
-    {
-      return CAccounts.getInstance()[accId].Password;
-    }
-    public string getDomain(int accId)
-    {
-      return CAccounts.getInstance()[accId].Domain;
-    }
-
-    public string getDisplayName()
-    {
-      return CAccounts.getInstance()[this.DefaultAccountIndex].DisplayName;
-    }
-
-    public int NumAccounts
-    {
-      get { return CAccounts.getInstance().getSize(); }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -547,7 +500,7 @@ namespace Telephony
     /// <param name="number">Number to call</param>
     public CStateMachine createOutboundCall(string number)
     {
-      int accId = CAccounts.getInstance().DefAccount.Index;
+      int accId = Config.DefaultAccountIndex;
       return this.createOutboundCall(number, accId);
     }
 
@@ -804,7 +757,7 @@ namespace Telephony
     /// <param name="regState">state of account</param>
     public void setAccountState(int accId, int regState)
     {
-      CAccounts.getInstance()[accId].RegState = regState;
+      Config.getAccount(accId).RegState = regState;
       updateGui();
     }
     

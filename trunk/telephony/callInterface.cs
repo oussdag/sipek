@@ -21,6 +21,8 @@ using System;
 using System.Collections.Generic;
 namespace Telephony
 {
+  #region Enums
+
   public enum EUserStatus : int
   { 
   	AVAILABLE, 
@@ -32,6 +34,53 @@ namespace Telephony
     OFFLINE, 
     OPT_MAX
   }
+
+
+  public enum ETones : int
+  {
+    EToneDial = 0,
+    EToneCongestion,
+    EToneRingback,
+    EToneRing,
+  }
+
+  #endregion
+
+  public delegate void TimerExpiredCallback(object sender, EventArgs e);
+
+  public abstract class ITimer
+  {
+    public abstract void Start();
+    public abstract void Stop();
+
+    public abstract int Interval { get; set;}
+
+    public abstract TimerExpiredCallback Elapsed { set;}
+
+  }
+
+  /// <summary>
+  /// AbstractFactory is an abstract interace providing interfaces for Telephony module
+  /// It consists of two parts: factory methods and getter methods. First creating instances, 
+  /// later returns instances. 
+  /// </summary>
+  public interface AbstractFactory
+  {
+    // factory methods
+    ITimer createTimer();
+
+    ICallProxyInterface createCallProxy();
+
+    // getters
+    IMediaProxyInterface getMediaProxy();
+
+    ICallLogInterface getCallLogger();
+
+    IConfiguratorInterface getConfigurator();
+
+    ICommonProxyInterface getCommonProxy();
+  }
+
 
   public interface ICallProxyInterface
   {
@@ -184,4 +233,43 @@ namespace Telephony
     public void deleteRecord(CCallRecord record) {}
   }
 
+  // Accounts
+  public abstract class IAccount
+  {
+    public abstract string AccountName { get; set;}
+    public abstract string HostName { get; set;}
+    public abstract string Id { get; set;}
+    public abstract string UserName { get; set;}
+    public abstract string Password { get; set;}
+    public abstract string DisplayName { get; set;}
+    public abstract string DomainName { get; set;}
+    public abstract int Port { get; set;}
+    public abstract int RegState { get; set;}
+
+  }
+
+  /// <summary>
+  /// IConfiguratorInterface
+  /// </summary>
+  public abstract class IConfiguratorInterface
+  {
+    public abstract bool DNDFlag { get; set; }
+    public abstract bool AAFlag { get; set; }
+    public abstract bool CFUFlag { get; set; }
+    public abstract string CFUNumber { get; set; }
+    public abstract bool CFNRFlag { get; set; }
+    public abstract string CFNRNumber { get; set; }
+    public abstract bool CFBFlag { get; set; }
+    public abstract string CFBNumber { get; set; }
+    public abstract int SIPPort { get; set; }
+    public abstract int DefaultAccountIndex { get; set; }
+    public abstract int NumOfAccounts { get; set; }
+
+    public IAccount getAccount() { return getAccount(DefaultAccountIndex); }
+    public abstract IAccount getAccount(int index);
+
+    #region Methods
+    public abstract void Save();
+    #endregion Methods
+  }
 } // namespace Sipek
