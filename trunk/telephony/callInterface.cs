@@ -264,7 +264,8 @@ namespace Telephony
     public abstract int SIPPort { get; set; }
     public abstract int DefaultAccountIndex { get; set; }
     public abstract int NumOfAccounts { get; set; }
-
+    public abstract List<string> CodecList { get; set; }
+    
     public IAccount getAccount() { return getAccount(DefaultAccountIndex); }
     public abstract IAccount getAccount(int index);
 

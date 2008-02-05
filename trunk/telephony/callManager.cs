@@ -148,6 +148,8 @@ namespace Telephony
     public override void Save()
     {}
 
+    public override List<string> CodecList { get { return null; } set { } }
+
     #endregion
 
   }
