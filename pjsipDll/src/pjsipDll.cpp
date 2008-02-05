@@ -515,12 +515,6 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 		goto on_error;
 	}
 
-	/* Optionally set codec orders */
-	for (i=0; i<app_config.codec_cnt; ++i) {
-		pjsua_codec_set_priority(&app_config.codec_arg[i],
-			(pj_uint8_t)(PJMEDIA_CODEC_PRIO_NORMAL+i+9));
-	}
-
 	/* Add RTP transports */
 	status = pjsua_media_transports_create(&app_config.rtp_cfg);
 	if (status != PJ_SUCCESS)
@@ -582,6 +576,15 @@ pj_status_t status;
 int dll_registerAccount(char* uri, char* reguri, char* domain, char* username, char* password)
 {
 pjsua_acc_config thisAccountsCfg; 
+
+	// sasacoh:::temporarily added here!!!
+	// disable all codecs
+	pjsua_codec_info c[32];
+	unsigned i, count = PJ_ARRAY_SIZE(c);
+	pjsua_enum_codecs(c, &count);
+	for (i=0; i<count; ++i) {
+		pjsua_codec_set_priority(&c[i].codec_id, (pj_uint8_t)(PJMEDIA_CODEC_PRIO_DISABLED));
+	}
 
 	pjsua_acc_config_default(&thisAccountsCfg);
 
@@ -853,3 +856,36 @@ pjsua_msg_data msg_data;
 }	
 
 //////////////////////////////////////////////////////////////////////////////
+int dll_getNumOfCodecs()
+{
+pjsua_codec_info c[32];
+unsigned i, count = PJ_ARRAY_SIZE(c);
+
+	pjsua_enum_codecs(c, &count);
+
+	return count;
+}
+
+char* dll_getCodec(int index)
+{
+pjsua_codec_info c[32];
+unsigned i, count = PJ_ARRAY_SIZE(c);
+
+	pjsua_enum_codecs(c, &count);
+	if (index >= count) return "";
+
+	return c[index].codec_id.ptr;
+}	
+
+int dll_setCodecPriority(char* name, int prio)
+{
+	if (prio >= 0)
+	{
+		pjsua_codec_set_priority(&pj_str(name), (pj_uint8_t)(PJMEDIA_CODEC_PRIO_NORMAL + prio + 9));
+	}
+	else
+	{
+		pjsua_codec_set_priority(&pj_str(name), (pj_uint8_t)(PJMEDIA_CODEC_PRIO_DISABLED));
+	}
+	return 1;
+}
