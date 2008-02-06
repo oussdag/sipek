@@ -37,6 +37,7 @@ static fptr_callholdconf* cb_callholdconf = 0;
 static fptr_callretrieveconf* cb_callretrieveconf = 0;
 static fptr_buddystatus* cb_buddystatus = 0;
 static fptr_msgrec* cb_messagereceived = 0;
+static fptr_dtmfdigit* cb_dtmfdigit = 0;
 
 
 enum {
@@ -209,6 +210,12 @@ PJSIPDLL_DLL_API int onMessageReceivedCallback(fptr_msgrec cb)
 PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb)
 {
   cb_buddystatus = cb;
+  return 1;
+}
+
+PJSIPDLL_DLL_API int onDtmfDigitCallback(fptr_dtmfdigit cb)
+{
+  cb_dtmfdigit = cb;
   return 1;
 }
 
@@ -402,6 +409,16 @@ static void on_typing(pjsua_call_id call_id, const pj_str_t *from,
 	      (is_typing?"is typing..":"has stopped typing")));
 }
 
+
+/*
+ * DTMF callback.
+ */
+static void on_dtmf_callback(pjsua_call_id call_id, int digit)
+{
+	PJ_LOG(3,(THIS_FILE, "Incoming DTMF on call %d: %c", call_id, digit));
+	if (cb_dtmfdigit != 0) (*cb_dtmfdigit)(call_id, digit);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // DLL functions...
 PJSIPDLL_DLL_API int dll_init(int listenPort)
@@ -438,7 +455,7 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 	app_config.cfg.cb.on_call_state = &on_call_state;
 	app_config.cfg.cb.on_call_media_state = &on_call_media_state;
 	app_config.cfg.cb.on_incoming_call = &on_incoming_call;
-//	app_config.cfg.cb.on_dtmf_digit = &call_on_dtmf_callback;
+	app_config.cfg.cb.on_dtmf_digit = &on_dtmf_callback;
 	app_config.cfg.cb.on_reg_state = &on_reg_state;
 	app_config.cfg.cb.on_buddy_state = &on_buddy_state;
 	app_config.cfg.cb.on_pager = &on_pager;
