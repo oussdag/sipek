@@ -422,15 +422,15 @@ namespace Telephony
     public delegate void CallStateChangedDelegate();  // define callback type 
     public delegate void MessageReceivedCallbackDelegate(string from, string message);  // define callback type 
     public delegate void BuddyStatusCallbackDelegate(int buddyId, int status, string text);  // define callback type 
+    public delegate void DtmfDigitCallbackDelegate(int callId, int digit);  // define callback type 
 
     public event CallStateChangedDelegate CallStateChanged;
     public event MessageReceivedCallbackDelegate MessageReceived;
     public event BuddyStatusCallbackDelegate BuddyStatusChanged;
+    public event DtmfDigitCallbackDelegate DtmfDigitReceived;
 
     // dummy callback method in case no other registered
-    private void dummy()
-    {
-    }
+    private void dummy() { }
 
     class PendingAction
     {
@@ -454,6 +454,53 @@ namespace Telephony
         if (null != _delegate) _delegate(_sessionId);
         _delegate = null;
       }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    // Callback handlers
+    /// <summary>
+    /// Inform GUI to be refreshed 
+    /// </summary>
+    public void updateGui()
+    {
+      if (null != CallStateChanged) CallStateChanged();
+    }
+
+    /// <summary>
+    /// Account state changed
+    /// </summary>
+    /// <param name="accId">account identification</param>
+    /// <param name="regState">state of account</param>
+    public void setAccountState(int accId, int regState)
+    {
+      Config.getAccount(accId).RegState = regState;
+      updateGui();
+    }
+
+    /// <summary>
+    /// Inform about new incoming message 
+    /// </summary>
+    /// <param name="from">identification of sender</param>
+    /// <param name="message">content of message</param>
+    public void setMessageReceived(string from, string message)
+    {
+      if (MessageReceived != null) MessageReceived(from, message);
+    }
+
+    /// <summary>
+    /// Buddy presence state changed
+    /// </summary>
+    /// <param name="buddyId">buddy identification</param>
+    /// <param name="status">buddy status</param>
+    /// <param name="text">buddy status additional text</param>
+    public void setBuddyState(int buddyId, int status, string text)
+    {
+      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
+    }
+
+    public void dtmfDigitReceived(int callId, int digit)
+    {
+      if (DtmfDigitReceived != null) DtmfDigitReceived(callId, digit);
     }
 
     #endregion Events
@@ -739,49 +786,6 @@ namespace Telephony
         // set conference flag
         return;
       }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    // Callback handlers
-
-    /// <summary>
-    /// Inform GUI to be refreshed 
-    /// </summary>
-    public void updateGui()
-    {
-      if (null != CallStateChanged) CallStateChanged();
-    }
-    
-    /// <summary>
-    /// Account state changed
-    /// </summary>
-    /// <param name="accId">account identification</param>
-    /// <param name="regState">state of account</param>
-    public void setAccountState(int accId, int regState)
-    {
-      Config.getAccount(accId).RegState = regState;
-      updateGui();
-    }
-    
-    /// <summary>
-    /// Inform about new incoming message 
-    /// </summary>
-    /// <param name="from">identification of sender</param>
-    /// <param name="message">content of message</param>
-    public void setMessageReceived(string from, string message)
-    {
-      if (MessageReceived!= null) MessageReceived(from, message);
-    }
-
-    /// <summary>
-    /// Buddy presence state changed
-    /// </summary>
-    /// <param name="buddyId">buddy identification</param>
-    /// <param name="status">buddy status</param>
-    /// <param name="text">buddy status additional text</param>
-    public void setBuddyState(int buddyId, int status, string text)
-    {
-      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
