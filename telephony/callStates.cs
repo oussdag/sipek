@@ -15,32 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
  */
+using Common;
 
-namespace Telephony
+
+namespace CallControl
 {
   /// <summary>
   /// 
   /// </summary>
   public enum EStateId  : int 
   {
-    IDLE,
-    CONNECTING,
-    ALERTING, 
-    ACTIVE,
-    RELEASED,
-    INCOMING,
-    HOLDING
+    IDLE = 0x1,
+    CONNECTING = 0x2,
+    ALERTING = 0x4, 
+    ACTIVE = 0x8,
+    RELEASED = 0x10,
+    INCOMING = 0x20,
+    HOLDING = 0x40
   }
-  
-  public enum EServiceCodes : int
-  {
-    SC_CD,
-    SC_CFU,
-    SC_CFNR,
-    SC_DND,
-    SC_3PTY
-  }
-  
+
   public enum EDtmfMode : int
   {
     DM_Outband,
@@ -267,6 +260,12 @@ namespace Telephony
     public override void onAlerting()
     {
       _smref.changeState(EStateId.ALERTING);
+    }
+
+
+    public override void onConnect()
+    {
+      _smref.changeState(EStateId.ACTIVE);
     }
 
     public override bool endCall(int sessionId)

@@ -39,8 +39,8 @@
  */
 
 
-/*! \namespace Telephony
-    \brief Module Telephony is a general Call Automaton engine.
+/*! \namespace CallControl
+    \brief Module CallControl is a general Call Automaton engine.
 
     A more detailed namespace description.
 */
@@ -48,287 +48,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using Common;
 
-namespace Telephony
+namespace CallControl
 {
 
   //////////////////////////////////////////////////////////////////////////
-  #region Null patterns
-  public class NullTimer : ITimer
-  {
-    #region ITimer Members
-    public override void Start() { }
-    public override void Stop() { }
-    public override int Interval
-    {
-      get { return 100; }
-      set { }
-    }
-
-    public override TimerExpiredCallback Elapsed
-    {
-      set { }
-    }
-    #endregion
-  }
-
-  public class NullConfigurator : IConfiguratorInterface
-  {
-    #region IConfiguratorInterface Members
-
-    public override bool CFUFlag
-    {
-      get { return false; }
-      set {}
-    }
-
-    public override string CFUNumber
-    {
-      get { return ""; }
-      set { }
-    }
-
-    public override bool CFNRFlag
-    {
-      get { return false; }
-      set { }
-    }
-
-    public override string CFNRNumber
-    {
-      get { return ""; }
-      set { }
-    }
-
-    public override bool CFBFlag
-    {
-      get { return false; }
-      set { }
-    }
-
-    public override string CFBNumber
-    {
-      get { return ""; }
-      set { }
-    }
-
-    public override bool DNDFlag
-    {
-      get { return false; }
-      set { }
-    }
-
-    public override bool AAFlag
-    {
-      get { return false; }
-      set { }
-    }
-    public override int SIPPort
-    {
-      get { return 5060; }
-      set { }
-    }
-    public override int DefaultAccountIndex
-    {
-      get { return 0; }
-      set { }
-    }
-
-    public override int NumOfAccounts
-    {
-      get { return 1; }
-      set {}
-    }
-
-    public override IAccount getAccount(int index)
-    {
-      return null;
-    }
-
-    public override void Save()
-    {}
-
-    public override List<string> CodecList { get { return null; } set { } }
-
-    #endregion
-
-  }
-
-  public class NullCallProxy : ICallProxyInterface
-  {
-    #region ICallProxyInterface Members
-
-    public int makeCall(string dialedNo, int accountId)
-    {
-      return 1;
-    }
-
-    public bool endCall(int sessionId)
-    {
-      return false;
-    }
-
-    public bool alerted(int sessionId)
-    {
-      return false;
-    }
-
-    public bool acceptCall(int sessionId)
-    {
-      return false;
-    }
-
-    public bool holdCall(int sessionId)
-    {
-      return false;
-    }
-
-    public bool retrieveCall(int sessionId)
-    {
-      return false;
-    }
-
-    public bool xferCall(int sessionId, string number)
-    {
-      return false;
-    }
-
-    public bool xferCallSession(int sessionId, int session)
-    {
-      return false;
-    }
-
-    public bool threePtyCall(int sessionId, int session)
-    {
-      return false;
-    }
-
-    public bool serviceRequest(int sessionId, int code, string dest)
-    {
-      return false;
-    }
-
-    public bool dialDtmf(int sessionId, string digits, int mode)
-    {
-      return false;
-    }
-
-    #endregion
-  }
-
-  public class NullCommonProxy : ICommonProxyInterface
-  {
-    #region ICommonProxyInterface Members
-
-    public int initialize()
-    {
-      return 1;    
-    }
-
-    public int shutdown()
-    {
-      return 1;
-    }
-
-    public int registerAccounts()
-    {
-      return 1;
-    }
-
-    public int registerAccounts(bool renew)
-    {
-      return 1;
-    }
-
-    public int addBuddy(string ident)
-    {
-      return 1;
-    }
-
-    public int delBuddy(int buddyId)
-    {
-      return 1;
-    }
-
-    public int sendMessage(string dest, string message)
-    {
-      return 1;
-    }
-
-    public int setStatus(int accId, EUserStatus presence_state)
-    {
-      return 1;
-    }
-
-    #endregion
-  }
-
-  public class NullMediaProxy : IMediaProxyInterface
-  {
-    #region IMediaProxyInterface Members
-
-    public int  playTone(ETones toneId)
-    {
-      return 1;
-    }
-
-    public int  stopTone()
-    {
-      return 1;
-    }
-    #endregion
-  }
-
-  /// <summary>
-  /// Null Factory implementation
-  /// </summary>
-  public class NullFactory : AbstractFactory
-  {
-    IConfiguratorInterface _config = new NullConfigurator();
-    ICommonProxyInterface _common = new NullCommonProxy();
-    IMediaProxyInterface _media = new NullMediaProxy();
-    ICallLogInterface _logger = new CNullCallLog();
-
-    #region AbstractFactory members
-    // factory methods
-    public ITimer createTimer()
-    {
-      return new NullTimer();
-    }
-
-    //TODO
-    public ICallProxyInterface createCallProxy() 
-    {
-      return new NullCallProxy();
-    }
-
-    public ICommonProxyInterface getCommonProxy()
-    {
-      return _common;
-    }
-
-    public IConfiguratorInterface getConfigurator()
-    {
-      return _config;
-    }
-
-    // Implement getters
-    public IMediaProxyInterface getMediaProxy() 
-    { 
-      return _media; 
-    }
-
-    public ICallLogInterface getCallLogger() 
-    { 
-      return _logger;
-    }
-    #endregion
-  }
-
-  #endregion
-
-  //////////////////////////////////////////////////////////////////////////
-
   /// <summary>
   /// CCallManager
   /// Main telephony class
@@ -342,8 +67,6 @@ namespace Telephony
     private Dictionary<int, CStateMachine> _calls;  //!< Call table
 
     private AbstractFactory _factory = new NullFactory();
-
-    delegate void PendingDelegate(int sessionId); // for onUserAnswer
 
     PendingAction _pendingAction;
  
@@ -402,6 +125,10 @@ namespace Telephony
 
     #region Constructor
 
+    /// <summary>
+    /// CCallManager Singleton
+    /// </summary>
+    /// <returns></returns>
     public static CCallManager getInstance()
     { 
       if (_instance == null)
@@ -411,49 +138,63 @@ namespace Telephony
       return _instance;
     }
 
-    protected CCallManager()
-    {
-    }
-
     #endregion Constructor
 
     #region Events
 
-    public delegate void CallStateChangedDelegate();  // define callback type 
-    public delegate void MessageReceivedCallbackDelegate(string from, string message);  // define callback type 
-    public delegate void BuddyStatusCallbackDelegate(int buddyId, int status, string text);  // define callback type 
-    public delegate void DtmfDigitCallbackDelegate(int callId, int digit);  // define callback type 
+    public delegate void DCallStateRefresh();  // define callback type 
+    public event DCallStateRefresh CallStateRefresh;
 
-    public event CallStateChangedDelegate CallStateChanged;
-    public event MessageReceivedCallbackDelegate MessageReceived;
-    public event BuddyStatusCallbackDelegate BuddyStatusChanged;
-    public event DtmfDigitCallbackDelegate DtmfDigitReceived;
+    enum EPendingActions : int
+    {
+      EUserAnswer,
+      ECreateSession,
+      EUserHold
+    };
 
-    // dummy callback method in case no other registered
-    private void dummy() { }
-
+    /// <summary>
+    /// 
+    /// </summary>
     class PendingAction
     {
-      private PendingDelegate _delegate;
+      delegate void DPendingAnswer(int sessionId); // for onUserAnswer
+      delegate void DPendingCreateSession(string number, int accountId); // for CreateOutboudCall
+
+      private EPendingActions _actionType;
       private int _sessionId;
+      private int _accountId;
       private string _number;
 
-      public PendingAction(PendingDelegate fctr, int sessionId)
-        : this(fctr, sessionId, "")
-      { }
 
-      public PendingAction(PendingDelegate fctr, int sessionId, string number)
+      public PendingAction(EPendingActions action, int sessionId)
       {
-        _delegate = fctr;
+        _actionType = action;
         _sessionId = sessionId;
+      }
+      public PendingAction(EPendingActions action, string number, int accId)
+      {
+        _actionType = action;
+        _sessionId = -1;
         _number = number;
+        _accountId = accId;
       }
 
       public void Activate()
       {
-        if (null != _delegate) _delegate(_sessionId);
-        _delegate = null;
+        switch (_actionType)
+        {
+          case EPendingActions.EUserAnswer:
+            CCallManager.getInstance().onUserAnswer(_sessionId);
+            break;
+          case EPendingActions.ECreateSession:
+            CCallManager.getInstance().createOutboundCall(_number, _accountId);
+        	  break;
+          case EPendingActions.EUserHold:
+            CCallManager.getInstance().onUserHoldRetrieve(_sessionId);
+            break;
+        }
       }
+
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -463,65 +204,32 @@ namespace Telephony
     /// </summary>
     public void updateGui()
     {
-      if (null != CallStateChanged) CallStateChanged();
-    }
-
-    /// <summary>
-    /// Account state changed
-    /// </summary>
-    /// <param name="accId">account identification</param>
-    /// <param name="regState">state of account</param>
-    public void setAccountState(int accId, int regState)
-    {
-      Config.getAccount(accId).RegState = regState;
-      updateGui();
-    }
-
-    /// <summary>
-    /// Inform about new incoming message 
-    /// </summary>
-    /// <param name="from">identification of sender</param>
-    /// <param name="message">content of message</param>
-    public void setMessageReceived(string from, string message)
-    {
-      if (MessageReceived != null) MessageReceived(from, message);
-    }
-
-    /// <summary>
-    /// Buddy presence state changed
-    /// </summary>
-    /// <param name="buddyId">buddy identification</param>
-    /// <param name="status">buddy status</param>
-    /// <param name="text">buddy status additional text</param>
-    public void setBuddyState(int buddyId, int status, string text)
-    {
-      if (BuddyStatusChanged != null) BuddyStatusChanged(buddyId, status, text);
-    }
-
-    public void dtmfDigitReceived(int callId, int digit)
-    {
-      if (DtmfDigitReceived != null) DtmfDigitReceived(callId, digit);
+      if (null != CallStateRefresh) CallStateRefresh();
     }
 
     #endregion Events
 
-
-    #region Methods
+    #region Public methods
 
     ///////////////////////////////////////////////////////////////////
     /// Common routines
 
     public int initialize()
     {
+      int status = 0;
       ///
       if (!isInitialized)
       {
-        CallStateChanged += dummy;
+        // register to signaling proxy interface
+        Factory.getCommonProxy().CallStateChanged += OnCallStateChanged;
+        Factory.getCommonProxy().CallIncoming += OnIncomingCall;
+        Factory.getCommonProxy().CallNotification += OnCallNotification;
 
         // Initialize call table
         _calls = new Dictionary<int, CStateMachine>(); 
         
-        Factory.getCommonProxy().initialize();
+        status = Factory.getCommonProxy().initialize();
+        if (status != 0) return status;
 
         Factory.getCommonProxy().registerAccounts(false);
       }
@@ -531,10 +239,13 @@ namespace Telephony
         Factory.getCommonProxy().registerAccounts(true); 
       }
       _initialized = true;
-      return 1;
+      return status;
     }
 
-    public void shutdown()
+    /// <summary>
+    /// Shutdown telephony
+    /// </summary>
+    public void Shutdown()
     {
       this.CallList.Clear();
       Factory.getCommonProxy().shutdown();
@@ -561,6 +272,11 @@ namespace Telephony
     public CStateMachine createOutboundCall(string number, int accountId)
     {
       // check if current call automatons allow session creation.
+      if (this.getNoCallsInStates((int)(EStateId.CONNECTING | EStateId.ALERTING)) > 0)
+      {
+        // new call not allowed!
+        return null;
+      }
       // if at least 1 connected try to put it on hold
       if (this.getNoCallsInState(EStateId.ACTIVE) == 0)
       {
@@ -575,6 +291,7 @@ namespace Telephony
           return null;
         }
         // update call table
+        // TODO catch argument exception (same key)!!!!
         call.Session = newsession;
         _calls.Add(newsession, call);
         return call;
@@ -582,7 +299,10 @@ namespace Telephony
       else // we have at least one ACTIVE call
       {
         // put connected call on hold
-        // TODO
+        // TODO pending action
+        _pendingAction = new PendingAction(EPendingActions.ECreateSession, number, accountId);
+        CStateMachine call = getCallInState(EStateId.ACTIVE); 
+        call.getState().holdCall(call.Session);
       }
       return null;
     }
@@ -661,6 +381,19 @@ namespace Telephony
       return cnt;
     }
 
+    private int getNoCallsInStates(int states)
+    {
+      int cnt = 0;
+      foreach (KeyValuePair<int, CStateMachine> kvp in _calls)
+      {
+        if ((states & (int)kvp.Value.getStateId()) == (int)kvp.Value.getStateId())
+        {
+          cnt++;
+        }
+      }
+      return cnt;
+    }
+
     /// <summary>
     /// Collect statemachines being in a given state
     /// </summary>
@@ -709,7 +442,7 @@ namespace Telephony
 
         // set ANSWER event pending for HoldConfirm
         // TODO
-        _pendingAction = new PendingAction(onUserAnswer, session);
+        _pendingAction = new PendingAction(EPendingActions.EUserAnswer, session);
         return;
       }
       this[session].getState().acceptCall(session);
@@ -738,7 +471,7 @@ namespace Telephony
           if (null != sm) sm.getState().holdCall(sm.Session);
 
           // set Retrieve event pending for HoldConfirm
-          _pendingAction = new PendingAction(onUserHoldRetrieve, session);
+          _pendingAction = new PendingAction(EPendingActions.EUserHold, session);
           return;
         }
 
@@ -788,11 +521,77 @@ namespace Telephony
       }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 
+    /// </summary>
     public void activatePendingAction()
     {
       if (null != _pendingAction) _pendingAction.Activate();
       _pendingAction = null;
+    }
+    
+    #endregion  // public methods
+
+    #region Private Methods
+    ////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="callId"></param>
+    /// <param name="callState"></param>
+    private void OnCallStateChanged(int callId, int callState, string info)
+    {
+      //    PJSIP_INV_STATE_NULL,	    /**< Before INVITE is sent or received  */
+      //    PJSIP_INV_STATE_CALLING,	    /**< After INVITE is sent		    */
+      //    PJSIP_INV_STATE_INCOMING,	    /**< After INVITE is received.	    */
+      //    PJSIP_INV_STATE_EARLY,	    /**< After response with To tag.	    */
+      //    PJSIP_INV_STATE_CONNECTING,	    /**< After 2xx is sent/received.	    */
+      //    PJSIP_INV_STATE_CONFIRMED,	    /**< After ACK is sent/received.	    */
+      //    PJSIP_INV_STATE_DISCONNECTED,   /**< Session is terminated.		    */
+      //if (callState == 2) return 0;
+
+      CStateMachine sm = getCall(callId);
+      if (sm == null) return;
+
+      switch (callState)
+      {
+        case 1:
+          //sm.getState().onCalling();
+          break;
+        case 2:
+          //sm.getState().incomingCall("4444");
+          break;
+        case 3:
+          sm.getState().onAlerting();
+          break;
+        case 4:
+          sm.getState().onConnect();
+          break;
+        case 6:
+          sm.getState().onReleased();
+          break;
+      }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="callId"></param>
+    /// <param name="number"></param>
+    /// <param name="info"></param>
+    private void OnIncomingCall(int callId, string number, string info)
+    {
+      CStateMachine sm = createSession(callId, number);
+      sm.getState().incomingCall(number, info);
+    }
+
+    private void OnCallNotification(int callId, ECallNotification notFlag, string text)
+    {
+      if (notFlag == ECallNotification.CN_HOLDCONFIRM)
+      {
+        CStateMachine sm = this.getCall(callId);
+        if (sm != null) sm.getState().onHoldConfirm();
+      }
     }
 
     #endregion Methods

@@ -7,7 +7,7 @@
     <ProjectGuid>{7C60E672-0016-457E-9D23-445F88FB1640}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Telephony</RootNamespace>
+    <RootNamespace>CallControl</RootNamespace>
     <AssemblyName>Telephony</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
