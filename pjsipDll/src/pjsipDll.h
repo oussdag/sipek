@@ -36,6 +36,7 @@ typedef int __stdcall fptr_callretrieveconf(int);
 typedef int __stdcall fptr_msgrec (char*, char*);
 typedef int __stdcall fptr_buddystatus(int, int, const char*);
 typedef int __stdcall fptr_dtmfdigit(int callId, int digit);
+typedef int __stdcall fptr_mwi(int mwi, char* info);
 
 // Callback registration 
 extern "C" PJSIPDLL_DLL_API int onRegStateCallback(fptr_regstate cb);	  // register registration notifier
@@ -47,6 +48,7 @@ extern "C" PJSIPDLL_DLL_API int onCallHoldConfirmCallback(fptr_callholdconf cb);
 extern "C" PJSIPDLL_DLL_API int onMessageReceivedCallback(fptr_msgrec cb); // register call notifier
 extern "C" PJSIPDLL_DLL_API int onBuddyStatusChangedCallback(fptr_buddystatus cb); // register call notifier
 extern "C" PJSIPDLL_DLL_API int onDtmfDigitCallback(fptr_dtmfdigit cb); // register dtmf digit notifier
+extern "C" PJSIPDLL_DLL_API int onMessageWaitingCallback(fptr_mwi cb); // register MWI notifier
 
 // pjsip common API
 extern "C" PJSIPDLL_DLL_API int dll_init(int listenPort);

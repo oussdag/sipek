@@ -38,6 +38,7 @@ static fptr_callretrieveconf* cb_callretrieveconf = 0;
 static fptr_buddystatus* cb_buddystatus = 0;
 static fptr_msgrec* cb_messagereceived = 0;
 static fptr_dtmfdigit* cb_dtmfdigit = 0;
+static fptr_mwi* cb_mwi = 0;
 
 
 enum {
@@ -136,6 +137,51 @@ static struct app_config
 //#define current_acc	pjsua_acc_get_default()
 static pjsua_call_id	current_call = PJSUA_INVALID_ID;
 
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// Request handler to receive out-of-dialog NOTIFY (from Asterisk)
+static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
+{
+	if (strstr(pj_strbuf(&rdata->msg_info.msg->line.req.method.name),
+		"NOTIFY"))
+	{
+		pjsip_generic_string_hdr * hdr;
+		pj_str_t did_str = pj_str("Event");
+		hdr = (pjsip_generic_string_hdr*) pjsip_msg_find_hdr_by_name(rdata->msg_info.msg, &did_str, NULL);
+		if (!hdr) return false;
+
+		// We have an event header, now determine if it's contents are "message-summary"
+		if (pj_strcmp2(&hdr->hvalue, "message-summary")) return false;
+
+		pjsip_msg_body * body_p = rdata->msg_info.msg->body;
+
+		char* buf = (char*)pj_pool_alloc(app_config.pool, body_p->len);
+		memcpy(buf, body_p->data, body_p->len);
+
+		// Process body message as desired...
+		if (strstr(buf, "Messages-Waiting: yes") != 0)
+		{
+			if (cb_mwi != 0) cb_mwi(1, buf);
+		}
+		else
+		{
+			if (cb_mwi != 0) cb_mwi(0, buf);
+		}
+
+	}
+
+	pjsip_endpt_respond_stateless(pjsip_ua_get_endpt(pjsip_ua_instance()),
+		rdata, 200, NULL,
+		NULL, NULL);
+
+	return PJ_TRUE;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
 /* Set default config. */
 static void default_config(struct app_config *cfg)
 {
@@ -217,6 +263,12 @@ PJSIPDLL_DLL_API int onDtmfDigitCallback(fptr_dtmfdigit cb)
 {
   cb_dtmfdigit = cb;
   return 1;
+}
+
+PJSIPDLL_DLL_API int onMessageWaitingCallback(fptr_mwi cb)
+{
+	cb_mwi = cb;
+	return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -467,6 +519,23 @@ PJSIPDLL_DLL_API int dll_init(int listenPort)
 	status = pjsua_init(&app_config.cfg, &app_config.log_cfg,	&app_config.media_cfg);
 	if (status != PJ_SUCCESS)
 		return status;
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// Registering new Module for Notify handling....
+	static pjsip_module MyModule; // cannot be a stack variable
+
+	memset(&MyModule, 0, sizeof(MyModule));
+	MyModule.id = -1;
+	MyModule.priority = PJSIP_MOD_PRIORITY_APPLICATION+1;
+	MyModule.on_rx_request = &on_rx_request;
+	MyModule.name = pj_str("My-Module");
+
+	status = pjsip_endpt_register_module(pjsip_ua_get_endpt(pjsip_ua_instance()), &MyModule);
+	if (status != PJ_SUCCESS) {
+		exit(1);
+	}
+	//////////////////////////////////////////////////////////////////////////
 
 #ifdef STEREO_DEMO
 	stereo_demo();
@@ -889,9 +958,16 @@ pjsua_codec_info c[32];
 unsigned i, count = PJ_ARRAY_SIZE(c);
 
 	pjsua_enum_codecs(c, &count);
+	
 	if (index >= count) return "";
 
-	return c[index].codec_id.ptr;
+	PJ_LOG(3,(THIS_FILE,"Codec %s: %d", (int)c[index].codec_id.ptr, c[index].codec_id.slen ));
+	
+	char codecId[256] = {0};
+	
+	strncpy(codecId , c[index].codec_id.ptr, c[index].codec_id.slen);
+
+	return &codecId[0];
 }	
 
 int dll_setCodecPriority(char* name, int prio)
