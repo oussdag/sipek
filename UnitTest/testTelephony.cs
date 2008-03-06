@@ -19,9 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Telephony;
-
+using CallControl;
+using Common;
 using NUnit.Framework;
+
 
 namespace UnitTest
 {
@@ -54,44 +55,61 @@ namespace UnitTest
   public class MockCommonProxy : ICommonProxyInterface
   {
     #region CCommonProxyInterface Members
-    public int initialize()
+    public override int initialize()
     {
       return 1;
     }
-    public int shutdown()
+    public override int shutdown()
     {
       return 1;
     }
 
-    public int registerAccounts()
+    public override int registerAccounts()
     {
       return registerAccounts(false);
     }
-    public int registerAccounts(bool renew)
+    public override int registerAccounts(bool renew)
     {
       return 1;
     }
 
-    public int addBuddy(string ident)
+    public override int addBuddy(string ident)
     {
       return 1;
     }
 
-    public int delBuddy(int buddyId)
+    public override int delBuddy(int buddyId)
     {
       return 1;
     }
 
-    public int sendMessage(string dest, string message)
+    public override int sendMessage(string dest, string message)
     {
       return 1;
     }
 
-    public int setStatus(int accId, EUserStatus status)
+    public override int setStatus(int accId, EUserStatus status)
     {
       return 1;
     }
+
+    public override void setCodecPrioroty(string item, int p)
+    {
+      throw new Exception("The method or operation is not implemented.");
+    }
+
+    public override int getNoOfCodecs()
+    {
+      throw new Exception("The method or operation is not implemented.");
+    }
+
+    public override string getCodec(int i)
+    {
+      throw new Exception("The method or operation is not implemented.");
+    }
+
     #endregion
+
   }
 
   public class MockMediaProxy : IMediaProxyInterface
@@ -124,7 +142,7 @@ namespace UnitTest
     public void Destroy()
     {
       Assert.AreEqual(0, _manager.Count);
-      _manager.shutdown();
+      _manager.Shutdown();
     }
 
     /// <summary>
