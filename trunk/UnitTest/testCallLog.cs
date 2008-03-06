@@ -4,7 +4,8 @@ using System.Text;
 
 using NUnit.Framework;
 using Sipek;
-using Telephony;
+using CallControl;
+using Common;
 
 namespace UnitTest
 {
