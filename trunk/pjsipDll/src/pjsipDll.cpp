@@ -962,12 +962,13 @@ unsigned i, count = PJ_ARRAY_SIZE(c);
 	if (index >= count) return "";
 
 	PJ_LOG(3,(THIS_FILE,"Codec %s: %d", (int)c[index].codec_id.ptr, c[index].codec_id.slen ));
-	
-	char codecId[256] = {0};
+	// is this memleak?
+	char* codecId = new char[256];
+	memset(codecId, 0, 256);
 	
 	strncpy(codecId , c[index].codec_id.ptr, c[index].codec_id.slen);
 
-	return &codecId[0];
+	return codecId;
 }	
 
 int dll_setCodecPriority(char* name, int prio)
