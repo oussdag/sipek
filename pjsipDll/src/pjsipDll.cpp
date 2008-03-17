@@ -663,15 +663,6 @@ int dll_registerAccount(char* uri, char* reguri, char* domain, char* username, c
 {
 pjsua_acc_config thisAccountsCfg; 
 
-	// sasacoh:::temporarily added here!!!
-	// disable all codecs
-	pjsua_codec_info c[32];
-	unsigned i, count = PJ_ARRAY_SIZE(c);
-	pjsua_enum_codecs(c, &count);
-	for (i=0; i<count; ++i) {
-		pjsua_codec_set_priority(&c[i].codec_id, (pj_uint8_t)(PJMEDIA_CODEC_PRIO_DISABLED));
-	}
-
 	pjsua_acc_config_default(&thisAccountsCfg);
 
 	//4.) set parameters 
